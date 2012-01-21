@@ -146,7 +146,7 @@ Font.prototype.ondownloaded = function() {
   var numTables = ushort(data[4], data[5]);
   var tagStart = 12, ptr, end = tagStart + 16 * numTables, tags={};
   for(ptr = tagStart; ptr<end; ptr += 16) {
-    tag = String.fromCharCode(data[ptr]) + String.fromCharCode(data[ptr+1]) + String.fromCharCode(data[ptr+2]) + String.fromCharCode(data[ptr+3]);
+    tag = chr(data[ptr]) + chr(data[ptr+1]) + chr(data[ptr+2]) + chr(data[ptr+3]);
     tags[tag] = {
       name: tag,
       checksum: ulong(data[ptr+4], data[ptr+5], data[ptr+6], data[ptr+7]),
