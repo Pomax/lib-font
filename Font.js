@@ -1,8 +1,11 @@
 /**
+
   This library adds Font objects to the general pool
   of available JavaScript objects.
 
   (c) Mike "Pomax" Kamermans, 2012
+  Licensed under MIT ("expat" flavour) license.
+
 **/
 
 // Make sure type arrays are available in IE9
@@ -50,10 +53,16 @@
  **/
 function Font() {}
 
+// if this is not specified, a random name is used
 Font.prototype.fontFamily = "fjs"+(999999*Math.random()|0);
+
+// the font resource URL
 Font.prototype.url = "";
+
+// the font's format ('truetype' for TT-OTF or 'opentype' for CFF-OTF)
 Font.prototype.format = "";
 
+// the font's byte code
 Font.prototype.data = "";
 
 // these metrics represent the font-indicated values,
@@ -67,25 +76,52 @@ Font.prototype.metrics = {
   weightclass: 400
 };
 
-// This gets called when the file is done downloading.
+
+/**
+ * validation function to see if the zero-width styled
+ * text is no longer zero-width. If this is true, the
+ * font is properly done loading. If this is false, the
+ * function calls itself via a timeout
+ */
+Font.prototype.validate = function(target, zero, mark, font) {
+  var computedStyle = document.defaultView.getComputedStyle(target,"");
+  var width = computedStyle.getPropertyValue("width").replace("px",'');
+  if(width>0) {
+    document.head.removeChild(zero);
+    document.head.removeChild(mark);
+    document.body.removeChild(target);
+    this.onload();
+  } else { 
+    // font has not finished loading - wait 50ms and try again
+    setTimeout(function() { font.validate(target, zero, mark, font); }, 50); }
+};
+
+/**
+ * This gets called when the file is done downloading.
+ */
 Font.prototype.ondownloaded = function() {
+  // decimal to character
   var chr = function(val) {
     return String.fromCharCode(val);
   };
 
+  // unsigned short to decimal
   var ushort = function(b1,b2) {
     return 256*b1 + b2;
   };
   
+  // signed short to decimal
   var fword = function(b1,b2) {
-    var val, negative = b1>>7===1;
+    var negative = b1>>7===1, val;
     b1 = b1 & 0x7F;
-    // position numbers are already done
-    if(!negative) { return 256*b1 + b2; }
+    val = 256*b1 + b2;
+    // positive numbers are already done
+    if(!negative) { return val; }
     // negative numbers need the two's complement treatment
-    return -(256*(~b1&0x7F) + (~b2&0x7f) + 1);
+    return  val - 0x8000;
   }
 
+  // unsigned long to decimal
   var ulong = function(b1,b2,b3,b4) {
     return 16777216*b1 + 65536*b2 + 256*b3 + b4;
   };
@@ -103,9 +139,10 @@ Font.prototype.ondownloaded = function() {
   else if(isCFF) { this.format = "opentype"; }
   else { throw("Error: file at "+this.url+" cannot be interpreted as OpenType font."); }
 
-  // if we get here, the font is good. Extract font metrics,
-  // and then wait for it to be available for styling.
+  // if we get here, the font is good. Extract some font metrics,
+  // and then wait for the font to be available for on-page styling.
 
+  // first, we parse the SFNT header data
   var numTables = ushort(data[4], data[5]);
   var tagStart = 12, ptr, end = tagStart + 16 * numTables, tags={};
   for(ptr = tagStart; ptr<end; ptr += 16) {
@@ -117,14 +154,14 @@ Font.prototype.ondownloaded = function() {
       length:   ulong(data[ptr+12], data[ptr+13], data[ptr+14], data[ptr+15]) };
   }
   
-  // access HEAD table (for "units per EM" value)
+  // then we access HEAD table for the "units per EM" value
   tag = "head";
   if(!tags[tag]) { throw("Error: font is missing the OpenType '"+tag+"' table."); }
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1] + data[ptr+2] + data[ptr+3];
   this.metrics.quadsize = ushort(data[ptr+18], data[ptr+19]);
 
-  // access HHEA table (for ascent/descent/leading values)
+  // followed by the HHEA table for ascent/descent/leading values
   tag = "hhea";
   if(!tags[tag]) { throw("Error: font is missing the OpenType '"+tag+"' table."); }
   ptr = tags[tag].offset;
@@ -133,12 +170,16 @@ Font.prototype.ondownloaded = function() {
   this.metrics.descent = fword(data[ptr+6], data[ptr+7]);
   this.metrics.leading = fword(data[ptr+8], data[ptr+9]);
 
-  // access OS/2 table (for font-indicated weight class)
+  // and then finally the OS/2 table for the font-indicated weight class.
   tag ="OS/2";
   if(!tags[tag]) { throw("Error: font is missing the OpenType '"+tag+"' table."); }
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1];
   this.metrics.weightclass = ushort(data[ptr+4], data[ptr+5]);
+
+  // Then the mechanism for determining whether the font is not
+  // just done downloading, but also fully parsed and ready for
+  // use on the page for typesetting.
 
   // For the moment we use a test font that has a hard coded "A",
   // but what we really want to do is grab a glyph we know exists
@@ -160,7 +201,7 @@ Font.prototype.ondownloaded = function() {
                "QABAAAAAAADAAEECQACAAIAAAAAAAEAAAAAAAAAAAAAAA"+
                "AAAA==";
   
-  // test font stylesheet
+  // test font stylesheet, using the zero-width font
   var tfName = this.fontFamily+" testfont";
   var zerowidth = document.createElement("style");
   zerowidth.setAttribute("type","text/css");
@@ -170,44 +211,30 @@ Font.prototype.ondownloaded = function() {
                         "       format('truetype');}";
   document.head.appendChild(zerowidth);
   
-  // validation stylesheet
+  // validation stylesheet, using the requested font
   var realfont = this.toStyleNode();
   document.head.appendChild(realfont);
 
-  // validation paragraph
+  // validation paragraph, consisting of the zero-width character
   var para = document.createElement("p");
   para.style.cssText = "position: absolute; top: 0; left: 0; opacity: 1.0;";
   para.style.fontFamily = "'"+this.fontFamily+"', '"+tfName+"'";
   para.innerHTML = "AAAAAAAAAA";
   document.body.appendChild(para);
 
-  // if there is no getComputedStyle, claim loading is done.
+  // Quasi-error: if there is no getComputedStyle, claim loading is done.
   if(!document.defaultView.getComputedStyle) {
     this.onload();
     throw("Error: document.defaultView.getComputedStyle is not supported by this browser.\n"+
-           "Consequently, Font.onload cannot be trusted."); }
+           "Consequently, Font.onload() cannot be trusted."); }
 
-  // if there is getComputedStyle, we do proper load completion verification, instead.
+  // If there is getComputedStyle, we do proper load completion verification.
   else { this.validate(para, zerowidth, realfont, this); }
 };
 
-// validation function to see if the zero-width styled
-// text is no longer zero-width. If this is true, the
-// font is properly done loading.
-Font.prototype.validate = function(target, zero, mark, font) {
-  var computedStyle = document.defaultView.getComputedStyle(target,"");
-  var width = computedStyle.getPropertyValue("width").replace("px",'');
-  if(width>0) {
-    document.head.removeChild(zero);
-    document.head.removeChild(mark);
-    document.body.removeChild(target);
-    this.onload();
-  } else { 
-    // font has not finished loading - wait 50ms and try again
-    setTimeout(function() { font.validate(target, zero, mark, font); }, 50); }
-};
-
-// this gets called when src is set
+/**
+ * This gets called when font.src is set
+ */
 Font.prototype.loadFont = function() {
   var font = this;
   var xhr = new XMLHttpRequest();
@@ -223,14 +250,23 @@ Font.prototype.loadFont = function() {
   xhr.send(null);  
 };
 
-// this gets called once the font is done loading,
-// and all its metrics have been determined.
-Font.prototype.onload = function() {
-};
+/**
+ * This function gets called once the font is done
+ * loading, its metrics have been determined, and it
+ * has been parsed for use on-page. By default, this
+ * function does nothing, and users can bind their
+ * own handler function.
+ */
+Font.prototype.onload = function() {};
 
 // The stylenode can be added to the document head
 // to make the font available for on-page styling.
 Font.prototype.styleNode = false;
+
+/**
+ * Get the DOM node associated with this Font
+ * object, for page-injection.
+ */
 Font.prototype.toStyleNode = function() {
   if(this.styleNode) { return this.styleNode; }
   this.styleNode = document.createElement("style");
@@ -242,8 +278,10 @@ Font.prototype.toStyleNode = function() {
   return this.styleNode;
 }
 
-// we want Font to do the same thing Image does when
-// we set the "src" property value, so we use the 
-// Object.defineProperty function to bind a setter
-// that does more than just bind values.
+/**
+ * we want Font to do the same thing Image does when
+ * we set the "src" property value, so we use the 
+ * Object.defineProperty function to bind a setter
+ * that does more than just bind values.
+ */
 Object.defineProperty(Font.prototype, "src", { set: function(url) { this.url=url; this.loadFont(); }});
