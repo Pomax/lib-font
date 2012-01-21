@@ -6,7 +6,46 @@ for use, as browsers can tell you when a font has
 downloaded, but not when it has been parsed and made
 ready for on-page rendering. This object can.
 
-A demonstrator for this can be found at:
+The API is pretty straight forward:
+
+  var font = new Font();
+  font.onload = function() {
+    /* your handling code goes here. Available values:
+       
+       - font.metrics, which is an object with the
+         following structure:
+
+         {
+           quadsize: <num>,    the font'sunits-per-em,
+           leading: <num>,     the font's line height,
+           ascent: <num>,      the font's maximum ascent,
+           descent: <num>,     the font's maximum descent,
+           weightclass: <num>, the font's "official" weight
+         }
+       
+       - font.fontFamily, the CSS "font-family: ..." value
+
+       - font.url, the CSS "url(...)" value
+
+       - font.format, the CSS "format(...)" value
+
+       - font.data, the font's byte code, as Int8Array
+
+       - font.styleNode, the font's associated <style>
+         element. However, this should be obtained using
+         font.toStyleNode() instead, rather than accessing
+         the property directly (you can, but you shouldn't)
+    */
+  };
+  font.fontFamily = "used for css font-family";
+  font.src = "url://for.your.font/file.ttf";
+
+When font.src is set, the whole shebang kicks in, just
+like for new Image(), so make sure to define your onload()
+handler BEFORE setting the "src" property, or your handler
+may not get called.
+
+A demonstrator of this object can be found at:
 
   http://pomax.nihongoresources.com/pages/Font.js
 
