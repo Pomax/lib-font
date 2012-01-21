@@ -1,0 +1,14 @@
+Font.js adds new Font() functionality to the JavaScript
+toolbox, akin to how you use new Image() for images. It
+adds an onload event hook so that you don't deploy a
+font resource on your webpage before it's actually ready
+for use, as browsers can tell you when a font has
+downloaded, but not when it has been parsed and made
+ready for on-page rendering. This object can.
+
+A demonstrator for this can be found at:
+
+  http://pomax.nihongoresources.com/pages/Font.js
+
+This code is (c) Mike "Pomax" Kamermans, 2012, but
+licensed under the MIT ("expat" flavour) license.
