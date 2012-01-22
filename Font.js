@@ -37,7 +37,9 @@
 // Also make sure XHR understands typing.
 // Code borrowed from pdf.js (https://gist.github.com/1057924)
 (function() {
-  if(window.opera) return; // fairly necessary, since Opera actually already works
+  // This line is necessary since Opera actually already works.
+  // Leaving it out actual breaks typed XHR in Opera. Not sure why.
+  if(window.opera) return;
   if ("response" in XMLHttpRequest.prototype ||
       "mozResponseArrayBuffer" in XMLHttpRequest.prototype || 
       "mozResponse" in XMLHttpRequest.prototype ||
@@ -48,7 +50,7 @@
 
 /**
 
-  Code starts here!
+  Not-borrowed-code starts here!
 
  **/
 function Font() {}
@@ -100,9 +102,24 @@ Font.prototype.validate = function(target, zero, mark, font) {
  * This gets called when the file is done downloading.
  */
 Font.prototype.ondownloaded = function() {
-  // decimal to character
+  // decimal to character.
   var chr = function(val) {
     return String.fromCharCode(val);
+  };
+  
+  // decimal to ushort
+  var chr16 = function(val) {
+    if(val<256) return chr(0) + chr(val);
+    var b1 = val >> 8;
+    var b2 = val & 0xFF;
+    return chr(b1) + chr(b2);
+  };
+
+  // decimal to hexadecimal
+  // See http://phpjs.org/functions/dechex:382
+  var dechex =  function(val) {
+    if (val < 0) { val = 0xFFFFFFFF + val + 1; }
+    return parseInt(val, 10).toString(16);
   };
 
   // unsigned short to decimal
@@ -119,7 +136,7 @@ Font.prototype.ondownloaded = function() {
     if(!negative) { return val; }
     // negative numbers need the two's complement treatment
     return  val - 0x8000;
-  }
+  };
 
   // unsigned long to decimal
   var ulong = function(b1,b2,b3,b4) {
@@ -154,36 +171,71 @@ Font.prototype.ondownloaded = function() {
       length:   ulong(data[ptr+12], data[ptr+13], data[ptr+14], data[ptr+15]) };
   }
   
+  // error shortcut function
+  var checkTableError = function(tag) {
+    if(!tags[tag]) { throw("Error: font is missing the required OpenType '"+tag+"' table."); }
+    return tag;
+  }
+  
   // then we access HEAD table for the "units per EM" value
-  tag = "head";
-  if(!tags[tag]) { throw("Error: font is missing the OpenType '"+tag+"' table."); }
+  tag = checkTableError("head");
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1] + data[ptr+2] + data[ptr+3];
-  this.metrics.quadsize = ushort(data[ptr+18], data[ptr+19]);
+  var unitsPerEm = ushort(data[ptr+18], data[ptr+19]);
+  this.metrics.quadsize = unitsPerEm;
 
   // followed by the HHEA table for ascent/descent/leading values
-  tag = "hhea";
-  if(!tags[tag]) { throw("Error: font is missing the OpenType '"+tag+"' table."); }
+  tag = checkTableError("hhea");
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1] + data[ptr+2] + data[ptr+3];
-  this.metrics.ascent  = fword(data[ptr+4], data[ptr+5]);
-  this.metrics.descent = fword(data[ptr+6], data[ptr+7]);
-  this.metrics.leading = fword(data[ptr+8], data[ptr+9]);
+  this.metrics.ascent  = fword(data[ptr+4], data[ptr+5]) / unitsPerEm;
+  this.metrics.descent = fword(data[ptr+6], data[ptr+7]) / unitsPerEm;
+  this.metrics.leading = fword(data[ptr+8], data[ptr+9]) / unitsPerEm;
 
   // and then finally the OS/2 table for the font-indicated weight class.
-  tag ="OS/2";
-  if(!tags[tag]) { throw("Error: font is missing the OpenType '"+tag+"' table."); }
+  tag = checkTableError("OS/2");
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1];
   this.metrics.weightclass = ushort(data[ptr+4], data[ptr+5]);
 
   // Then the mechanism for determining whether the font is not
   // just done downloading, but also fully parsed and ready for
-  // use on the page for typesetting.
+  // use on the page for typesetting: we pick a letter that we know
+  // is supported by the font, and generate a font that implements
+  // only that letter, as a zero-width glyph. We can then test
+  // whether the font is available by checking whether a paragraph
+  // consisting of just that letter, styled with "desiredfont, zwfont"
+  // has zero width, or a real width. As long as it's zero width, the
+  // font has not finished loading yet.
 
-  // For the moment we use a test font that has a hard coded "A",
-  // but what we really want to do is grab a glyph we know exists
-  // in the font, instead, like in github.com/Pomax/Minimal-font-generator
+  // To find a letter, we must consult the character map
+  tag = checkTableError("cmap");
+  ptr = tags[tag].offset;
+  tags[tag].version = "" + data[ptr] + data[ptr+1];
+  numTables = ushort(data[ptr+2], data[ptr+3]);
+
+  // For the moment, we only look for windows/unicode records, with
+  // a cmap subtable format 4 (= {3,1->4}) because OTS (the sanitiser
+  // used in Chrome and Firefox) does not actually support anything
+  // else at the moment.
+  //
+  // When http://code.google.com/p/chromium/issues/detail?id=110175
+  // is resolved, remember to stab me to add support for the other
+  // maps, too.
+  var encodingRecord, rptr, platformID, encodingID, offset, cmap314=false;
+  for(var encodingRecord=0; encodingRecord<numTables; encodingRecord++) {
+    rptr = ptr + 4 + encodingRecord*8;
+    platformID = ushort(data[rptr], data[rptr+1]);
+    encodingID = ushort(data[rptr+2], data[rptr+3]); 
+    offset     =  ulong(data[rptr+4], data[rptr+5],data[rptr+6], data[rptr+7]);
+    if(platformID===3 && encodingID===1) { cmap314=offset; }
+  }
+
+  // this is our fallback - a minimal font that implements the
+  // letter "A". We can transform this font to implementing
+  // any character between 0x0000 and 0xFFFF by altering a 
+  // handful of letters.
+  var printChar = "A";
   var base64 = "AAEAAAAKAIAAAwAgT1MvMgAAAAAAAACsAAAAWGNtYXAA"+
                "AAAAAAABBAAAACxnbHlmAAAAAAAAATAAAAAQaGVhZAAAA"+
                "AAAAAFAAAAAOGhoZWEAAAAAAAABeAAAACRobXR4AAAAAA"+
@@ -200,7 +252,83 @@ Font.prototype.ondownloaded = function() {
                "AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAIAHgADAAEEC"+
                "QABAAAAAAADAAEECQACAAIAAAAAAAEAAAAAAAAAAAAAAA"+
                "AAAA==";
-  
+
+  // Now, if we found a format 4 {windows/unicode} cmap subtable,
+  // we can find a suitable glyph and modify the 'base64' content.
+  if(cmap314!==false) {
+    ptr += cmap314;
+    version = ushort(data[ptr], data[ptr+1]);
+    if(version===4) {
+      // First find the number of segments in this map
+      var segCount = ushort(data[ptr+6],data[ptr+7]) / 2;
+
+      // Then, fnd the segment end characters. We'll use
+      // whichever of those isn't a whitespace character
+      // for our verification font. We use the list of
+      // Unicode 6.0 recognised whitespace code points
+      // for determining whether to skip a character.
+      var printable = function(chr) {
+        return [0x0009,0x000A,0x000B,0x000C,0x000D,0x0020,0x0085,0x00A0,
+                 0x1680,0x180E,0x2000,0x2001,0x2002,0x2003,0x2004,0x2005,
+                 0x2006,0x2007,0x2008,0x2009,0x200A,0x2028,0x2029,0x202F,
+                 0x205F,0x3000].indexOf(chr)===-1; }
+
+      // loop through the segments in search of a usable character code
+      var i=ptr+14, e=ptr+14+2*segCount, endChar=false;
+      for(; i<e; i+=2) {
+        endChar = ushort(data[i],data[i+1]);
+        if(printable(endChar)) { break; }
+        endChar = false;
+      }
+
+      if(endChar!==false) {
+        // We now have a printable character to validate with!
+        // We need to make sure to encode the correct "idDelta"
+        // value for this character, because our "glyph" will
+        // always be at index 1 (index 0 is reserved for .notdef).
+        // As such, we need to set up a delta value such that:
+        //
+        //   [character code] + [delta value] == 1
+        //
+        printChar = String.fromCharCode(endChar);
+        var delta = -(endChar - 1) + 65536;
+
+        // now we need to substitute the values in our
+        // base64 font template. The CMAP modification
+        // consists of generating a new base64 string
+        // for the bit that indicates the encoded char.
+        // In our 'A'-encoding font, this is:
+        //
+        //   0x00 0x41 0xFF 0xFF 0x00 0x00
+        //   0x00 0x41 0xFF 0xFF 0xFF 0xC0
+        //
+        // which is the 20 letter base64 string at [380]:
+        //
+        //   AABB//8AAABB////wAAB
+        //
+        // We replace this with our new character:
+        //
+        //   [hexchar] 0xFF 0xFF 0x00 0x00
+        //   [hexchar] 0xFF 0xFF [ delta ]
+        //
+        // Note: in order to do so properly, we need to
+        // make sure that the bytes are base64 aligned, so
+        // we have to add a leading 0x00:
+        var newhex = btoa(chr(0) +                         // base64 padding
+                          chr16(endChar) + chr16(0xFFFF) + // endCount array
+                          chr16(0) +                       // cmap required padding 
+                          chr16(endChar) + chr16(0xFFFF) + // startCount array
+                          chr16(delta) +                   // delta value
+                          chr16(1));                       // delta terminator
+
+        // and now we replace the text in 'base64' at
+        // position 380 with this new base64 string:
+        base64 = base64.substring(0,380) + newhex +
+                 base64.substring(380 + newhex.length);
+      }
+    }
+  }
+
   // test font stylesheet, using the zero-width font
   var tfName = this.fontFamily+" testfont";
   var zerowidth = document.createElement("style");
@@ -217,9 +345,10 @@ Font.prototype.ondownloaded = function() {
 
   // validation paragraph, consisting of the zero-width character
   var para = document.createElement("p");
-  para.style.cssText = "position: absolute; top: 0; left: 0; opacity: 1.0;";
+  para.style.cssText = "position: absolute; top: 0; left: 0; opacity: 0;";
   para.style.fontFamily = "'"+this.fontFamily+"', '"+tfName+"'";
-  para.innerHTML = "AAAAAAAAAA";
+  para.innerHTML = printChar+printChar+printChar+printChar+printChar+
+                   printChar+printChar+printChar+printChar+printChar;
   document.body.appendChild(para);
 
   // Quasi-error: if there is no getComputedStyle, claim loading is done.
