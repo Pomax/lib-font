@@ -106,6 +106,21 @@ Font.prototype.metrics = {
 
 
 /**
+ * This function gets called once the font is done
+ * loading, its metrics have been determined, and it
+ * has been parsed for use on-page. By default, this
+ * function does nothing, and users can bind their
+ * own handler function.
+ */
+Font.prototype.onload = function() {};
+
+/**
+ * This function gets called when there is a problem
+ * loading the font.
+ */
+Font.prototype.onerror = function() {};
+
+/**
  * validation function to see if the zero-width styled
  * text is no longer zero-width. If this is true, the
  * font is properly done loading. If this is false, the
@@ -169,6 +184,11 @@ Font.prototype.ondownloaded = function() {
     return 16777216*b1 + 65536*b2 + 256*b3 + b4;
   };
 
+  // unified error handling
+  var error = function(msg) {
+    this.onerror(msg);
+  }
+
   // we know about TTF (0x00010000) and CFF ('OTTO') fonts
   var ttf = chr(0) + chr(1) + chr(0) + chr(0);
   var cff = "OTTO";
@@ -180,7 +200,10 @@ Font.prototype.ondownloaded = function() {
   var isCFF = isTTF? false : version===cff;
   if(isTTF) { this.format = "truetype"; }
   else if(isCFF) { this.format = "opentype"; }
-  else { throw("Error: file at "+this.url+" cannot be interpreted as OpenType font."); }
+  else { 
+    error("Error: file at "+this.url+" cannot be interpreted as OpenType font.");
+    // terminal error: stop running code
+    return; }
 
   // if we get here, the font is good. Extract some font metrics,
   // and then wait for the font to be available for on-page styling.
@@ -199,12 +222,16 @@ Font.prototype.ondownloaded = function() {
   
   // error shortcut function
   var checkTableError = function(tag) {
-    if(!tags[tag]) { throw("Error: font is missing the required OpenType '"+tag+"' table."); }
+    if(!tags[tag]) {
+      error("Error: font is missing the required OpenType '"+tag+"' table.");
+      // return false, so that the result of this function can be used to stop running code
+      return false; }
     return tag;
   }
   
   // then we access HEAD table for the "units per EM" value
   tag = checkTableError("head");
+  if(tag===false) { return; }
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1] + data[ptr+2] + data[ptr+3];
   var unitsPerEm = ushort(data[ptr+18], data[ptr+19]);
@@ -212,6 +239,7 @@ Font.prototype.ondownloaded = function() {
 
   // followed by the HHEA table for ascent/descent/leading values
   tag = checkTableError("hhea");
+  if(tag===false) { return; }
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1] + data[ptr+2] + data[ptr+3];
   this.metrics.ascent  = fword(data[ptr+4], data[ptr+5]) / unitsPerEm;
@@ -220,6 +248,7 @@ Font.prototype.ondownloaded = function() {
 
   // and then finally the OS/2 table for the font-indicated weight class.
   tag = checkTableError("OS/2");
+  if(tag===false) { return; }
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1];
   this.metrics.weightclass = ushort(data[ptr+4], data[ptr+5]);
@@ -236,6 +265,7 @@ Font.prototype.ondownloaded = function() {
 
   // To find a letter, we must consult the character map
   tag = checkTableError("cmap");
+  if(tag===false) { return; }
   ptr = tags[tag].offset;
   tags[tag].version = "" + data[ptr] + data[ptr+1];
   numTables = ushort(data[ptr+2], data[ptr+3]);
@@ -380,9 +410,8 @@ Font.prototype.ondownloaded = function() {
   // Quasi-error: if there is no getComputedStyle, claim loading is done.
   if(!document.defaultView.getComputedStyle) {
     this.onload();
-    throw("Error: document.defaultView.getComputedStyle is not supported by this browser.\n"+
-           "Consequently, Font.onload() cannot be trusted."); }
-
+    error("Error: document.defaultView.getComputedStyle is not supported by this browser.\n"+
+          "Consequently, Font.onload() cannot be trusted."); }
   // If there is getComputedStyle, we do proper load completion verification.
   else { this.validate(para, zerowidth, realfont, this); }
 };
@@ -400,19 +429,12 @@ Font.prototype.loadFont = function() {
     if (arrayBuffer) {  
       font.data =  new Uint8Array(arrayBuffer);
       font.ondownloaded();
-    } else { throw("Error!"); }
+    } else {
+      error("Error downloading font resource from "+url);
+    }
   };  
   xhr.send(null);  
 };
-
-/**
- * This function gets called once the font is done
- * loading, its metrics have been determined, and it
- * has been parsed for use on-page. By default, this
- * function does nothing, and users can bind their
- * own handler function.
- */
-Font.prototype.onload = function() {};
 
 // The stylenode can be added to the document head
 // to make the font available for on-page styling.
