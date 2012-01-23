@@ -41,7 +41,7 @@
   // Leaving it out actual breaks typed XHR in Opera. Not sure why.
   if(window.opera) return;
   if ("response" in XMLHttpRequest.prototype ||
-      "mozResponseArrayBuffer" in XMLHttpRequest.prototype || 
+      "mozResponseArrayBuffer" in XMLHttpRequest.prototype ||
       "mozResponse" in XMLHttpRequest.prototype ||
       "responseArrayBuffer" in XMLHttpRequest.prototype) { return; }
   Object.defineProperty(XMLHttpRequest.prototype, "response", {
@@ -138,7 +138,7 @@ Font.prototype.validate = function(target, zero, mark, font) {
     document.body.removeChild(target);
     this.loaded = true;
     this.onload();
-  } else { 
+  } else {
     // font has not finished loading - wait 50ms and try again
     setTimeout(function() { font.validate(target, zero, mark, font); }, 50); }
 };
@@ -151,7 +151,7 @@ Font.prototype.ondownloaded = function() {
   var chr = function(val) {
     return String.fromCharCode(val);
   };
-  
+
   // decimal to ushort
   var chr16 = function(val) {
     if(val<256) return chr(0) + chr(val);
@@ -171,7 +171,7 @@ Font.prototype.ondownloaded = function() {
   var ushort = function(b1,b2) {
     return 256*b1 + b2;
   };
-  
+
   // signed short to decimal
   var fword = function(b1,b2) {
     var negative = b1>>7===1, val;
@@ -204,7 +204,7 @@ Font.prototype.ondownloaded = function() {
   var isCFF = isTTF? false : version===cff;
   if(isTTF) { this.format = "truetype"; }
   else if(isCFF) { this.format = "opentype"; }
-  else { 
+  else {
     error("Error: file at "+this.url+" cannot be interpreted as OpenType font.");
     // terminal error: stop running code
     return; }
@@ -223,7 +223,7 @@ Font.prototype.ondownloaded = function() {
       offset:   ulong(data[ptr+8], data[ptr+9], data[ptr+10], data[ptr+11]),
       length:   ulong(data[ptr+12], data[ptr+13], data[ptr+14], data[ptr+15]) };
   }
-  
+
   // error shortcut function
   var checkTableError = function(tag) {
     if(!tags[tag]) {
@@ -232,7 +232,7 @@ Font.prototype.ondownloaded = function() {
       return false; }
     return tag;
   }
-  
+
   // then we access HEAD table for the "units per EM" value
   tag = checkTableError("head");
   if(tag===false) { return; }
@@ -286,14 +286,14 @@ Font.prototype.ondownloaded = function() {
   for(var encodingRecord=0; encodingRecord<numTables; encodingRecord++) {
     rptr = ptr + 4 + encodingRecord*8;
     platformID = ushort(data[rptr], data[rptr+1]);
-    encodingID = ushort(data[rptr+2], data[rptr+3]); 
+    encodingID = ushort(data[rptr+2], data[rptr+3]);
     offset     =  ulong(data[rptr+4], data[rptr+5],data[rptr+6], data[rptr+7]);
     if(platformID===3 && encodingID===1) { cmap314=offset; }
   }
 
   // this is our fallback - a minimal font that implements the
   // letter "A". We can transform this font to implementing
-  // any character between 0x0000 and 0xFFFF by altering a 
+  // any character between 0x0000 and 0xFFFF by altering a
   // handful of letters.
   var printChar = "A";
   var base64 = "AAEAAAAKAIAAAwAgT1MvMgAAAAAAAACsAAAAWGNtYXAA"+
@@ -376,7 +376,7 @@ Font.prototype.ondownloaded = function() {
         // we have to add a leading 0x00:
         var newhex = btoa(chr(0) +                         // base64 padding
                           chr16(endChar) + chr16(0xFFFF) + // endCount array
-                          chr16(0) +                       // cmap required padding 
+                          chr16(0) +                       // cmap required padding
                           chr16(endChar) + chr16(0xFFFF) + // startCount array
                           chr16(delta) +                   // delta value
                           chr16(1));                       // delta terminator
@@ -395,10 +395,10 @@ Font.prototype.ondownloaded = function() {
   zerowidth.setAttribute("type","text/css");
   zerowidth.innerHTML =  "@font-face {\n" +
                         "  font-family: '"+tfName+"';\n" +
-                        "  src: url('data:application/x-font-ttf;base64,"+base64+"')\n" + 
+                        "  src: url('data:application/x-font-ttf;base64,"+base64+"')\n" +
                         "       format('truetype');}";
   document.head.appendChild(zerowidth);
-  
+
   // validation stylesheet, using the requested font
   var realfont = this.toStyleNode();
   document.head.appendChild(realfont);
@@ -416,14 +416,34 @@ Font.prototype.ondownloaded = function() {
     this.onload();
     error("Error: document.defaultView.getComputedStyle is not supported by this browser.\n"+
           "Consequently, Font.onload() cannot be trusted."); }
+
   // If there is getComputedStyle, we do proper load completion verification.
   else {
-
     var canvas = document.createElement("canvas");
+
+    // Because we need to 'preload' a canvas with this
+    // font, we have no idea how much surface area
+    // we'll need for text measurements later on. So
+    // be safe, we assign a surface that is quad² big,
+    // and then when measureText is called, we'll
+    // actually build a quick <span> to see how much
+    // of that surface we don't need to look at.
     canvas.width = this.metrics.quadsize;
     canvas.height = this.metrics.quadsize;
     this.canvas = canvas;
 
+    // The reason we preload is because some browsers
+    // will also take a few milliseconds to assign a font
+    // to a Canvas2D context, so if measureText is called
+    // later, without this preloaded context, there is no
+    // time for JavaScript to "pause" long enough for the
+    // context to properly load the font, and metrics may
+    // be completely wrong. The solution is normally to
+    // add in a setTimeout call, to give the browser a bit
+    // of a breather, but then we can't do synchronous
+    // data returns, and we need a callback just to get
+    // string metrics, which is about as far from desired
+    // as is possible.
     var context = canvas.getContext("2d");
     context.font = "1em '"+this.fontFamily+"'";
     context.fillStyle = "white";
@@ -432,12 +452,19 @@ Font.prototype.ondownloaded = function() {
     context.fillText("test text", 50, this.metrics.quadsize/2);
     this.context = context;
 
-    // thanks to Opera and Firefox, we need to add in more
+    // Thanks to Opera and Firefox, we need to add in more
     // "you can do your thing, browser" moments. If we call
-    // validate() outright, JavaScript doesn't get the
-    // breathing room to update things. This is mad, but eh.
+    // validate() as a straight function call, the browser
+    // doesn't get the breathing space to perform page styling.
+    // This is a bit mad, but until there's a JS function for
+    // "make the browser update the page RIGHT NOW", we're
+    // stuck with this.
     var local = this;
-    var go_on = function() { local.validate(para, zerowidth, realfont, local); };
+    var go_on = function() {
+                  // we can't use "this" because that'll become
+                  // the global context after the timeout =)
+                  local.validate(para, zerowidth, realfont, local);
+                };
     setTimeout(go_on, 50);
   }
 };
@@ -448,18 +475,18 @@ Font.prototype.ondownloaded = function() {
 Font.prototype.loadFont = function() {
   var font = this;
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', this.url, true);  
-  xhr.responseType = "arraybuffer";  
-  xhr.onload = function (evt) {  
-    var arrayBuffer = xhr.response; // Note: not oXHR.responseText  
-    if (arrayBuffer) {  
+  xhr.open('GET', this.url, true);
+  xhr.responseType = "arraybuffer";
+  xhr.onload = function (evt) {
+    var arrayBuffer = xhr.response; // Note: not oXHR.responseText
+    if (arrayBuffer) {
       font.data =  new Uint8Array(arrayBuffer);
       font.ondownloaded();
     } else {
       error("Error downloading font resource from "+url);
     }
-  };  
-  xhr.send(null);  
+  };
+  xhr.send(null);
 };
 
 // The stylenode can be added to the document head
@@ -504,9 +531,14 @@ Font.prototype.measureText = function(textstring, fontSize) {
   var getCSSValue = function(element, property) {
     return document.defaultView.getComputedStyle(element,null).getPropertyValue(property);
   };
-  
+
+  // are we dealing with a white-space string?
   var isSpace = /^\s*$/.test(textstring);
+
+  // set up the right font size.
   this.context.font = fontSize + "px '"+this.fontFamily+"'";
+
+  // get the initial string width through our preloaded Canvas2D context
   var metrics = this.context.measureText(textstring);
 
   // Assign remaining default values
@@ -519,22 +551,29 @@ Font.prototype.measureText = function(textstring, fontSize) {
                       maxy: 0 };
   metrics.height = 0;
 
-  // for text lead values, we measure a multiline text container.
+  // for text leading values, we measure an multiline text container.
   var leadDiv = document.createElement("div");
   leadDiv.style.position = "absolute";
   leadDiv.style.opacity = 0;
   leadDiv.style.font = fontSize + "px '" + this.fontFamily + "'";
-  leadDiv.innerHTML = textstring + "<br/>" + textstring;
+  var numLines = 10;
+  leadDiv.innerHTML = textstring;
+  for(var i=1; i<numLines; i++) {
+    leadDiv.innerHTML += "<br/>" + textstring;
+  }
   document.body.appendChild(leadDiv);
 
-  // Second custom value: line height, called by its typographical name.
-  // We make some initial guess at the text leading (using the standard TeX ratio)
+  // First we guess at the leading (=line height) value,
+  // using the standard TeX ratio.
   metrics.leading = 1.2 * fontSize;
 
-  // we then try to get the real value based on how the browser renders the text.
+  // We then try to get the real value based on how
+  // the browser renders the text.
   var leadDivHeight = getCSSValue(leadDiv,"height");
   leadDivHeight = leadDivHeight.replace("px","");
-  if (leadDivHeight >= fontSize * 2) { metrics.leading = (leadDivHeight/2) | 0; }
+  if (leadDivHeight >= fontSize * numLines) {
+    metrics.leading = (leadDivHeight/numLines) | 0;
+  }
   document.body.removeChild(leadDiv);
 
   // If we're not dealing with a white-space-only
@@ -543,55 +582,73 @@ Font.prototype.measureText = function(textstring, fontSize) {
 
     var canvas = this.canvas,
         ctx = this.context,
-        w = canvas.width,
-        h = canvas.height,
-        baseline = h/2,
-        padding = 100;
+        quad = this.metrics.quadsize,
+        w = quad,
+        h = quad,
+        baseline = quad/2,
+        padding = 50,
+        xpos = (quad - metrics.width)/2;
+    
+    // xpos may be a fractional number at this point, and that
+    // will *complete* screw up line scanning, because cropping
+    // a canvas on fractional coordiantes does really funky edge
+    // interpolation. As such, we force it to an integer.
+    if(xpos!==(xpos|0)) { xpos = xpos|0; }
 
     // Set all canvas pixeldata values to 255, with all the content
     // data being 0. This lets us scan for data[i] != 255.
-    ctx.clearRect(0,0,w,h);
     ctx.fillStyle = "white";
-    ctx.fillRect(-1, -1, w+2, h+2);
+    ctx.fillRect(-padding, -padding, w+2*padding,h+2*padding);
+    // Then render the text centered on the canvas surface.
     ctx.fillStyle = "black";
-    ctx.fillText(textstring, padding/2, baseline);
-    var pixelData = ctx.getImageData(0, 0, w, h).data;
+    ctx.fillText(textstring, xpos, baseline);
 
-    // canvas pixel data is w*4 by h*4, because R, G, B and A are separate,
-    // consecutive values in the array, rather than stored as 32 bit ints.
-    var i = 0, j =0,
-        w4 = w * 4,
-        len = pixelData.length;
+    // Rather than getting all four million+ subpixels, we instead
+    // get a (much smaller) subset that we know contains our text.
+    // Canvas pixel data is w*4 by h*4, because {R,G,B,A} is stored
+    // as separate channels in the array. Hence the factor 4.
+    var scanwidth = metrics.width + padding,
+        scanheight = 4*fontSize,
+        x_offset = xpos - padding/2,
+        y_offset = baseline-scanheight/2,
+        pixelData = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight).data;
 
-    // Finding the ascent uses a normal, forward scanline
+    // set up our scanning variables
+    var i = 0,
+        j = 0,
+        w4 = scanwidth * 4,
+        len = pixelData.length,
+        mid = scanheight/2;
+
+    // Scan 1: find the ascent using a normal, forward scan
     while (++i < len && pixelData[i] === 255) {}
     var ascent = (i/w4)|0;
 
-    // Finding the descent uses a reverse scanline
+    // Scan 2: find the descent using a reverse scan
     i = len - 1;
     while (--i > 0 && pixelData[i] === 255) {}
     var descent = (i/w4)|0;
 
-    // find the min-x coordinate (terminate based on columns traveled)
-    for(i = 0, j = 0; j<w && pixelData[i] === 255; ) {
+    // Scan 3: find the min-x value, using a forward column scan
+    for(i=0, j=0; j<scanwidth && pixelData[i] === 255;) {
       i += w4;
       if(i>=len) { j++; i = (i-len) + 4; }}
-    var minx = ((i%w4)/4) | 0;
+    var minx = j;
 
-    // find the max-x coordinate (terminate based on columns traveled)
+    // Scan 3: find the max-x value, using a reverse column scan
     var step = 1;
-    for(i = len-3, j = 0; j<w && pixelData[i] === 255; ) {
+    for(i = len-3, j = 0; j<scanwidth && pixelData[i] === 255; ) {
       i -= w4;
       if(i<0) { j++; i = (len - 3) - (step++)*4; }}
-    var maxx = ((i%w4)/4) + 1 | 0;
+    var maxx = scanwidth - j;
 
-    // set font metrics
-    metrics.ascent  = (baseline - ascent);
-    metrics.descent = (descent - baseline);
+    // set font metrics based on the scan results
+    metrics.ascent  = (mid - ascent);
+    metrics.descent = (descent - mid);
     metrics.bounds  = { minx: minx - (padding/2),
                         maxx: maxx - (padding/2),
-                        miny: 0,
-                        maxy: descent-ascent };
+                        miny: -metrics.descent,
+                        maxy: metrics.ascent };
     metrics.height = 1+(descent - ascent);
   }
 
@@ -601,7 +658,7 @@ Font.prototype.measureText = function(textstring, fontSize) {
 
 /**
  * we want Font to do the same thing Image does when
- * we set the "src" property value, so we use the 
+ * we set the "src" property value, so we use the
  * Object.defineProperty function to bind a setter
  * that does more than just bind values.
  */
