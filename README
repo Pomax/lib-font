@@ -1,3 +1,5 @@
+=====  Font.js =====
+
 Font.js adds new Font() functionality to the JavaScript
 toolbox, akin to how you use new Image() for images. It
 adds an onload event hook so that you don't deploy a
@@ -8,37 +10,81 @@ ready for on-page rendering. This object can.
 
 The API is pretty straight forward:
 
-  var font = new Font();
-  font.onload = function() {
-    /* your handling code goes here. Available values:
-       
-       - font.metrics, which is an object with the
-         following structure:
+  constructor
+    var font = new Font()
 
-         {
-           quadsize: <num>,    the font'sunits-per-em,
-           leading: <num>,     the font's line height,
-           ascent: <num>,      the font's maximum ascent,
-           descent: <num>,     the font's maximum descent,
-           weightclass: <num>, the font's "official" weight
-         }
-       
-       - font.fontFamily, the CSS "font-family: ..." value
+  load event handler
+    font.onload = function() {
+      /* your code here */
+    }
 
-       - font.url, the CSS "url(...)" value
+  error event handler
+    font.onerror = function(error_message) {
+      /* your code here */
+    }
 
-       - font.format, the CSS "format(...)" value
+  name assignment
+    font.fontFamily = "name goes here"
 
-       - font.data, the font's byte code, as Int8Array
+  font loading
+    font.src = "http://your.font.location/here.ttf"
 
-       - font.styleNode, the font's associated <style>
-         element. However, this should be obtained using
-         font.toStyleNode() instead, rather than accessing
-         the property directly (you can, but you shouldn't)
-    */
-  };
-  font.fontFamily = "used for css font-family";
-  font.src = "url://for.your.font/file.ttf";
+  DOM insertion
+    document.head.appendChild(font.toStyleNode())
+
+  DOM removal
+    document.head.removeChild(font.toStyleNode())
+
+Font Metrics API:
+
+    font.metrics.quadsize
+      The font-indicated number of units per em
+    
+    font.metrics.leading
+      The font-indicated line height, in font units
+      (this vaue is, often, useless)
+
+    font.metrics.ascent
+      The maximum ascent for this font, as a ratio
+      of the fontsize
+
+    font.metrics.decent
+      The maximum descent for this font, as a ratio
+      of the fontsize
+
+    font.metrics.weightclass
+      The font-indicated weight class
+
+Text Metrics API:
+
+    font.measureText(string, size)
+      Compute the metrics for a particular string, with
+      this font applied at the specific font size in pixels
+
+    font.measureText(...).width
+      the width of the string in pixels, using this font
+      at the specified font size
+
+    font.measureText(...).fontsize
+      the specified font size
+
+    font.measureText(...).height
+      the height of the string. This may differ from the
+      font size
+
+    font.measureText(...).leading
+      the actual line spacing for this font based on ten
+      lines.
+
+    font.measureText(...).ascent
+      the ascent above the baseline for this string
+
+    font.measureText(...).descent
+      the descent below the baseline for this string
+
+    font.measureText(...).bounds
+      An object {xmin:<num>, ymin:<num>, xmax:<num>,
+      ymax:<num>} indicating the string's bounding box.
 
 When font.src is set, the whole shebang kicks in, just
 like for new Image(), so make sure to define your onload()
