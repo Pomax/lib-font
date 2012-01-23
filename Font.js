@@ -104,6 +104,8 @@ Font.prototype.metrics = {
   weightclass: 400
 };
 
+// internal indicator that the font is done loading
+Font.prototype.loaded = false;
 
 /**
  * This function gets called once the font is done
@@ -130,9 +132,11 @@ Font.prototype.validate = function(target, zero, mark, font) {
   var computedStyle = document.defaultView.getComputedStyle(target,"");
   var width = computedStyle.getPropertyValue("width").replace("px",'');
   if(width>0) {
+    // remove the zero-width and validation paragraph,
+    // but leave the actual font stylesheet.
     document.head.removeChild(zero);
-    document.head.removeChild(mark);
     document.body.removeChild(target);
+    this.loaded = true;
     this.onload();
   } else { 
     // font has not finished loading - wait 50ms and try again
@@ -413,7 +417,29 @@ Font.prototype.ondownloaded = function() {
     error("Error: document.defaultView.getComputedStyle is not supported by this browser.\n"+
           "Consequently, Font.onload() cannot be trusted."); }
   // If there is getComputedStyle, we do proper load completion verification.
-  else { this.validate(para, zerowidth, realfont, this); }
+  else {
+
+    var canvas = document.createElement("canvas");
+    canvas.width = this.metrics.quadsize;
+    canvas.height = this.metrics.quadsize;
+    this.canvas = canvas;
+
+    var context = canvas.getContext("2d");
+    context.font = "1em '"+this.fontFamily+"'";
+    context.fillStyle = "white";
+    context.fillRect(-1, -1, this.metrics.quadsize+2, this.metrics.quadsize+2);
+    context.fillStyle = "black";
+    context.fillText("test text", 50, this.metrics.quadsize/2);
+    this.context = context;
+
+    // thanks to Opera and Firefox, we need to add in more
+    // "you can do your thing, browser" moments. If we call
+    // validate() outright, JavaScript doesn't get the
+    // breathing room to update things. This is mad, but eh.
+    var local = this;
+    var go_on = function() { local.validate(para, zerowidth, realfont, local); };
+    setTimeout(go_on, 50);
+  }
 };
 
 /**
@@ -447,6 +473,7 @@ Font.prototype.styleNode = false;
 Font.prototype.toStyleNode = function() {
   if(this.styleNode) { return this.styleNode; }
   this.styleNode = document.createElement("style");
+  this.styleNode.type = "text/css";
   var styletext = "@font-face {\n";
      styletext += "  font-family: '"+this.fontFamily+"';\n";
      styletext += "  src: url('"+this.url+"') format('"+this.format+"');\n";
@@ -454,6 +481,123 @@ Font.prototype.toStyleNode = function() {
   this.styleNode.innerHTML = styletext;
   return this.styleNode;
 }
+
+
+// preassigned quad × quad context, for measurements
+Font.prototype.canvas = false;
+Font.prototype.context = false;
+
+/**
+ * Measure a specific string of text, given this font.
+ * FIXME: this approach currently relies on an em x em
+ * canvas, meaning that if the font's em is 1000 units,
+ * any text that is longer than 1000px will fail.
+ */
+Font.prototype.measureText = function(textstring, fontSize) {
+  // error shortcut
+  if(!this.loaded) {
+    error("measureText() was called while the font was not yet loaded");
+    return false;
+  }
+
+  // shortcut function for getting computed CSS values
+  var getCSSValue = function(element, property) {
+    return document.defaultView.getComputedStyle(element,null).getPropertyValue(property);
+  };
+  
+  var isSpace = /^\s*$/.test(textstring);
+  this.context.font = fontSize + "px '"+this.fontFamily+"'";
+  var metrics = this.context.measureText(textstring);
+
+  // Assign remaining default values
+  metrics.fontsize = fontSize;
+  metrics.ascent  = 0;
+  metrics.descent = 0;
+  metrics.bounds  = { minx: 0,
+                      maxx: metrics.width,
+                      miny: 0,
+                      maxy: 0 };
+  metrics.height = 0;
+
+  // for text lead values, we measure a multiline text container.
+  var leadDiv = document.createElement("div");
+  leadDiv.style.position = "absolute";
+  leadDiv.style.opacity = 0;
+  leadDiv.style.font = fontSize + "px '" + this.fontFamily + "'";
+  leadDiv.innerHTML = textstring + "<br/>" + textstring;
+  document.body.appendChild(leadDiv);
+
+  // Second custom value: line height, called by its typographical name.
+  // We make some initial guess at the text leading (using the standard TeX ratio)
+  metrics.leading = 1.2 * fontSize;
+
+  // we then try to get the real value based on how the browser renders the text.
+  var leadDivHeight = getCSSValue(leadDiv,"height");
+  leadDivHeight = leadDivHeight.replace("px","");
+  if (leadDivHeight >= fontSize * 2) { metrics.leading = (leadDivHeight/2) | 0; }
+  document.body.removeChild(leadDiv);
+
+  // If we're not dealing with a white-space-only
+  // string,  we can compute additional metrics.
+  if (!isSpace) {
+
+    var canvas = this.canvas,
+        ctx = this.context,
+        w = canvas.width,
+        h = canvas.height,
+        baseline = h/2,
+        padding = 100;
+
+    // Set all canvas pixeldata values to 255, with all the content
+    // data being 0. This lets us scan for data[i] != 255.
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = "white";
+    ctx.fillRect(-1, -1, w+2, h+2);
+    ctx.fillStyle = "black";
+    ctx.fillText(textstring, padding/2, baseline);
+    var pixelData = ctx.getImageData(0, 0, w, h).data;
+
+    // canvas pixel data is w*4 by h*4, because R, G, B and A are separate,
+    // consecutive values in the array, rather than stored as 32 bit ints.
+    var i = 0, j =0,
+        w4 = w * 4,
+        len = pixelData.length;
+
+    // Finding the ascent uses a normal, forward scanline
+    while (++i < len && pixelData[i] === 255) {}
+    var ascent = (i/w4)|0;
+
+    // Finding the descent uses a reverse scanline
+    i = len - 1;
+    while (--i > 0 && pixelData[i] === 255) {}
+    var descent = (i/w4)|0;
+
+    // find the min-x coordinate (terminate based on columns traveled)
+    for(i = 0, j = 0; j<w && pixelData[i] === 255; ) {
+      i += w4;
+      if(i>=len) { j++; i = (i-len) + 4; }}
+    var minx = ((i%w4)/4) | 0;
+
+    // find the max-x coordinate (terminate based on columns traveled)
+    var step = 1;
+    for(i = len-3, j = 0; j<w && pixelData[i] === 255; ) {
+      i -= w4;
+      if(i<0) { j++; i = (len - 3) - (step++)*4; }}
+    var maxx = ((i%w4)/4) + 1 | 0;
+
+    // set font metrics
+    metrics.ascent  = (baseline - ascent);
+    metrics.descent = (descent - baseline);
+    metrics.bounds  = { minx: minx - (padding/2),
+                        maxx: maxx - (padding/2),
+                        miny: 0,
+                        maxy: descent-ascent };
+    metrics.height = 1+(descent - ascent);
+  }
+
+  // and we're done, return the metrics.
+  return metrics;
+};
 
 /**
  * we want Font to do the same thing Image does when
