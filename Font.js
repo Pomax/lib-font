@@ -51,7 +51,7 @@
 
 
 // IE9 does not have binary-to-ascii built in O_O
-if(!btoa) {s
+if(!btoa) {
   // Code borrowed from PHP.js (http://phpjs.org/functions/base64_encode:358)
   var btoa = function(data) {
     var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
