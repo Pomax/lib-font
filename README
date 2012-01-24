@@ -29,11 +29,18 @@ The API is pretty straight forward:
   font loading
     font.src = "http://your.font.location/here.ttf"
 
-  DOM insertion
-    document.head.appendChild(font.toStyleNode())
+    (!) This lines will kick off font loading and
+    will make the font available on-page.
 
   DOM removal
     document.head.removeChild(font.toStyleNode())
+
+  DOM (re)insertion
+    document.head.appendChild(font.toStyleNode())
+
+    (!) This is only required if you removed the
+    font from the page, as the font is added to the
+    DOM for use on-page during font loading already.
 
 Font Metrics API:
 
