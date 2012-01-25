@@ -102,5 +102,20 @@ A demonstrator of this object can be found at:
 
   http://pomax.nihongoresources.com/pages/Font.js
 
+Font.js is compatible with all browsers that support
+<canvas> and Object.defineProperty - This includes all
+versions of Firefox, Chrome, Opera, IE and Safari that
+were 'current' (Firefox 9, Chrome 16, Opera 11.6, IE9,
+Safari 5.1) at the time Font.js was released.
+
+Font.js will not work on IE8 or below due to the lack of
+Object.defineProperty - I recommend using the solution
+outlined in http://ie6update.com/ for websites that are
+not corporate intranet sites, because as a home user you
+have no excuse not to have upgraded to Internet Explorer
+9 yet, or simply not using Internet Explorer if you're
+still using Windows XP. If you have friends or family that
+still use IE8 or below: intervene.
+
 This code is (c) Mike "Pomax" Kamermans, 2012, but
 licensed under the MIT ("expat" flavour) license.

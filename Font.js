@@ -1,12 +1,48 @@
 /**
 
-  This library adds Font objects to the general pool
-  of available JavaScript objects.
-
+  Font.js v2012.01.25
   (c) Mike "Pomax" Kamermans, 2012
   Licensed under MIT ("expat" flavour) license.
+  Hosted on http://github.com/Pomax/Font.js
+
+  This library adds Font objects to the general pool
+  of available JavaScript objects, so that you can load
+  fonts through a JavaScript object similar to loading
+  images through a new Image() object.
+
+  Font.js is compatible with all browsers that support
+  <canvas> and Object.defineProperty - This includes
+  all versions of Firefox, Chrome, Opera, IE and Safari
+  that were 'current' (Firefox 9, Chrome 16, Opera 11.6,
+  IE9, Safari 5.1) at the time Font.js was released.
+  
+  Font.js will not work on IE8 or below due to the lack
+  of Object.defineProperty - I recommend using the
+  solution outlined in http://ie6update.com/ for websites
+  that are not corporate intranet sites, because as a home
+  user you have no excuse not to have upgraded to Internet
+  Explorer 9 yet, or simply not using Internet Explorer if
+  you're still using Windows XP. If you have friends or
+  family that still use IE8 or below: intervene.
+  
+  You may remove every line in this header except for
+  the first block of four lines, for the purposes of
+  saving space and minification. If minification strips
+  the header, you'll have to paste that paragraph back in.
+
+  Issue tracker: https://github.com/Pomax/Font.js/issues
 
 **/
+
+// 1) Do we have a mechanism for binding implicit get/set?
+if(!Object.defineProperty) {
+  throw("Font.js requires Object.defineProperty, which this browser does not support.");
+}
+
+// 2) Do we have Canvas2D available?
+if(!document.createElement("canvas").getContext) {
+  throw("Font.js requires <canvas> and the Canvas2D API, which this browser does not support.");
+}
 
 // Make sure type arrays are available in IE9
 // Code borrowed from pdf.js (https://gist.github.com/1057924)
@@ -526,33 +562,22 @@ Font.prototype.toStyleNode = function () {
 
 /**
  * Measure a specific string of text, given this font.
- * FIXME: this approach currently relies on an em x em
- * canvas, meaning that if the font's em is 1000 units,
- * any text that is longer than 1000px will fail.
+ * If the text is too wide for our preallocated canvas,
+ * it will be chopped up and the segments measured
+ * separately.
  */
-Font.prototype.measureText = function (textstring, fontSize) {
+Font.prototype.measureText = function (textString, fontSize) {
   // error shortcut
   if (!this.loaded) {
     error("measureText() was called while the font was not yet loaded");
     return false;
   }
 
-  // Shortcut function for getting computed CSS values
-  var getCSSValue = function (element, property) {
-    return document.defaultView.getComputedStyle(element, null).getPropertyValue(property);
-  };
-
-  // We are going to be using you ALL over the place, little variable.
-  var i;
-
-  // Are we dealing with a white-space string?
-  var isSpace = /^\s*$/.test(textstring);
-
   // Set up the right font size.
   this.context.font = fontSize + "px '"+this.fontFamily+"'";
 
   // Get the initial string width through our preloaded Canvas2D context
-  var metrics = this.context.measureText(textstring);
+  var metrics = this.context.measureText(textString);
 
   // Assign the remaining default values, because the
   // TextMetrics object is horribly deficient.
@@ -565,6 +590,38 @@ Font.prototype.measureText = function (textstring, fontSize) {
                       maxy: 0 };
   metrics.height = 0;
 
+  // Does the text fit on the canvas? If not, we have to
+  // chop it up and measure each segment separately.
+  var segments = [],
+      minSegments = metrics.width / this.metrics.quadsize;
+  if (minSegments <= 1) { segments.push(textString); }
+  else {
+    // TODO: add the chopping code here. For now this
+    // code acts as placeholder 
+    segments.push(textString); 
+  }
+
+  // run through all segments, updating the metrics as we go.
+  var segmentLength = segments.length, i;
+  for (i = 0; i < segmentLength; i++) {
+    this.measureSegment(segments[i], fontSize, metrics);
+  }
+  return metrics;
+};
+
+/**
+ * Measure a section of text, given this font, that is
+ * guaranteed to fit on our preallocated canvas.
+ */
+Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
+  // Shortcut function for getting computed CSS values
+  var getCSSValue = function (element, property) {
+    return document.defaultView.getComputedStyle(element, null).getPropertyValue(property);
+  };
+
+  // We are going to be using you ALL over the place, little variable.
+  var i;
+
   // For text leading values, we measure a multiline
   // text container as built by the browser.
   var leadDiv = document.createElement("div");
@@ -572,9 +629,9 @@ Font.prototype.measureText = function (textstring, fontSize) {
   leadDiv.style.opacity = 0;
   leadDiv.style.font = fontSize + "px '" + this.fontFamily + "'";
   var numLines = 10;
-  leadDiv.innerHTML = textstring;
+  leadDiv.innerHTML = textSegment;
   for (i = 1; i < numLines; i++) {
-    leadDiv.innerHTML += "<br/>" + textstring;
+    leadDiv.innerHTML += "<br/>" + textSegment;
   }
   document.body.appendChild(leadDiv);
 
@@ -590,86 +647,86 @@ Font.prototype.measureText = function (textstring, fontSize) {
   }
   document.body.removeChild(leadDiv);
 
-  // If we're not dealing with a white-space-only
-  // string, we can compute additional metrics.
-  if (!isSpace) {
+  // If we're not with a white-space-only string,
+  // this is all we will be able to do.
+  if (/^\s*$/.test(textSegment)) { return metrics; }
 
-    var canvas = this.canvas,
-        ctx = this.context,
-        quad = this.metrics.quadsize,
-        w = quad,
-        h = quad,
-        baseline = quad / 2,
-        padding = 50,
-        xpos = (quad - metrics.width) / 2;
+  // If we're not, let's try some more things.
+  var canvas = this.canvas,
+      ctx = this.context,
+      quad = this.metrics.quadsize,
+      w = quad,
+      h = quad,
+      baseline = quad / 2,
+      padding = 50,
+      xpos = (quad - metrics.width) / 2;
 
-    // SUPER IMPORTANT, HARDCORE NECESSARY STEP:
-    // xpos may be a fractional number at this point, and
-    // that will *complete* screw up line scanning, because
-    // cropping a canvas on fractional coordiantes does
-    // really funky edge interpolation. As such, we force
-    // it to an integer.
-    if (xpos !== (xpos | 0)) { xpos = xpos | 0; }
+  // SUPER IMPORTANT, HARDCORE NECESSARY STEP:
+  // xpos may be a fractional number at this point, and
+  // that will *complete* screw up line scanning, because
+  // cropping a canvas on fractional coordiantes does
+  // really funky edge interpolation. As such, we force
+  // it to an integer.
+  if (xpos !== (xpos | 0)) { xpos = xpos | 0; }
 
-    // Set all canvas pixeldata values to 255, with all the content
-    // data being 0. This lets us scan for data[i] != 255.
-    ctx.fillStyle = "white";
-    ctx.fillRect(-padding, -padding, w + 2 * padding, h + 2 * padding);
-    // Then render the text centered on the canvas surface.
-    ctx.fillStyle = "black";
-    ctx.fillText(textstring, xpos, baseline);
+  // Set all canvas pixeldata values to 255, with all the content
+  // data being 0. This lets us scan for data[i] != 255.
+  ctx.fillStyle = "white";
+  ctx.fillRect(-padding, -padding, w + 2 * padding, h + 2 * padding);
+  // Then render the text centered on the canvas surface.
+  ctx.fillStyle = "black";
+  ctx.fillText(textSegment, xpos, baseline);
 
-    // Rather than getting all four million+ subpixels, we
-    // instead get a (much smaller) subset that we know
-    // contains our text. Canvas pixel data is w*4 by h*4,
-    // because {R,G,B,A} is stored as separate channels in
-    // the array. Hence the factor 4.
-    var scanwidth = metrics.width + padding,
-        scanheight = 4 * fontSize,
-        x_offset = xpos - padding / 2,
-        y_offset = baseline-scanheight / 2,
-        pixelData = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight).data;
+  // Rather than getting all four million+ subpixels, we
+  // instead get a (much smaller) subset that we know
+  // contains our text. Canvas pixel data is w*4 by h*4,
+  // because {R,G,B,A} is stored as separate channels in
+  // the array. Hence the factor 4.
+  var scanwidth = (metrics.width + padding) | 0,
+      scanheight = 4 * fontSize,
+      x_offset = xpos - padding / 2,
+      y_offset = baseline-scanheight / 2,
+      pixelData = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight).data;
 
-    // Set up our scanline variables
-    var i = 0,
-        j = 0,
-        w4 = scanwidth * 4,
-        len = pixelData.length,
-        mid = scanheight / 2;
+  // Set up our scanline variables
+  var i = 0,
+      j = 0,
+      w4 = scanwidth * 4,
+      len = pixelData.length,
+      mid = scanheight / 2;
 
-    // Scan 1: find the ascent using a normal, forward scan
-    while (++i < len && pixelData[i] === 255) {}
-    var ascent = (i / w4) | 0;
+  // Scan 1: find the ascent using a normal, forward scan
+  while (++i < len && pixelData[i] === 255) {}
+  var ascent = (i / w4) | 0;
 
-    // Scan 2: find the descent using a reverse scan
-    i = len - 1;
-    while (--i > 0 && pixelData[i] === 255) {}
-    var descent = (i / w4) | 0;
+  // Scan 2: find the descent using a reverse scan
+  i = len - 1;
+  while (--i > 0 && pixelData[i] === 255) {}
+  var descent = (i / w4) | 0;
 
-    // Scan 3: find the min-x value, using a forward column scan
-    for (i =0, j = 0; j < scanwidth && pixelData[i] === 255;) {
-      i += w4;
-      if (i >= len) { j++; i = (i - len) + 4; }}
-    var minx = j;
+  // Scan 3: find the min-x value, using a forward column scan
+  window.console.log(w4);
+  for (i = 0, j = 0; j < scanwidth && pixelData[i] === 255;) {
+    i += w4;
+    if (i >= len) { j++; i = (i - len) + 4; }}
+  var minx = j;
 
-    // Scan 3: find the max-x value, using a reverse column scan
-    var step = 1;
-    for (i = len-3, j = 0; j<scanwidth && pixelData[i] === 255; ) {
-      i -= w4;
-      if (i < 0) { j++; i = (len - 3) - (step++) * 4; }}
-    var maxx = scanwidth - j;
+  // Scan 3: find the max-x value, using a reverse column scan
+  var step = 1;
+  for (i = len-3, j = 0; j<scanwidth && pixelData[i] === 255; ) {
+    i -= w4;
+    if (i < 0) { j++; i = (len - 3) - (step++) * 4; }}
+  var maxx = scanwidth - j;
 
-    // We have all our metrics now, so fill in the
-    // metrics object and return it to the user.
-    metrics.ascent  = (mid - ascent);
-    metrics.descent = (descent - mid);
-    metrics.bounds  = { minx: minx - (padding / 2),
-                        maxx: maxx - (padding / 2),
-                        miny: -metrics.descent,
-                        maxy: metrics.ascent };
-    metrics.height = 1 + (descent - ascent);
-  }
-
+  // We have all our metrics now, so fill in the
+  // metrics object and return it to the user.
+  metrics.ascent  = (mid - ascent);
+  metrics.descent = (descent - mid);
+  metrics.bounds  = { minx: minx - (padding / 2),
+                      maxx: maxx - (padding / 2),
+                      miny: -metrics.descent,
+                      maxy: metrics.ascent };
+  metrics.height = 1 + (descent - ascent);
   return metrics;
 };
 
