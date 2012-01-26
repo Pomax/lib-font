@@ -705,7 +705,6 @@ Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
   var descent = (i / w4) | 0;
 
   // Scan 3: find the min-x value, using a forward column scan
-  window.console.log(w4);
   for (i = 0, j = 0; j < scanwidth && pixelData[i] === 255;) {
     i += w4;
     if (i >= len) { j++; i = (i - len) + 4; }}
