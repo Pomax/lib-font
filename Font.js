@@ -572,6 +572,11 @@ Font.prototype.measureText = function (textString, fontSize) {
     error("measureText() was called while the font was not yet loaded");
     return false;
   }
+  
+  // safety error
+  if (!fontSize) {
+    throw("measureText called without a specific fontSize.");
+  }
 
   // Set up the right font size.
   this.context.font = fontSize + "px '"+this.fontFamily+"'";
@@ -590,37 +595,10 @@ Font.prototype.measureText = function (textString, fontSize) {
                       maxy: 0 };
   metrics.height = 0;
 
-  // Does the text fit on the canvas? If not, we have to
-  // chop it up and measure each segment separately.
-  var segments = [],
-      minSegments = metrics.width / this.metrics.quadsize;
-  if (minSegments <= 1) { segments.push(textString); }
-  else {
-    // TODO: add the chopping code here. For now this
-    // code acts as placeholder 
-    segments.push(textString); 
-  }
-
-  // run through all segments, updating the metrics as we go.
-  var segmentLength = segments.length, i;
-  for (i = 0; i < segmentLength; i++) {
-    this.measureSegment(segments[i], fontSize, metrics);
-  }
-  return metrics;
-};
-
-/**
- * Measure a section of text, given this font, that is
- * guaranteed to fit on our preallocated canvas.
- */
-Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
   // Shortcut function for getting computed CSS values
   var getCSSValue = function (element, property) {
     return document.defaultView.getComputedStyle(element, null).getPropertyValue(property);
   };
-
-  // We are going to be using you ALL over the place, little variable.
-  var i;
 
   // For text leading values, we measure a multiline
   // text container as built by the browser.
@@ -628,10 +606,10 @@ Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
   leadDiv.style.position = "absolute";
   leadDiv.style.opacity = 0;
   leadDiv.style.font = fontSize + "px '" + this.fontFamily + "'";
-  var numLines = 10;
-  leadDiv.innerHTML = textSegment;
+  leadDiv.innerHTML = "this is a dummy text";
+  var numLines = 10, i;
   for (i = 1; i < numLines; i++) {
-    leadDiv.innerHTML += "<br/>" + textSegment;
+    leadDiv.innerHTML += "<br/>this is a dummy text";
   }
   document.body.appendChild(leadDiv);
 
@@ -647,9 +625,74 @@ Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
   }
   document.body.removeChild(leadDiv);
 
-  // If we're not with a white-space-only string,
+  // If we're dealing with a white-space-only string,
   // this is all we will be able to do.
-  if (/^\s*$/.test(textSegment)) { return metrics; }
+  if (/^\s*$/.test(textString)) { return metrics; }
+
+  // We have real text to deal with. Does it fit on
+  // the canvas? If not, we have to chop it up and
+  // measure each segment separately.
+  var segments = [textString],
+      minSegments = (0.5 + metrics.width / this.metrics.quadsize) | 0,
+      padding = 50;
+  if (minSegments > 1) {
+    segments = [];
+    var segmentPosPrev = 0,
+        segmentPos,
+        head,
+        tail,
+        segment = 1,
+        w1 = metrics.width,
+        w2,
+        w3;
+    do {
+        segmentPos = (segment * textString.length / minSegments) | 0;
+        head = textString.substring(segmentPosPrev, segmentPos);
+        tail = textString.substring(segmentPos);
+        w2 = this.context.measureText(head).width;
+        w3 = this.context.measureText(tail).width;
+
+        while (segmentPos > segmentPosPrev && (Math.abs(w1 - (w2 + w3)) > 2 || w2 > (this.metrics.quadsize - 3 * padding))) {
+          segmentPos--;
+          head = textString.substring(segmentPosPrev, segmentPos);
+          tail = textString.substring(segmentPos);
+          w2 = this.context.measureText(head).width;
+          w3 = this.context.measureText(tail).width;
+        }
+
+        if (segmentPos === segmentPosPrev) {
+          // this is a mystifyingly bad condition. I don't know if it can even occur...
+          throw("measureText was called for a string that could not be separated into measurable substrings");
+        }
+
+        segments.push(head);
+        segmentPosPrev = segmentPos;
+        segment++;
+        window.console.log("w2: "+w2);
+        w1 = w3;
+    } while(segment<minSegments);
+    segments.push(tail);
+  }
+
+  // run through all segments, updating the metrics as we go.
+  var segmentLength = segments.length, i;
+  segmentLength = 1;
+  for (i = 0; i < segmentLength; i++) {
+    this.measureSegment(segments[i], metrics, padding);
+  }
+
+  document.body.appendChild(this.canvas);
+  return metrics;
+};
+
+/**
+ * Measure a section of text, given this font, that is
+ * guaranteed to fit on our preallocated canvas.
+ */
+Font.prototype.measureSegment = function(textSegment, metrics, padding) {
+  // If we're dealing with a white-space-only segment,
+  // there are no additional metrics to measure.
+  if (/^\s*$/.test(textSegment)) { return; }
 
   // If we're not, let's try some more things.
   var canvas = this.canvas,
@@ -658,8 +701,7 @@ Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
       w = quad,
       h = quad,
       baseline = quad / 2,
-      padding = 50,
-      xpos = (quad - metrics.width) / 2;
+      xpos = (quad - this.context.measureText(textSegment).width) / 2;
 
   // SUPER IMPORTANT, HARDCORE NECESSARY STEP:
   // xpos may be a fractional number at this point, and
@@ -671,6 +713,7 @@ Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
 
   // Set all canvas pixeldata values to 255, with all the content
   // data being 0. This lets us scan for data[i] != 255.
+  ctx.clearRect(-padding, -padding, w + 2 * padding, h + 2 * padding);
   ctx.fillStyle = "white";
   ctx.fillRect(-padding, -padding, w + 2 * padding, h + 2 * padding);
   // Then render the text centered on the canvas surface.
@@ -716,6 +759,8 @@ Font.prototype.measureSegment = function(textSegment, fontSize, metrics) {
     i -= w4;
     if (i < 0) { j++; i = (len - 3) - (step++) * 4; }}
   var maxx = scanwidth - j;
+
+  window.console.log("["+textSegment+"] => a: "+ascent+", d: "+descent+", m: "+minx+", M: "+maxx);
 
   // We have all our metrics now, so fill in the
   // metrics object and return it to the user.
