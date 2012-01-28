@@ -628,6 +628,9 @@ Font.prototype.measureText = function (textString, fontSize) {
   // If we're dealing with a white-space-only string,
   // this is all we will be able to do.
   if (/^\s*$/.test(textString)) { return metrics; }
+  
+  // we have real text. Let's start measuring.
+  metrics.bounds.maxx = 0;
 
   // We have real text to deal with. Does it fit on
   // the canvas? If not, we have to chop it up and
@@ -668,20 +671,17 @@ Font.prototype.measureText = function (textString, fontSize) {
         segments.push(head);
         segmentPosPrev = segmentPos;
         segment++;
-        window.console.log("w2: "+w2);
         w1 = w3;
-    } while(segment<minSegments);
+    } while (segment <= minSegments);
     segments.push(tail);
   }
 
   // run through all segments, updating the metrics as we go.
   var segmentLength = segments.length, i;
-  segmentLength = 1;
   for (i = 0; i < segmentLength; i++) {
     this.measureSegment(segments[i], metrics, padding);
   }
 
-  document.body.appendChild(this.canvas);
   return metrics;
 };
 
@@ -690,8 +690,16 @@ Font.prototype.measureText = function (textString, fontSize) {
  * guaranteed to fit on our preallocated canvas.
  */
 Font.prototype.measureSegment = function(textSegment, metrics, padding) {
+  // create a new, local metrics object
+  var localMtx = this.context.measureText(textSegment);
+  localMtx.fontsize = metrics.fontsize;
+  localMtx.ascent   = 0;
+  localMtx.descent  = 0;
+  localMtx.bounds   = { minx: 0, maxx: 0, miny: 0, maxy: 0 };
+  localMtx.height   = 0;
+
   // If we're dealing with a white-space-only segment,
-  // there are no additional metrics to measure.
+  // there are no additional localMtx to measure.
   if (/^\s*$/.test(textSegment)) { return; }
 
   // If we're not, let's try some more things.
@@ -725,7 +733,7 @@ Font.prototype.measureSegment = function(textSegment, metrics, padding) {
   // contains our text. Canvas pixel data is w*4 by h*4,
   // because {R,G,B,A} is stored as separate channels in
   // the array. Hence the factor 4.
-  var scanwidth = (metrics.width + padding) | 0,
+  var scanwidth = (localMtx.width + padding) | 0,
       scanheight = 4 * fontSize,
       x_offset = xpos - padding / 2,
       y_offset = baseline-scanheight / 2,
@@ -760,18 +768,46 @@ Font.prototype.measureSegment = function(textSegment, metrics, padding) {
     if (i < 0) { j++; i = (len - 3) - (step++) * 4; }}
   var maxx = scanwidth - j;
 
-  window.console.log("["+textSegment+"] => a: "+ascent+", d: "+descent+", m: "+minx+", M: "+maxx);
+  var id = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight);
+  id.data = pixelData;
+  ctx.putImageData(id, x_offset, y_offset);
 
-  // We have all our metrics now, so fill in the
-  // metrics object and return it to the user.
-  metrics.ascent  = (mid - ascent);
-  metrics.descent = (descent - mid);
-  metrics.bounds  = { minx: minx - (padding / 2),
+  // We have all our localMtx now, so fill in the
+  // localMtx object and return it to the user.
+  localMtx.ascent  = (mid - ascent);
+  localMtx.descent = (descent - mid);
+  localMtx.bounds  = { minx: minx - (padding / 2),
                       maxx: maxx - (padding / 2),
-                      miny: -metrics.descent,
-                      maxy: metrics.ascent };
-  metrics.height = 1 + (descent - ascent);
-  return metrics;
+                      miny: -localMtx.descent,
+                      maxy: localMtx.ascent };
+  localMtx.height = 1 + (descent - ascent);
+
+  // Now, update the master metrics
+  metrics.ascent  = Math.max(metrics.ascent, localMtx.ascent);
+  metrics.descent = Math.max(metrics.descent, localMtx.descent);
+  metrics.height  = Math.max(metrics.height, localMtx.height);
+  metrics.bounds.miny = Math.min(metrics.bounds.miny, localMtx.bounds.miny);
+  metrics.bounds.maxy = Math.max(metrics.bounds.maxy, localMtx.bounds.maxy);
+  if (metrics.bounds.maxx === 0) {
+    metrics.bounds.maxx = localMtx.bounds.maxx;
+  } else {
+    var increment = localMtx.bounds.maxx - localMtx.bounds.minx;
+    metrics.bounds.maxx += increment;
+  }
+  
+  // However, it's possible the width is wrong, due
+  // to leading and trailing whitespace for the text
+  // segment. Let's fix this. Note: this will now miss
+  // out on any <letter>+<space> or <space>+<letter>
+  // kerning pair corrections. Short of actually looking
+  // those values up, we won't get around this without
+  // making sure text segmentation avoids splitting on
+  // the end of whitespace.
+  var trimmed = textSegment.trim();
+  if (trimmed !== textSegment) {
+    var correction = this.context.measureText(textSegment.replace(trimmed,'')).width;
+    metrics.bounds.maxx += correction;
+  }
 };
 
 /**
