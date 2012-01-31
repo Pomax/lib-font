@@ -636,7 +636,7 @@ Font.prototype.measureText = function (textString, fontSize) {
   // the canvas? If not, we have to chop it up and
   // measure each segment separately.
   var segments = [textString],
-      minSegments = (0.5 + metrics.width / this.metrics.quadsize) | 0,
+      minSegments = (1 + metrics.width / this.metrics.quadsize) | 0,
       padding = 50;
   if (minSegments > 1) {
     segments = [];
@@ -734,7 +734,7 @@ Font.prototype.measureSegment = function(textSegment, metrics, padding) {
   // because {R,G,B,A} is stored as separate channels in
   // the array. Hence the factor 4.
   var scanwidth = (localMtx.width + padding) | 0,
-      scanheight = 4 * fontSize,
+      scanheight = 4 * localMtx.fontsize,
       x_offset = xpos - padding / 2,
       y_offset = baseline-scanheight / 2,
       pixelData = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight).data;
