@@ -39,7 +39,7 @@ The API is pretty straight forward:
     - remote fonts:
 
       font.src = "http://your.font.location/here.ttf";
-      
+
     - system fonts:
 
       font.src = font.fontFamily;
