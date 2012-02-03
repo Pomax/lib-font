@@ -6,41 +6,58 @@ adds an onload event hook so that you don't deploy a
 font resource on your webpage before it's actually ready
 for use, as browsers can tell you when a font has
 downloaded, but not when it has been parsed and made
-ready for on-page rendering. This object can.
+ready for on-page rendering. This object can. It can
+also do this for system fonts, so you can also use
+Font.js to detect whether a specific system font is
+installed at the client, for fallbacks and failsafes.
 
 The API is pretty straight forward:
 
   constructor
-    var font = new Font()
+    var font = new Font();
 
   load event handler
     font.onload = function() {
       /* your code here */
-    }
+    };
 
   error event handler
     font.onerror = function(error_message) {
       /* your code here */
-    }
+    };
 
   name assignment
-    font.fontFamily = "name goes here"
+    font.fontFamily = "name goes here";
 
   font loading
-    font.src = "http://your.font.location/here.ttf"
+    remote fonts: 
+      font.src = "http://your.font.location/here.ttf";
+      
+    system fonts:
+      font.src = font.fontFamily;
 
-    (!) This lines will kick off font loading and
-    will make the font available on-page.
+    (!) This line will kick off font loading and
+    will make the font available on-page (if a
+    remote font was requested).
 
   DOM removal
-    document.head.removeChild(font.toStyleNode())
+    document.head.removeChild(font.toStyleNode());
+    
+    (!) this only applies to fonts loaded from a
+    remote resource. System fonts do not have an
+    associated style node.
 
   DOM (re)insertion
-    document.head.appendChild(font.toStyleNode())
+    document.head.appendChild(font.toStyleNode());
 
     (!) This is only required if you removed the
     font from the page, as the font is added to the
     DOM for use on-page during font loading already.
+
+    (!) this only applies to fonts loaded from a
+    remote resource. System fonts do not have an
+    associated style node.
+
 
 Font Metrics API:
 
@@ -61,6 +78,11 @@ Font Metrics API:
 
     font.metrics.weightclass
       The font-indicated weight class
+      
+    (!) As system font files cannot be inspected, they
+    do not have an associated font.metrics object.
+    Instead, font.metrics is simply "false".
+
 
 Text Metrics API:
 
