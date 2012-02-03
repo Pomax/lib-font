@@ -1,4 +1,5 @@
-=====  Font.js =====
+Font.js
+=======
 
 Font.js adds new Font() functionality to the JavaScript
 toolbox, akin to how you use new Image() for images. It
@@ -13,41 +14,50 @@ installed at the client, for fallbacks and failsafes.
 
 The API is pretty straight forward:
 
-  constructor
-    var font = new Font();
+  * constructor
+    
+      var font = new Font();
 
-  load event handler
+  * load event handler
+
     font.onload = function() {
       /* your code here */
     };
 
-  error event handler
+  * error event handler
+
     font.onerror = function(error_message) {
       /* your code here */
     };
 
-  name assignment
+  * name assignment
+
     font.fontFamily = "name goes here";
 
-  font loading
-    remote fonts: 
+  * font loading
+
+    - remote fonts:
+
       font.src = "http://your.font.location/here.ttf";
       
-    system fonts:
+    - system fonts:
+
       font.src = font.fontFamily;
 
     (!) This line will kick off font loading and
     will make the font available on-page (if a
     remote font was requested).
 
-  DOM removal
+  * DOM removal
+
     document.head.removeChild(font.toStyleNode());
     
     (!) this only applies to fonts loaded from a
     remote resource. System fonts do not have an
     associated style node.
 
-  DOM (re)insertion
+  * DOM (re)insertion
+
     document.head.appendChild(font.toStyleNode());
 
     (!) This is only required if you removed the
@@ -58,74 +68,91 @@ The API is pretty straight forward:
     remote resource. System fonts do not have an
     associated style node.
 
+Font Metrics API
+----------------
 
-Font Metrics API:
+  * font.metrics.quadsize
 
-    font.metrics.quadsize
-      The font-indicated number of units per em
+    The font-indicated number of units per em
     
-    font.metrics.leading
-      The font-indicated line height, in font units
-      (this vaue is, often, useless)
+  * font.metrics.leading
 
-    font.metrics.ascent
-      The maximum ascent for this font, as a ratio
-      of the fontsize
+    The font-indicated line height, in font units
+    (this vaue is, often, useless)
 
-    font.metrics.decent
-      The maximum descent for this font, as a ratio
-      of the fontsize
+  * font.metrics.ascent
 
-    font.metrics.weightclass
-      The font-indicated weight class
+    The maximum ascent for this font, as a ratio
+    of the fontsize
+
+  * font.metrics.decent
+
+    The maximum descent for this font, as a ratio
+    of the fontsize
+
+  * font.metrics.weightclass
+
+    The font-indicated weight class
       
-    (!) As system font files cannot be inspected, they
-    do not have an associated font.metrics object.
-    Instead, font.metrics is simply "false".
+  (!) As system font files cannot be inspected, they
+  do not have an associated font.metrics object.
+  Instead, font.metrics is simply "false".
 
 
-Text Metrics API:
+Text Metrics API
+----------------
 
-    font.measureText(string, size)
-      Compute the metrics for a particular string, with
-      this font applied at the specific font size in pixels
+  * font.measureText(string, size)
 
-    font.measureText(...).width
-      the width of the string in pixels, using this font
-      at the specified font size
+    Compute the metrics for a particular string, with
+    this font applied at the specific font size in pixels
 
-    font.measureText(...).fontsize
-      the specified font size
+  * font.measureText(...).width
 
-    font.measureText(...).height
-      the height of the string. This may differ from the
-      font size
+    the width of the string in pixels, using this font
+    at the specified font size
 
-    font.measureText(...).leading
-      the actual line spacing for this font based on ten
-      lines.
+  * font.measureText(...).fontsize
 
-    font.measureText(...).ascent
-      the ascent above the baseline for this string
+    the specified font size
 
-    font.measureText(...).descent
-      the descent below the baseline for this string
+  * font.measureText(...).height
 
-    font.measureText(...).bounds
-      An object {xmin:<num>, ymin:<num>, xmax:<num>,
-      ymax:<num>} indicating the string's bounding box.
+    the height of the string. This may differ from the
+    font size
+
+  * font.measureText(...).leading
+
+    the actual line spacing for this font based on ten
+    lines.
+
+  * font.measureText(...).ascent
+
+    the ascent above the baseline for this string
+
+  * font.measureText(...).descent
+
+    the descent below the baseline for this string
+
+  * font.measureText(...).bounds
+
+    An object {xmin:<num>, ymin:<num>, xmax:<num>,
+    ymax:<num>} indicating the string's bounding box.
 
 When font.src is set, the whole shebang kicks in, just
 like for new Image(), so make sure to define your onload()
 handler BEFORE setting the "src" property, or your handler
 may not get called.
 
+Demonstrator
+------------
+
 A demonstrator of this object can be found at:
 
-  http://pomax.nihongoresources.com/pages/Font.js
+  * http://pomax.nihongoresources.com/pages/Font.js
 
 Font.js is compatible with all browsers that support
-<canvas> and Object.defineProperty - This includes all
+canvas and Object.defineProperty --  This includes all
 versions of Firefox, Chrome, Opera, IE and Safari that
 were 'current' (Firefox 9, Chrome 16, Opera 11.6, IE9,
 Safari 5.1) at the time Font.js was released.
