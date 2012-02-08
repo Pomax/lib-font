@@ -40,13 +40,21 @@ The API is pretty straight forward:
 
       font.src = "http://your.font.location/here.ttf";
 
-    - system fonts:
-
-      font.src = font.fontFamily;
-
     (!) This line will kick off font loading and
     will make the font available on-page (if a
     remote font was requested).
+
+
+    - system fonts / already @font-face loaded fonts:
+
+      font.src = font.fontFamily;
+
+    (!) Note that this also works for google webfont and
+    typekit fonts that have been loaded through an HTML
+    stylesheet. Any font that is available by name, rather
+    than by font file, can be loaded using the above
+    "src=fontFamily" solution.
+
 
   * DOM removal
 
