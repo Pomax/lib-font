@@ -74,17 +74,24 @@
   }(window));
 
   // Also make sure XHR understands typing.
-  // Code borrowed from pdf.js (https://gist.github.com/1057924)
+  // Code based on pdf.js (https://gist.github.com/1057924)
   (function(window) {
-    // This line is necessary since Opera actually already works.
-    // Leaving it out actual breaks typed XHR in Opera. Not sure why.
-    if (window.opera) { return; }
+    // shortcut for Opera - it's already fine
+    if(window.opera) return;
+    // shortcuts for browsers that already implement XHR minetyping
     if ("response" in XMLHttpRequest.prototype ||
         "mozResponseArrayBuffer" in XMLHttpRequest.prototype ||
         "mozResponse" in XMLHttpRequest.prototype ||
         "responseArrayBuffer" in XMLHttpRequest.prototype) { return; }
-    Object.defineProperty(XMLHttpRequest.prototype, "response", {
-      get: function() { return new Uint8Array(new VBArray(this.responseBody).toArray()); }});
+    var getter;
+    // If we have access to the VBArray (i.e., we're in IE), use that
+    if(window.VBArray) {
+      getter = function() {
+        return new Uint8Array(new VBArray(this.responseBody).toArray()); }}
+    // Okay... umm.. untyped arrays? This may break completely.
+    // (Android browser 2.3 and 3 don't do typed arrays)
+    else { getter = function() { this.responseBody; }}
+    Object.defineProperty(XMLHttpRequest.prototype, "response", {get: getter});
   }(window));
 
 
@@ -578,7 +585,7 @@
         font.data = new Uint8Array(arrayBuffer);
         font.ondownloaded();
       } else {
-        error("Error downloading font resource from "+url);
+        font.onerror("Error downloading font resource from "+font.url);
       }
     };
     xhr.send(null);
