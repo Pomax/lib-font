@@ -719,15 +719,6 @@ Font.prototype.measureSegment = function(textSegment, metrics, padding) {
   // it to an integer.
   if (xpos !== (xpos | 0)) { xpos = xpos | 0; }
 
-  // Set all canvas pixeldata values to 255, with all the content
-  // data being 0. This lets us scan for data[i] != 255.
-  ctx.clearRect(-padding, -padding, w + 2 * padding, h + 2 * padding);
-  ctx.fillStyle = "white";
-  ctx.fillRect(-padding, -padding, w + 2 * padding, h + 2 * padding);
-  // Then render the text centered on the canvas surface.
-  ctx.fillStyle = "black";
-  ctx.fillText(textSegment, xpos, baseline);
-
   // Rather than getting all four million+ subpixels, we
   // instead get a (much smaller) subset that we know
   // contains our text. Canvas pixel data is w*4 by h*4,
@@ -736,8 +727,18 @@ Font.prototype.measureSegment = function(textSegment, metrics, padding) {
   var scanwidth = (localMtx.width + padding) | 0,
       scanheight = 4 * localMtx.fontsize,
       x_offset = xpos - padding / 2,
-      y_offset = baseline-scanheight / 2,
-      pixelData = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight).data;
+      y_offset = baseline-scanheight / 2;
+
+  // Set all canvas pixeldata values to 255, with all the content
+  // data being 0. This lets us scan for data[i] != 255.
+  ctx.fillStyle = "white";
+  ctx.fillRect(x_offset, y_offset, scanwidth, scanheight);
+  // Then render the text centered on the canvas surface.
+  ctx.fillStyle = "black";
+  ctx.fillText(textSegment, xpos, baseline); 
+
+  // Get the pixel data from the canvas
+  var pixelData = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight).data;
 
   // Set up our scanline variables
   var i = 0,
@@ -767,10 +768,6 @@ Font.prototype.measureSegment = function(textSegment, metrics, padding) {
     i -= w4;
     if (i < 0) { j++; i = (len - 3) - (step++) * 4; }}
   var maxx = scanwidth - j;
-
-  var id = ctx.getImageData(x_offset, y_offset, scanwidth, scanheight);
-  id.data = pixelData;
-  ctx.putImageData(id, x_offset, y_offset);
 
   // We have all our localMtx now, so fill in the
   // localMtx object and return it to the user.
