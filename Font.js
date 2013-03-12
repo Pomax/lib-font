@@ -15,7 +15,7 @@
   all versions of Firefox, Chrome, Opera, IE and Safari
   that were 'current' (Firefox 9, Chrome 16, Opera 11.6,
   IE9, Safari 5.1) at the time Font.js was released.
-  
+
   Font.js will not work on IE8 or below due to the lack
   of Object.defineProperty - I recommend using the
   solution outlined in http://ie6update.com/ for websites
@@ -24,7 +24,7 @@
   Explorer 9 yet, or simply not using Internet Explorer if
   you're still using Windows XP. If you have friends or
   family that still use IE8 or below: intervene.
-  
+
   You may remove every line in this header except for
   the first block of four lines, for the purposes of
   saving space and minification. If minification strips
@@ -138,7 +138,7 @@
 
   // the font's byte code
   Font.prototype.data = "";
-  
+
   // custom font, implementing the letter 'A' as zero-width letter.
   Font.prototype.base64 = "AAEAAAAKAIAAAwAgT1MvMgAAAAAAAACsAAAAWGNtYXAA"+
                           "AAAAAAABBAAAACxnbHlmAAAAAAAAATAAAAAQaGVhZAAAA"+
@@ -223,6 +223,8 @@
    * This gets called when the file is done downloading.
    */
   Font.prototype.ondownloaded = function () {
+    var instance = this;
+
     // decimal to character
     var chr = function (val) {
       return String.fromCharCode(val);
@@ -266,7 +268,7 @@
 
     // unified error handling
     var error = function (msg) {
-      this.onerror(msg);
+      instance.onerror(msg);
     };
 
     // we know about TTF (0x00010000) and CFF ('OTTO') fonts
@@ -453,10 +455,10 @@
         }
       }
     }
-    
+
     this.bootstrapValidation(printChar, false);
   }
-  
+
   Font.prototype.bootstrapValidation = function (printChar, timeout) {
     // Create a stylesheet for using the zero-width font:
     var tfName = this.fontFamily+" testfont";
@@ -570,7 +572,7 @@
     // System font?
     if(this.url.indexOf(".") === -1) {
       setTimeout(function(){
-        font.processSystemFont(); 
+        font.processSystemFont();
       }, 10);
       return;
     }
@@ -651,8 +653,8 @@
     if (minSegments <= 1) { segments.push(textString); }
     else {
       // TODO: add the chopping code here. For now this
-      // code acts as placeholder 
-      segments.push(textString); 
+      // code acts as placeholder
+      segments.push(textString);
     }
 
     // run through all segments, updating the metrics as we go.
