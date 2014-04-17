@@ -204,9 +204,7 @@
       this.onerror("Requested system font '"+this.fontFamily+"' could not be loaded (it may not be installed).");
       return;
     }
-
-    var computedStyle = document.defaultView.getComputedStyle(target, '');
-    var width = computedStyle.getPropertyValue("width").replace("px", '');
+    var width = getComputedStyle(target, null).getPropertyValue("width").replace("px", '');
     // font has finished loading - remove the zero-width and
     // validation paragraph, but leave the actual font stylesheet (mark);
     if (width > 0) {
@@ -216,7 +214,13 @@
       this.onload();
     }
     // font has not finished loading - wait 50ms and try again
-    else { setTimeout(function () { font.validate(target, zero, mark, font, timeout === false ? false : timeout-50); }, 50); }
+    else {
+      console.log("timing out");
+      setTimeout(function () {
+        font.validate(target, zero, mark, font, timeout === false ? false : timeout-50);
+      },
+      1000);
+    }
   };
 
   /**
@@ -384,6 +388,7 @@
     // Now, if we found a format 4 {windows/unicode} cmap subtable,
     // we can find a suitable glyph and modify the 'base64' content.
     if (cmap314 !== false) {
+
       ptr += cmap314;
       version = ushort(data[ptr], data[ptr+1]);
       if (version === 4) {
@@ -408,7 +413,7 @@
           endChar = false;
         }
 
-        if (endChar !== false) {
+        if (endChar != false) {
           // We now have a printable character to validate with!
           // We need to make sure to encode the correct "idDelta"
           // value for this character, because our "glyph" will
@@ -418,7 +423,8 @@
           //   [character code] + [delta value] == 1
           //
           printChar = String.fromCharCode(endChar);
-          var delta = -(endChar - 1) + 65536;
+
+          var delta = (-(endChar - 1) + 65536) % 65536;
 
           // Now we need to substitute the values in our
           // base64 font template. The CMAP modification
@@ -441,12 +447,13 @@
           // Note: in order to do so properly, we need to
           // make sure that the bytes are base64 aligned, so
           // we have to add a leading 0x00:
-          var newhex = btoa(chr(0) +                         // base64 padding byte
-                            chr16(endChar) + chr16(0xFFFF) + // "endCount" array
-                            chr16(0) +                       // cmap required padding
-                            chr16(endChar) + chr16(0xFFFF) + // "startCount" array
-                            chr16(delta) +                   // delta value
-                            chr16(1));                       // delta terminator
+          var newcode = chr(0) +                         // base64 padding byte
+                        chr16(endChar) + chr16(0xFFFF) + // "endCount" array
+                        chr16(0) +                       // cmap required padding
+                        chr16(endChar) + chr16(0xFFFF) + // "startCount" array
+                        chr16(delta) +                   // delta value
+                        chr16(1);                        // delta terminator
+          var newhex = btoa(newcode);
 
           // And now we replace the text in 'base64' at
           // position 380 with this new base64 string:
@@ -486,9 +493,9 @@
     document.body.appendChild(para);
 
     // Quasi-error: if there is no getComputedStyle, claim loading is done.
-    if (!document.defaultView.getComputedStyle) {
+    if (typeof getComputedStyle === "undefined") {
       this.onload();
-      error("Error: document.defaultView.getComputedStyle is not supported by this browser.\n" +
+      error("Error: getComputedStyle is not supported by this browser.\n" +
             "Consequently, Font.onload() cannot be trusted."); }
 
     // If there is getComputedStyle, we do proper load completion verification.
@@ -543,7 +550,9 @@
       // We need to alias "this" because the keyword "this"
       // becomes the global context after the timeout.
       var local = this;
-      var delayedValidate = function() { local.validate(para, zerowidth, realfont, local, timeout); };
+      var delayedValidate = function() {
+        local.validate(para, zerowidth, realfont, local, timeout);
+      };
       setTimeout(delayedValidate, 50);
     }
   };
@@ -625,7 +634,7 @@
   Font.prototype.measureText = function (textString, fontSize) {
     // error shortcut
     if (!this.loaded) {
-      error("measureText() was called while the font was not yet loaded");
+      this.error("measureText() was called while the font was not yet loaded");
       return false;
     }
 
@@ -793,10 +802,14 @@
    */
   Object.defineProperty(Font.prototype, "src", { set: function(url) { this.url=url; this.loadFont(); }});
 
-
   /**
    * Bind to global scope
    */
-  window.Font = Font;
-
+  if(typeof define !== "undefined") {
+    define(function() {
+      return Font;
+    });
+  } else {
+    window.Font = Font;
+  }
 }(window));
