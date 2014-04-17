@@ -125,10 +125,10 @@
     Not-borrowed-code starts here!
 
    **/
-  function Font() {}
-
-  // if this is not specified, a random name is used
-  Font.prototype.fontFamily = "fjs" + (999999 * Math.random() | 0);
+  function Font() {
+    // if this is not specified, a random name is used
+    this.fontFamily = "fjs" + (999999 * Math.random() | 0);
+  }
 
   // the font resource URL
   Font.prototype.url = "";
