@@ -632,9 +632,8 @@
    * separately.
    */
   Font.prototype.measureText = function (textString, fontSize) {
-    // error shortcut
     if (!this.loaded) {
-      this.error("measureText() was called while the font was not yet loaded");
+      this.onerror("measureText() was called while the font was not yet loaded");
       return false;
     }
 
