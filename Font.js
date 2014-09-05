@@ -599,6 +599,9 @@
         font.onerror("Error downloading font resource from "+font.url);
       }
     };
+    xhr.onerror = function (evt) {
+      font.onerror("Error downloading font resource from "+font.url);
+    };
     xhr.send(null);
   };
 
