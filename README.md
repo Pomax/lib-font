@@ -1,3 +1,14 @@
+Before you decide to use this library, be aware that [OpenType.js](https://nodebox.github.io/opentype.js)
+has become better at doing what you were probably thinking
+of using Font.js for - I still think JavaScript needs
+a Font object, but at this point rewriting it from
+scratch so that it's backed by OpenType.js is far more
+sensible than using Font.js in its current form. So:
+head on over there and discover an amazing library.
+
+With that said....
+
+
 Font.js
 =======
 
