@@ -204,7 +204,7 @@
       this.onerror("Requested system font '"+this.fontFamily+"' could not be loaded (it may not be installed).");
       return;
     }
-    var width = getComputedStyle(target, null).getPropertyValue("width").replace("px", '');
+    var width = getComputedStyle(target, null).getPropertyValue("width").replace("px", '').replace(",",'.') ;
     // font has finished loading - remove the zero-width and
     // validation paragraph, but leave the actual font stylesheet (mark);
     if (width > 0) {
