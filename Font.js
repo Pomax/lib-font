@@ -631,7 +631,7 @@
     var fixedIEUrl = this.url.replace('.ttf', '.eot');
     var styletext = "@font-face {\n";
        styletext += "  font-family: '" + this.fontFamily + "';\n";
-       styletext += "  src: url('" + fixedIEUrl + "') format(eot), url('" + this.url + "') format('" + this.format + "');\n";
+       styletext += "  src: url('" + fixedIEUrl + "') format('eot'), url('" + this.url + "') format('" + this.format + "');\n";
        styletext += "}";
     this.styleNode.innerHTML = styletext;
     return this.styleNode;
