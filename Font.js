@@ -134,6 +134,20 @@
                     get: () => this.getValue(name, increment)
                 });    
             });
+
+            Object.defineProperty(this, `uint128`, {
+                // I have no idea why the variable uint128 was chosen over a
+                // fixed-width uint32, but it was, and so we need to decode it.
+                get: () => {
+                    let value = 0;
+                    for (let i=0; i<5; i++) {
+                        let byte = this.uint8;
+                        value = (value * 128) + (byte & 127);
+                        if (byte < 128) break;
+                    }
+                    return value;
+                }
+            })
         }
         getValue(type, increment) {
             let pos = this.start + this.offset;
@@ -195,8 +209,8 @@
      * Table Record struct.
      */
     class TableRecord {
-        constructor(dataview, start) {
-            const p = new Parser("sfnt", { offset: start }, dataview);
+        constructor(dataview, offset) {
+            const p = new Parser("table record", { offset }, dataview);
             const t = p.uint32;
             this.tag = asText([t>>24, t>>16 & 255, t>>8 & 255, t & 255]);
             this.checksum = p.uint32;
@@ -208,6 +222,8 @@
 
     /**
      * the SFNT header.
+     * 
+     * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for more information
      */
     class SFNTheader {
         constructor(dataview) {
@@ -228,6 +244,83 @@
             this.tables.forEach(dict => {
                 lazy(this, dict.tag.trim(), () => dict.table);
             });
+        }
+    }
+
+    function getWOFF2Tag(flag) {
+        return [
+            `cmap`,`head`,`hhea`,`hmtx`,`maxp`,`name`,`OS/2`,`post`,`cvt `,`fpgm`,`glyf`,`loca`,`prep`,
+            `CFF `,`VORG`,`EBDT`,`EBLC`,`gasp`,`hdmx`,`kern`,`LTSH`,`PCLT`,`VDMX`,`vhea`,`vmtx`,`BASE`,
+            `GDEF`,`GPOS`,`GSUB`,`EBSC`,`JSTF`,`MATH`,`CBDT`,`CBLC`,`COLR`,`CPAL`,`SVG `,`sbix`,`acnt`,
+            `avar`,`bdat`,`bloc`,`bsln`,`cvar`,`fdsc`,`feat`,`fmtx`,`fvar`,`gvar`,`hsty`,`just`,`lcar`,
+            `mort`,`morx`,`opbd`,`prop`,`trak`,`Zapf`,`Silf`,`Glat`,`Gloc`,`Feat`,`Sill`
+        ][flag];
+    }
+
+    /**
+     * WOFF2 Table Directory Entry
+     */
+    class TableDirectoryEntry {
+        constructor(dataview, offset) {
+            const p = new Parser("WOFF2 table record", { offset }, dataview);
+            this.flags = p.uint8;
+
+            const tagNumber  = this.flags & 63;
+            if (tagNumber === 63) {
+                const t = p.uint32;
+                const letters = [t >> 24, t >> 16 & 255, t >> 8 & 255, t & 255];
+                this.tag = asText(letters);
+            } else {
+                this.tag = getWOFF2Tag(tagNumber);
+            }
+
+            this.origLength = p.uint128;
+
+            const pptVersion = this.flags >> 6;
+            if (pptVersion !== 0 || ((this.tag === 'glyf' || this.tag === 'loca') && pptVersion !== 3)) {
+                this.transformLength = p.uint128;
+            }
+
+            this.length = p.offset;
+            // lazy(this, `table`, () => createTable(this, dataview));
+        }
+    }
+
+    /**
+     * The WOFF2 header
+     * See https://www.w3.org/TR/WOFF2 for more information
+     */
+    class WOFF2Header {
+        constructor(dataview) {
+            const p = new Parser("woff2", { offset: 0, length: 48 }, dataview);
+            const s = p.uint32;
+            this.signature = asText([s>>24, s>>16 & 255, s>>8 & 255, s & 255]);
+            this.flavor = p.uint32;
+            this.length = p.uint32;
+
+            this.numTables = p.uint16;
+            p.uint16 // reserved, should be 0
+            
+            this.totalSfntSize = p.uint32;
+            this.totalCompressedSize = p.uint32;
+            this.majorVersion = p.uint16;
+            this.minorVersion = p.uint16;
+            this.metaOffset = p.uint32;
+            this.metaLength = p.uint32;
+            this.metaOrigLength = p.uint32;
+            this.privOffset = p.uint32;
+            this.privLength = p.uint32;
+            p.verifyLength();
+
+            // parse the dictionary
+            let dictOffset = p.offset;
+            this.directory = [... new Array(this.numTables)].map((_,i) => {
+                let entry = new TableDirectoryEntry(dataview, dictOffset);
+                dictOffset += entry.length;
+                return entry;
+            });
+
+            this.compressedDataStart = dictOffset;
         }
     }
 
@@ -275,9 +368,10 @@
          * @param {String} url The URL for the font in question 
          */
         async loadFont(url) {
+            const type = getFontCSSFormat(url);
             fetch(url)
             .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
-            .then(buffer => this.fromDataBuffer(buffer))
+            .then(buffer => this.fromDataBuffer(buffer, type))
             .catch(err => {
                 console.error(err);
                 const evt = new Event(`error`, err, `Failed to load font at ${url}`);
@@ -291,9 +385,9 @@
          * 
          * @param {Buffer} buffer The binary data associated with this font.  
          */
-        async fromDataBuffer(buffer) {
+        async fromDataBuffer(buffer, type) {
             this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
-            await this.parseBasicData();
+            await this.parseBasicData(type);
             const evt = new Event("load", { font: this });
             this.dispatch(evt);
             if (this.onload) this.onload(evt);
@@ -302,8 +396,13 @@
         /**
          * This is a non-blocking operation if called from an async function
          */
-        async parseBasicData() {
-            this.sfnt = new SFNTheader(this.fontData);
+        async parseBasicData(type) {
+            if (type === `truetype` || type === `opentype`) {
+                this.sfnt = new SFNTheader(this.fontData);
+            }
+            if (type === `WOFF2`) {
+                this.woff2 = new WOFF2Header(this.fontData);
+            }
         }
     }
 
