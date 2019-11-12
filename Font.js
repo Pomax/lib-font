@@ -138,7 +138,13 @@
         getValue(type, increment) {
             let pos = this.start + this.offset;
             this.offset += increment;
-            return this.data[type](pos);
+            try {
+                return this.data[type](pos);
+            } catch (e) {
+                console.log(this.data);
+                console.log(this.start, this.offset);
+                throw e;
+            }
         }
         flags(n) {
             if (n === 8 || n === 16 || n === 32 || n === 64) {
@@ -171,7 +177,7 @@
             this.unitsPerEm = p.uint16;
             let startDate = (new Date(`1904-01-01T00:00:00+0000`)).getTime();
             this.created = new Date(startDate + 1000 * parseInt(p.int64.toString()));
-            this.modified = new Date(startDate + 1000 * parseInt(p.int64.toString()));;
+            this.modified = new Date(startDate + 1000 * parseInt(p.int64.toString()));
             this.xMin = p.int16;
             this.yMin = p.int16;
             this.xMax = p.int16;
@@ -193,9 +199,9 @@
             const p = new Parser("sfnt", { offset: start }, dataview);
             const t = p.uint32;
             this.tag = asText([t>>24, t>>16 & 255, t>>8 & 255, t & 255]);
+            this.checksum = p.uint32;
             this.offset = p.uint32;
             this.length = p.uint32;
-            this.checksum = p.uint32;
             lazy(this, `table`, () => createTable(this, dataview));
         }
     }
