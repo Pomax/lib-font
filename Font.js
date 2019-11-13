@@ -1,4 +1,4 @@
-(function Font(scope) {
+(function Font(scope, gzipDecode, brotliDecode) {
     "use strict";
 
     /**
@@ -61,8 +61,8 @@
         let format = {
             ttf: `truetype`,
             otf: `opentype`,
-            woff: `WOFF`,
-            woff2: `WOFF2`
+            woff: `woff`,
+            woff2: `woff2`
         }[ext];
 
         if (format) return format;
@@ -247,6 +247,12 @@
         }
     }
 
+
+    /**
+     * WOFF2 uses a numbered tag registry, such that only unknown tables require a 4 byte tag
+     * in the WOFF directory entry struct. Everything else uses a uint8. Nice and tidy.
+     * @param {*} flag 
+     */
     function getWOFF2Tag(flag) {
         return [
             `cmap`,`head`,`hhea`,`hmtx`,`maxp`,`name`,`OS/2`,`post`,`cvt `,`fpgm`,`glyf`,`loca`,`prep`,
@@ -299,7 +305,7 @@
             this.length = p.uint32;
 
             this.numTables = p.uint16;
-            p.uint16 // reserved, should be 0
+            p.uint16 // why woff2 even has any reserved bytes is a complete mystery. But it does.
             
             this.totalSfntSize = p.uint32;
             this.totalCompressedSize = p.uint32;
@@ -320,7 +326,26 @@
                 return entry;
             });
 
+            // record table offsets in the original data
+            this.directory[0].origOffset = 0;
+            this.directory.forEach((e,i) => {
+                let t = this.directory[i+1]
+                if (t) t.origOffset = e.origOffset + e.origLength;
+            });
+
+            // and then _get_ the original data
             this.compressedDataStart = dictOffset;
+            let datablock = dataview.buffer.slice(dictOffset);
+            let data = new Uint8Array(datablock);
+            let decoded = brotliDecode(data);
+            console.log("reported original size:", this.totalSfntSize);
+            console.log("decoded original data", decoded.length);
+
+            // test the head table:
+            let headEntry = this.directory.find(v => v.tag === "head");
+            let headData = decoded.slice(headEntry.origOffset, headEntry.origOffset + headEntry.origLength);
+            let headTable = new head({ offset: 0, length: headEntry.origLength }, new DataView(headData.buffer));
+            console.log("head table from decoded data", headTable);
         }
     }
 
@@ -357,7 +382,7 @@
             let style = document.createElement(`style`);
             style.className = `injected by Font.js`;
             let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
-            style.textContent = `@font-face {\n\tfont-family: '${name}';\n\t${rules}\n\tsrc: url('${url}') format(${format});\n}`;
+            style.textContent = `@font-face {\n\tfont-family: "${name}";\n\t${rules}\n\tsrc: url("${url}") format("${format}");\n}`;
             this.styleElement = style;
             document.head.appendChild(style);
         }
@@ -400,11 +425,11 @@
             if (type === `truetype` || type === `opentype`) {
                 this.sfnt = new SFNTheader(this.fontData);
             }
-            if (type === `WOFF2`) {
+            if (type === `woff2`) {
                 this.woff2 = new WOFF2Header(this.fontData);
             }
         }
     }
 
     scope.Font = Font;
-})(this);
+})(this, this.pako ? this.pako.Inflate : undefined, this.unbrotli);
