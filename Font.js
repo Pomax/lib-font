@@ -22,7 +22,7 @@
     /**
      * Simple event manager so people can write the
      * same code they would for anything else.
-     */   
+     */
     class EventManager {
         constructor() {
             this.listeners = {};
@@ -97,7 +97,7 @@
         Object.defineProperty(object, property, {
             get: getter
         });
-    } 
+    }
 
     function createTable(dict, dataview) {
         if (dict.tag === `head`) return new head(dict, dataview);
@@ -132,7 +132,7 @@
                 let increment = parseInt(name.replace(/[^\d]/g,'')) / 8;
                 Object.defineProperty(this, fn, {
                     get: () => this.getValue(name, increment)
-                });    
+                });
             });
 
             Object.defineProperty(this, `uint128`, {
@@ -222,7 +222,7 @@
 
     /**
      * the SFNT header.
-     * 
+     *
      * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for more information
      */
     class SFNTheader {
@@ -251,7 +251,7 @@
     /**
      * WOFF2 uses a numbered tag registry, such that only unknown tables require a 4 byte tag
      * in the WOFF directory entry struct. Everything else uses a uint8. Nice and tidy.
-     * @param {*} flag 
+     * @param {*} flag
      */
     function getWOFF2Tag(flag) {
         return [
@@ -306,7 +306,7 @@
 
             this.numTables = p.uint16;
             p.uint16 // why woff2 even has any reserved bytes is a complete mystery. But it does.
-            
+
             this.totalSfntSize = p.uint32;
             this.totalCompressedSize = p.uint32;
             this.majorVersion = p.uint16;
@@ -335,9 +335,9 @@
 
             // and then _get_ the original data
             this.compressedDataStart = dictOffset;
-            let datablock = dataview.buffer.slice(dictOffset);
-            let data = new Uint8Array(datablock);
-            let decoded = brotliDecode(data);
+            let decoded = brotliDecode(
+                new Uint8Array(dataview.buffer.slice(dictOffset))
+            );
             console.log("reported original size:", this.totalSfntSize);
             console.log("decoded original data", decoded.length);
 
@@ -362,7 +362,7 @@
         /**
          * Just like Image and Audio, we kick everything off when
          * our `src` gets assigned.
-         * 
+         *
          * @param {string} url
          */
         set src(url) {
@@ -389,8 +389,8 @@
 
         /**
          * This is a non-blocking operation.
-         * 
-         * @param {String} url The URL for the font in question 
+         *
+         * @param {String} url The URL for the font in question
          */
         async loadFont(url) {
             const type = getFontCSSFormat(url);
@@ -407,8 +407,8 @@
 
         /**
          * This is a non-blocking operation.
-         * 
-         * @param {Buffer} buffer The binary data associated with this font.  
+         *
+         * @param {Buffer} buffer The binary data associated with this font.
          */
         async fromDataBuffer(buffer, type) {
             this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
