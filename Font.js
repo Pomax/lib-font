@@ -155,8 +155,8 @@
             try {
                 return this.data[type](pos);
             } catch (e) {
-                console.log(this.data);
-                console.log(this.start, this.offset);
+                // console.error(`parser`, this.data);
+                // console.error(`parser`, this.start, this.offset);
                 throw e;
             }
         }
@@ -216,7 +216,6 @@
             this.checksum = p.uint32;
             this.offset = p.uint32;
             this.length = p.uint32;
-            lazy(this, `table`, () => createTable(this, dataview));
         }
     }
 
@@ -236,17 +235,94 @@
 
             // parse the dictionary
             const dictOffset = 12;
-            this.tables = [... new Array(this.numTables)].map((_,i) =>
+            this.directory = [... new Array(this.numTables)].map((_,i) =>
                 new TableRecord(dataview, dictOffset + i * 16)
             );
 
             // add convenience bindings for each table, with lazy loading
-            this.tables.forEach(dict => {
-                lazy(this, dict.tag.trim(), () => dict.table);
+            this.tables = {};
+            this.directory.forEach(entry => {
+                let table = false;
+                Object.defineProperty(this.tables, entry.tag.trim(), {
+                    get: () => {
+                        if (table) return table;
+                        table = createTable({
+                            tag: entry.tag,
+                            offset: entry.offset,
+                            length: entry.length
+                        }, dataview);
+                        return table;
+                    }
+                });
             });
         }
     }
 
+    /**
+     * ...
+     */
+    class WoffTableDirectoryEntry {
+        constructor(dataview, offset) {
+            const p = new Parser("woff", { offset, length: 20 }, dataview);
+            const t = p.uint32;
+            this.tag = asText([t>>24, t>>16 & 255, t>>8 & 255, t & 255]);
+            this.offset = p.uint32;
+            this.compLength = p.uint32;
+            this.origLength = p.uint32;
+            this.origChecksum = p.uint32;
+            p.verifyLength();
+        }
+    }
+
+    /**
+     * The WOFF header
+     * See https://www.w3.org/TR/WOFF for more information
+     */
+    class WOFFHeader {
+        constructor(dataview) {
+            const p = new Parser("woff", { offset: 0, length: 44 }, dataview);
+            const s = p.uint32;
+            this.signature = asText([s>>24, s>>16 & 255, s>>8 & 255, s & 255]);
+            this.flavor = p.uint32;
+            this.length = p.uint32;
+            this.numTables = p.uint16;
+            p.uint16;
+            this.totalSfntSize = p.uint32;
+            this.majorVersion = p.uint16;
+            this.minorVersion = p.uint16;
+            this.metaOffset = p.uint32;
+            this.metaLength = p.uint32;
+            this.metaOrigLength = p.uint32;
+            this.privOffset = p.uint32;
+            this.privLength = p.uint32;
+            p.verifyLength();
+
+            // parse the dictionary
+            let dictOffset = p.offset;
+            this.directory = [... new Array(this.numTables)].map((_,i) =>
+                new WoffTableDirectoryEntry(dataview, dictOffset + i * 20)
+            );
+
+            // build lazy lookups
+            this.tables = {};
+            this.directory.forEach(entry => {
+                let table = false;
+                Object.defineProperty(this.tables, entry.tag.trim(), {
+                    get: () => {
+                        if (table) return table;
+
+                        let unpacked = gzipDecode(new Uint8Array(dataview.buffer.slice(entry.offset, entry.offset + entry.compLength)));
+                        table = createTable({
+                            tag: entry.tag,
+                            offset: 0,
+                            length: entry.origLength
+                        }, new DataView(unpacked.buffer));
+                        return table;
+                    }
+                });
+            });
+        }
+    }
 
     /**
      * WOFF2 uses a numbered tag registry, such that only unknown tables require a 4 byte tag
@@ -266,7 +342,7 @@
     /**
      * WOFF2 Table Directory Entry
      */
-    class TableDirectoryEntry {
+    class Woff2TableDirectoryEntry {
         constructor(dataview, offset) {
             const p = new Parser("WOFF2 table record", { offset }, dataview);
             this.flags = p.uint8;
@@ -321,7 +397,7 @@
             // parse the dictionary
             let dictOffset = p.offset;
             this.directory = [... new Array(this.numTables)].map((_,i) => {
-                let entry = new TableDirectoryEntry(dataview, dictOffset);
+                let entry = new Woff2TableDirectoryEntry(dataview, dictOffset);
                 dictOffset += entry.length;
                 return entry;
             });
@@ -333,19 +409,31 @@
                 if (t) t.origOffset = e.origOffset + e.origLength;
             });
 
-            // and then _get_ the original data
+            // then decompress the original data
             this.compressedDataStart = dictOffset;
             let decoded = brotliDecode(
                 new Uint8Array(dataview.buffer.slice(dictOffset))
             );
-            console.log("reported original size:", this.totalSfntSize);
-            console.log("decoded original data", decoded.length);
 
-            // test the head table:
-            let headEntry = this.directory.find(v => v.tag === "head");
-            let headData = decoded.slice(headEntry.origOffset, headEntry.origOffset + headEntry.origLength);
-            let headTable = new head({ offset: 0, length: headEntry.origLength }, new DataView(headData.buffer));
-            console.log("head table from decoded data", headTable);
+            // finally, build lazy lookups
+            this.tables = {};
+            this.directory.forEach(entry => {
+                let table = false;
+                Object.defineProperty(this.tables, entry.tag.trim(), {
+                    get: () => {
+                        if (table) return table;
+
+                        let data = decoded.slice(entry.origOffset, entry.origOffset + entry.origLength);
+                        table = createTable({
+                            tag: entry.tag,
+                            offset: 0,
+                            length: entry.origLength
+                        }, new DataView(data.buffer));
+
+                        return table;
+                    }
+                });
+            });
         }
     }
 
@@ -398,7 +486,6 @@
             .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
             .then(buffer => this.fromDataBuffer(buffer, type))
             .catch(err => {
-                console.error(err);
                 const evt = new Event(`error`, err, `Failed to load font at ${url}`);
                 this.dispatch(evt);
                 if (this.onerror) this.onerror(evt);
@@ -425,6 +512,9 @@
             if (type === `truetype` || type === `opentype`) {
                 this.sfnt = new SFNTheader(this.fontData);
             }
+            if (type === `woff`) {
+                this.woff = new WOFFHeader(this.fontData);
+            }
             if (type === `woff2`) {
                 this.woff2 = new WOFF2Header(this.fontData);
             }
@@ -432,4 +522,4 @@
     }
 
     scope.Font = Font;
-})(this, this.pako ? this.pako.Inflate : undefined, this.unbrotli);
+})(this, this.pako ? this.pako.inflate : undefined, this.unbrotli);
