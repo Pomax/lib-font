@@ -1,6 +1,7 @@
 (function Font(scope, gzipDecode, brotliDecode) {
     "use strict";
 
+
     /**
      * Simple event object so people can write the
      * same code they would for anything else.
@@ -18,6 +19,7 @@
         valueOf() { return this; }
         toString() { return this.msg ? `[${this.type} event]: ${this.msg}` : `[${this.type} event]`; }
     }
+
 
     /**
      * Simple event manager so people can write the
@@ -52,9 +54,14 @@
     }
 
 
-    // ====================
-
-
+    /**
+     * either return the appropriate CSS format
+     * for a specific font URL, or generate an 
+     * error if someone is trying to use a
+     * font that died years ago.
+     * 
+     * @param {*} path 
+     */
     function getFontCSSFormat(path) {
         let pos = path.lastIndexOf(`.`);
         let ext = (path.substring(pos + 1) || ``).toLowerCase();
@@ -79,6 +86,12 @@
         this.dispatch(new Event(`error`, {}, msg));
     }
 
+
+    /**
+     * Borderline trivial http response helper function
+     * 
+     * @param {HttpResponse} response 
+     */
     function checkFetchResponseStatus(response) {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status} - ${response.statusText}`);
@@ -86,6 +99,11 @@
         return response;
     }
 
+    /**
+     * Convert an array of uint8 char into a proper string.
+     * 
+     * @param {uint8[]} data 
+     */
     function asText(data) {
         return Array
         .from(data)
@@ -93,66 +111,48 @@
         .join(``);
     }
 
+    /**
+     * Build late-evaluating properties for each table in a
+     * woff/woff2 font, so that accessing a table via the
+     * woff.tables.tableName or woff2.tables.tableName
+     * property kicks off a table parse on first access.
+     * 
+     * @param {*} woff the woff or woff2 font object
+     * @param {DataView} dataview passed when dealing with woff
+     * @param {buffer} decoded passed when dealing with woff2
+     */
     function buildWoffLazyLookups(woff, dataview, decoded) {
         woff.tables = {};
         woff.directory.forEach(entry => {
             let table = false;
             let tableFn = () => {};
+
+            // woff2 handling requires parsing within pre-unpacked table data.
             if (decoded) {
                 tableFn = () => {
-                    if (entry.origOffset > decoded.length) {
-                        console.log(
-                            "original offset is past the decoded data length?",
-                            "offset:", entry.origOffset,
-                            "data length:", decoded.length
-                        );
-                    }
-                    let data = decoded.slice(entry.origOffset, entry.origOffset + entry.origLength);
-                    table = createTable({
-                        tag: entry.tag,
-                        offset: 0,
-                        length: entry.origLength
-                    }, new DataView(data.buffer));
-                };
-            } else {
-                tableFn = () => {
-                    // Is this a compressed table?
-                    if (entry.compLength !== entry.origLength) {
-                        let unpacked = gzipDecode(
-                            new Uint8Array(
-                                dataview.buffer.slice(
-                                    entry.offset,
-                                    entry.offset + entry.compLength
-                                )
-                            )
-                        );
-                        table = createTable({
-                            tag: entry.tag,
-                            offset: 0,
-                            length: entry.origLength
-                        }, new DataView(unpacked.buffer));
-                    }
-                    
-                    // no, this is not a compressed table
-                    else {
-                        table = createTable({
-                            tag: entry.tag,
-                            offset: entry.offset,
-                            length: entry.origLength
-                        }, dataview);
-                    }
+                    const useTransform = typeof entry.transformLength !== "undefined";
+                    const data = decoded.slice(entry.origOffset, entry.origOffset + (useTransform ? entry.transformLength : entry.origLength));
+                    table = createTable({ tag: entry.tag, offset: 0, length: entry.origLength }, new DataView(data.buffer));
                 };
             }
+
+            // woff handling requires gzip.inflate'ing table data before parsing
+            else {
+                tableFn = () => {
+                    let offset = 0;
+                    let view = dataview;
+                    if (entry.compLength !== entry.origLength) {
+                        const unpacked = gzipDecode(new Uint8Array(dataview.buffer.slice(entry.offset, entry.offset + entry.compLength)));
+                        view = new DataView(unpacked.buffer);
+                    } else { offset = entry.offset; }
+                    table = createTable({ tag: entry.tag, offset, length: entry.origLength }, view);
+                };
+            }
+            
             Object.defineProperty(woff.tables, entry.tag.trim(), {
                 get: () => { if (table) return table; tableFn(); return table; }
             });
         });
-    }
-
-    function createTable(dict, dataview) {
-        if (dict.tag === `head`) return new head(dict, dataview);
-        // further code goes here once more table parsers exist
-        return {};
     }
 
 
@@ -212,15 +212,82 @@
         }
         flags(n) {
             if (n === 8 || n === 16 || n === 32 || n === 64) {
-                return this[`uint${n}`].toString(2).padStart(16,0).split(``).map(v => v==="1");
+                return this[`uint${n}`].toString(2).padStart(n,0).split(``).map(v => v==="1");
             }
             console.error(`Error parsing flags: flag types can only be 1, 2, 4, or 8 bytes long`);
             console.trace();
         }
         verifyLength() {
             if (this.offset != this.length) {
-                console.error(`unexpected parsed table size for "${this.name}" (${this.offset} != ${this.length})`);
+                console.error(`unexpected parsed table size (${this.offset}) for "${this.name}" (expected ${this.length})`);
             }
+        }
+    }
+
+    /**
+     * Table factory
+     * @param {*} dict 
+     * @param {*} dataview 
+     */
+    function createTable(dict, dataview) {
+        if (dict.tag === `head`) return new head(dict, dataview);
+        if (dict.tag === `gasp`) return new gasp(dict, dataview);
+        if (dict.tag === `OS/2`) return new OS2(dict, dataview);
+        // further code goes here once more table parsers exist
+        return {};
+    }
+
+
+    /**
+     * The OpenType `OS/2` table.
+     */
+    class OS2 {
+        constructor(dict, dataview) {
+            const p = new Parser(`OS/2`, dict, dataview);
+            this.version = p.uint16;
+            this.xAvgCharWidth = p.int16;
+            this.usWeightClass = p.uint16;
+            this.usWidthClass = p.uint16;
+            this.fsType = p.uint16;
+            this.ySubscriptXSize = p.int16;
+            this.ySubscriptYSize = p.int16;
+            this.ySubscriptXOffset = p.int16;
+            this.ySubscriptYOffset = p.int16;
+            this.ySuperscriptXSize = p.int16;
+            this.ySuperscriptYSize = p.int16;
+            this.ySuperscriptXOffset = p.int16;
+            this.ySuperscriptYOffset = p.int16;
+            this.yStrikeoutSize = p.int16;
+            this.yStrikeoutPosition = p.int16;
+            this.sFamilyClass = p.int16;
+            this.panose = [... new Array(10)].map(_ => p.uint8);
+            this.ulUnicodeRange1 = p.flags(32);
+            this.ulUnicodeRange2 = p.flags(32);
+            this.ulUnicodeRange3 = p.flags(32);
+            this.ulUnicodeRange4 = p.flags(32);
+            const v = p.uint32;
+            this.achVendID = asText([v >> 24, v >> 16 & 255, v >> 8 & 255, v & 255]);
+            this.fsSelection = p.uint16;
+            this.usFirstCharIndex = p.uint16;
+            this.usLastCharIndex = p.uint16;
+            this.sTypoAscender = p.int16;
+            this.sTypoDescender = p.int16;
+            this.sTypoLineGap = p.int16;
+            this.usWinAscent = p.uint16;
+            this.usWinDescent = p.uint16;
+            if (this.version === 0) p.verifyLength();
+            this.ulCodePageRange1 = p.flags(32);
+            this.ulCodePageRange2 = p.flags(32);
+            if (this.version === 1) p.verifyLength();
+            this.sxHeight = p.int16;
+            this.sCapHeight = p.int16;
+            this.usDefaultChar = p.uint16;
+            this.usBreakChar = p.uint16;
+            this.usMaxContext = p.uint16;
+            if (this.version > 1 && this.version <= 4) p.verifyLength();
+            this.usLowerOpticalPointSize = p.uint16;
+            this.usUpperOpticalPointSize = p.uint16;
+            if (this.version === 5) p.verifyLength();
         }
     }
 
@@ -252,6 +319,33 @@
             this.indexToLocFormat = p.uint16;
             this.glyphDataFormat = p.uint16;
             p.verifyLength();
+        }
+    }
+
+    /**
+     * GASPRange record
+     */
+    class GASPRange {
+        constructor(dataview, offset) {
+            const p = new Parser("gasp range", { offset }, dataview);
+            this.rangeMaxPPEM = p.uint16;
+            this.rangeGaspBehavior = p.uint16;
+        }
+    }
+
+    /**
+     * The OpenType `gasp` table.
+     */
+    class gasp {
+        constructor(dict, dataview) {
+            const p = new Parser(`gasp`, dict, dataview);
+            this.version = p.uint16;
+            this.numRanges = p.uint16;
+
+            const gaspOffset = p.offset;
+            this.gaspRange = [... new Array(this.numRanges)].map((_,i) =>
+                new GASPRange(dataview, gaspOffset + i * 4)
+            );
         }
     }
 
@@ -380,7 +474,7 @@
             const p = new Parser("WOFF2 table record", { offset }, dataview);
             this.flags = p.uint8;
 
-            const tagNumber  = this.flags & 63;
+            const tagNumber  = this.tagNumber = this.flags & 63;
             if (tagNumber === 63) {
                 const t = p.uint32;
                 const letters = [t >> 24, t >> 16 & 255, t >> 8 & 255, t & 255];
@@ -390,7 +484,7 @@
             }
 
             this.origLength = p.uint128;
-            const pptVersion = this.flags >> 6;
+            const pptVersion = this.pptVersion = this.flags >> 6;
             if (pptVersion !== 0 || ((this.tag === 'glyf' || this.tag === 'loca') && pptVersion !== 3)) {
                 this.transformLength = p.uint128;
             }
@@ -432,15 +526,17 @@
                 return entry;
             });
 
-            // record table offsets in the original data
+            // compute table byte offsets in the decompressed data
             this.directory[0].origOffset = 0;
             this.directory.forEach((e,i) => {
                 let t = this.directory[i+1]
-                if (t) t.origOffset = e.origOffset + e.origLength;
+                if (t) {
+                    const useTransform = typeof e.transformLength !== "undefined";
+                    t.origOffset = e.origOffset + (useTransform ? e.transformLength : e.origLength);
+                }
             });
 
             // then decompress the original data and lazy-bind
-            this.compressedDataStart = dictOffset;
             let decoded = brotliDecode(new Uint8Array(dataview.buffer.slice(dictOffset)));
             buildWoffLazyLookups(this, false, decoded);
         }
