@@ -1,6 +1,6 @@
 // basic inmports
-import { EventManager } from "./eventing.js";
-import { SFNT, WOFF, WOFF2 } from "./opentype.js";
+import { Event, EventManager } from "./lib/eventing.js";
+import { SFNT, WOFF, WOFF2 } from "./lib/opentype/index.js";
 
 /**
  * ...docs go here...

@@ -1,5 +1,5 @@
 const matrix = [
-//    -      woff     woff2  
+//    -      woff     woff2
     true,    true,    true,  // otf
     true,    true,    true,  // otf var
     true,    true,    true,  // ttf
