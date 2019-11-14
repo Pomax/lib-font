@@ -2,6 +2,8 @@ import { Parser } from "../../parser.js";
 
 /**
  * The OpenType `gasp` table.
+ *
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/gasp
  */
 class gasp {
     constructor(dict, dataview) {

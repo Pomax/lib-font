@@ -23,7 +23,7 @@ function buildWoff2LazyLookups(woff2, decoded) {
                 if (table) return table;
                 const useTransform = typeof entry.transformLength !== "undefined";
                 const data = decoded.slice(entry.origOffset, entry.origOffset + (useTransform ? entry.transformLength : entry.origLength));
-                table = createTable({ tag: entry.tag, offset: 0, length: entry.origLength }, new DataView(data.buffer));
+                table = createTable(woff2.tables, { tag: entry.tag, offset: 0, length: entry.origLength }, new DataView(data.buffer));
                 return table;
             }
         });

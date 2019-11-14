@@ -41,7 +41,7 @@ class SFNT {
             Object.defineProperty(this.tables, entry.tag.trim(), {
                 get: () => {
                     if (table) return table;
-                    table = createTable({
+                    table = createTable(this.tables, {
                         tag: entry.tag,
                         offset: entry.offset,
                         length: entry.length

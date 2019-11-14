@@ -29,7 +29,7 @@ function buildWoffLazyLookups(woff, dataview) {
                     view = new DataView(unpacked.buffer); }
                 // uncompressed data.
                 else { offset = entry.offset; }
-                table = createTable({ tag: entry.tag, offset, length: entry.origLength }, view);
+                table = createTable(woff.tables, { tag: entry.tag, offset, length: entry.origLength }, view);
                 return table;
             }
         });

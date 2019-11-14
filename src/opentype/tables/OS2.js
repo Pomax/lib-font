@@ -2,6 +2,8 @@ import { Parser } from "../../parser.js";
 
 /**
  * The OpenType `OS/2` table.
+ *
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/OS2
  */
 class OS2 {
     constructor(dict, dataview) {

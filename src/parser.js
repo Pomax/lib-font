@@ -1,3 +1,5 @@
+const startDate = (new Date(`1904-01-01T00:00:00+0000`)).getTime();
+
 /**
  * Convert an array of uint8 char into a proper string.
  *
@@ -33,36 +35,8 @@ class Parser {
                 get: () => this.getValue(name, increment)
             });
         });
-
-        Object.defineProperty(this, `fixed`, {
-            get: () => {
-                let major = this.uint16;
-                let minor = Math.round(1000 * this.uint16/65356);
-                return major + minor/1000;
-            }
-        })
-
-        Object.defineProperty(this, `tag`, {
-            get: () => {
-                const t = this.uint32;
-                return asText([t >> 24 & 255, t >> 16 & 255, t >> 8 & 255, t & 255]);
-            }
-        })
-
-        Object.defineProperty(this, `uint128`, {
-            // I have no idea why the variable uint128 was chosen over a
-            // fixed-width uint32, but it was, and so we need to decode it.
-            get: () => {
-                let value = 0;
-                for (let i=0; i<5; i++) {
-                    let byte = this.uint8;
-                    value = (value * 128) + (byte & 127);
-                    if (byte < 128) break;
-                }
-                return value;
-            }
-        })
     }
+
     getValue(type, increment) {
         let pos = this.start + this.offset;
         this.offset += increment;
@@ -74,6 +48,7 @@ class Parser {
             throw e;
         }
     }
+
     flags(n) {
         if (n === 8 || n === 16 || n === 32 || n === 64) {
             return this[`uint${n}`].toString(2).padStart(n,0).split(``).map(v => v==="1");
@@ -81,10 +56,59 @@ class Parser {
         console.error(`Error parsing flags: flag types can only be 1, 2, 4, or 8 bytes long`);
         console.trace();
     }
+
+    get tag() {
+        const t = this.uint32;
+        return asText([t >> 24 & 255, t >> 16 & 255, t >> 8 & 255, t & 255]);
+    }
+
+    get fixed() {
+        let major = this.uint16;
+        let minor = Math.round(1000 * this.uint16/65356);
+        return major + minor/1000;
+    }
+
+    get legacyFixed() {
+        // Only used in the `maxp`, `post`, and `vhea` tables.
+        let major = this.uint16;
+        let minor = (this.uint16).toString(16).padStart(4,0);
+        return parseFloat(`${major}.${minor}`);
+    }
+
+    get uint128() {
+        // I have no idea why the variable uint128 was chosen over a
+        // fixed-width uint32, but it was, and so we need to decode it.
+        let value = 0;
+        for (let i=0; i<5; i++) {
+            let byte = this.uint8;
+            value = (value * 128) + (byte & 127);
+            if (byte < 128) break;
+        }
+        return value;
+    }
+
+    get longdatetime() {
+        return new Date(startDate + 1000 * parseInt(this.int64.toString()));
+    }
+
+    // alias datatypes
+
+    get fword() { return this.int16; }
+    get ufword() { return this.uint16; }
+    get offset16() { return this.uint16; }
+    get offset32() { return this.uint32; }
+
     verifyLength() {
         if (this.offset != this.length) {
             console.error(`unexpected parsed table size (${this.offset}) for "${this.name}" (expected ${this.length})`);
         }
+    }
+
+    toBytes() {
+        // Get the entire datablock out.
+        const start = this.start + this.offset;
+        const end = start + this.length;
+        return this.data.buffer.slice(start, end);
     }
 }
 

@@ -1,8 +1,10 @@
 import { Parser } from "../../parser.js";
 
 /**
-    * The OpenType `head` table.
-    */
+* The OpenType `head` table.
+*
+* See https://docs.microsoft.com/en-us/typography/opentype/spec/head
+*/
 class head {
     constructor(dict, dataview) {
         const p = new Parser(`head`, dict, dataview);
@@ -13,9 +15,8 @@ class head {
         this.magicNumber = p.uint32;
         this.flags = p.flags(16);
         this.unitsPerEm = p.uint16;
-        let startDate = (new Date(`1904-01-01T00:00:00+0000`)).getTime();
-        this.created = new Date(startDate + 1000 * parseInt(p.int64.toString()));
-        this.modified = new Date(startDate + 1000 * parseInt(p.int64.toString()));
+        this.created = p.longdatetime;
+        this.modified = p.longdatetime;
         this.xMin = p.int16;
         this.yMin = p.int16;
         this.xMax = p.int16;

@@ -1,7 +1,9 @@
 import { Parser } from "../../parser.js";
 
 /**
- * the OpenType `fvar` table.
+ * The OpenType `fvar` table.
+ *
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/fvar
  */
 class fvar {
     constructor(dict, dataview) {
