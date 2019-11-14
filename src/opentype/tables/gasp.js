@@ -1,4 +1,5 @@
 import { Parser } from "../../parser.js";
+import lazy from "../../lazy.js";
 
 /**
  * The OpenType `gasp` table.
@@ -11,10 +12,8 @@ class gasp {
         this.version = p.uint16;
         this.numRanges = p.uint16;
 
-        const gaspOffset = p.offset;
-        this.gaspRange = [... new Array(this.numRanges)].map((_,i) =>
-            new GASPRange(dataview, gaspOffset + i * 4)
-        );
+        const getter = () => [... new Array(this.numRanges)].map(_ => new GASPRange(p));
+        lazy(this, `gaspRanges`, getter);
     }
 }
 
@@ -22,8 +21,7 @@ class gasp {
  * GASPRange record
  */
 class GASPRange {
-    constructor(dataview, offset) {
-        const p = new Parser("gasp range", { offset }, dataview);
+    constructor(p) {
         this.rangeMaxPPEM = p.uint16;
         this.rangeGaspBehavior = p.uint16;
     }

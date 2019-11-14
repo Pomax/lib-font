@@ -1,4 +1,5 @@
 import { Parser } from "../../parser.js";
+import lazy from "../../lazy.js";
 
 /**
  * The OpenType `fvar` table.
@@ -17,10 +18,8 @@ class fvar {
         this.instanceCount = p.uint16;
         this.instanceSize = p.uint16;
 
-        const recordOffset = p.offset;
-        this.axes = [... new Array(this.axisCount)].map((_,i) =>
-            new VariationAxisRecord(dataview, recordOffset + i * 4)
-        );
+        const getter = () => [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
+        lazy(this, `axes`, getter);
     }
 }
 
@@ -28,8 +27,7 @@ class fvar {
  * The fvar variation axis record class
  */
 class VariationAxisRecord {
-    constructor(dataview, offset) {
-        const p = new Parser(`variation axis record`, { offset }, dataview);
+    constructor(p) {
         this.tag = p.tag;
         this.minValue = p.fixed;
         this.defaultValue = p.fixed;

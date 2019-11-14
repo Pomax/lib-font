@@ -1,5 +1,5 @@
 import { Parser } from "../../parser.js";
-
+import lazy from "../../lazy.js";
 
 /**
 * The OpenType `hmtx` table.
@@ -12,11 +12,13 @@ class hmtx {
         const numGlyphs = tables.maxp.numGlyphs;
 
         const p = new Parser(`head`, dict, dataview);
-        this.hMetrics = [...new Array(numberOfHMetrics)].map(_ => new LongHorMetric(p.uint16, p.int16));
+        const hMetricGetter = () => [...new Array(numberOfHMetrics)].map(_ => new LongHorMetric(p.uint16, p.int16));
+        lazy(this, `hMetrics`, hMetricGetter);
+
         if (numberOfHMetrics < numGlyphs) {
-            this.leftSideBearings = [...new Array(numGlyphs - numberOfHMetrics)].map(_ => p.int16);
+            const lsbGetter = () => [...new Array(numGlyphs - numberOfHMetrics)].map(_ => p.int16);
+            lazy(this, `leftSideBearings`, lsbGetter);
         }
-        p.verifyLength();
     }
 }
 

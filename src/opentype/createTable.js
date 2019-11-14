@@ -1,4 +1,5 @@
 // opentype tables
+import { cmap } from "./tables/cmap.js";
 import { fvar } from "./tables/fvar.js";
 import { gasp } from "./tables/gasp.js";
 import { head } from "./tables/head.js";
@@ -14,7 +15,8 @@ import { post } from "./tables/post.js";
  * @param {*} dict an object of the form: { tag: "string", offset: <number>, [length: <number>]}
  * @param {*} dataview a DataView object over an ArrayBuffer of Uint8Array
  */
-function createTable(tables, dict, dataview) {
+export default function createTable(tables, dict, dataview) {
+    if (dict.tag === `cmap`) return new cmap(dict, dataview);
     if (dict.tag === `fvar`) return new fvar(dict, dataview);
     if (dict.tag === `gasp`) return new gasp(dict, dataview);
     if (dict.tag === `head`) return new head(dict, dataview);
@@ -26,6 +28,4 @@ function createTable(tables, dict, dataview) {
     if (dict.tag === `post`) return new post(dict, dataview);
     // further code goes here once more table parsers exist
     return {};
-}
-
-export default createTable;
+};
