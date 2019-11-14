@@ -105,10 +105,7 @@
      * @param {uint8[]} data 
      */
     function asText(data) {
-        return Array
-        .from(data)
-        .map(v => String.fromCharCode(v))
-        .join(``);
+        return Array.from(data).map(v => String.fromCharCode(v)).join(``);
     }
 
     /**
@@ -169,6 +166,7 @@
             this.start = dict.offset;
             this.offset = 0;
             this.data = dataview;
+
             [   `getInt8`,
                 `getUint8`,
                 `getInt16`,
@@ -184,6 +182,21 @@
                     get: () => this.getValue(name, increment)
                 });
             });
+
+            Object.defineProperty(this, `fixed`, {
+                get: () => {
+                    let major = this.uint16;
+                    let minor = Math.round(1000 * this.uint16/65356);
+                    return major + minor/1000;
+                }
+            })
+
+            Object.defineProperty(this, `tag`, {
+                get: () => {
+                    const t = this.uint32;
+                    return asText([t >> 24 & 255, t >> 16 & 255, t >> 8 & 255, t & 255]);
+                }
+            })
 
             Object.defineProperty(this, `uint128`, {
                 // I have no idea why the variable uint128 was chosen over a
@@ -205,8 +218,8 @@
             try {
                 return this.data[type](pos);
             } catch (e) {
-                // console.error(`parser`, this.data);
-                // console.error(`parser`, this.start, this.offset);
+                console.error(`parser`, type, increment, this);
+                console.error(`parser`, this.start, this.offset);
                 throw e;
             }
         }
@@ -232,9 +245,47 @@
     function createTable(dict, dataview) {
         if (dict.tag === `head`) return new head(dict, dataview);
         if (dict.tag === `gasp`) return new gasp(dict, dataview);
+        if (dict.tag === `fvar`) return new fvar(dict, dataview);
         if (dict.tag === `OS/2`) return new OS2(dict, dataview);
         // further code goes here once more table parsers exist
         return {};
+    }
+
+    /**
+     * The fvar variation axis record class
+     */
+    class VariationAxisRecord {
+        constructor(dataview, offset) {
+            const p = new Parser(`variation axis record`, { offset }, dataview);
+            this.tag = p.tag;
+            this.minValue = p.fixed;
+            this.defaultValue = p.fixed;
+            this.maxValue = p.fixed;
+            this.flags = p.flags(16);
+            this.axisNameID = p.uint16;
+        }
+    }
+
+    /**
+     * the OpenType `fvar` table.
+     */
+    class fvar {
+        constructor(dict, dataview) {
+            const p = new Parser(`fvar2`, dict, dataview);
+            this.majorVersion = p.uint16;
+            this.minorVersion = p.uint16;
+            this.axesArrayOffset = p.uint16;
+            p.uint16;
+            this.axisCount = p.uint16;
+            this.axisSize = p.uint16;
+            this.instanceCount = p.uint16;
+            this.instanceSize = p.uint16;
+
+            const recordOffset = p.offset;
+            this.axes = [... new Array(this.axisCount)].map((_,i) =>
+                new VariationAxisRecord(dataview, recordOffset + i * 4)
+            );
+        }   
     }
 
 
@@ -265,8 +316,7 @@
             this.ulUnicodeRange2 = p.flags(32);
             this.ulUnicodeRange3 = p.flags(32);
             this.ulUnicodeRange4 = p.flags(32);
-            const v = p.uint32;
-            this.achVendID = asText([v >> 24, v >> 16 & 255, v >> 8 & 255, v & 255]);
+            this.achVendID = p.tag;
             this.fsSelection = p.uint16;
             this.usFirstCharIndex = p.uint16;
             this.usLastCharIndex = p.uint16;
@@ -299,9 +349,7 @@
             const p = new Parser(`head`, dict, dataview);
             this.majorVersion = p.uint16;
             this.minorVersion = p.uint16;
-            let major = p.uint16;
-            let minor = Math.round(1000 * p.uint16/65356);
-            this.fontRevision = `${major}.${minor}`;
+            this.fontRevision = p.fixed;
             this.checkSumAdjustment = p.uint32;
             this.magicNumber = p.uint32;
             this.flags = p.flags(16);
@@ -355,8 +403,7 @@
     class TableRecord {
         constructor(dataview, offset) {
             const p = new Parser("table record", { offset }, dataview);
-            const t = p.uint32;
-            this.tag = asText([t>>24, t>>16 & 255, t>>8 & 255, t & 255]);
+            this.tag = p.tag;
             this.checksum = p.uint32;
             this.offset = p.uint32;
             this.length = p.uint32;
@@ -408,8 +455,7 @@
     class WoffTableDirectoryEntry {
         constructor(dataview, offset) {
             const p = new Parser("woff", { offset, length: 20 }, dataview);
-            const t = p.uint32;
-            this.tag = asText([t>>24, t>>16 & 255, t>>8 & 255, t & 255]);
+            this.tag = p.tag;
             this.offset = p.uint32;
             this.compLength = p.uint32;
             this.origLength = p.uint32;
@@ -425,8 +471,7 @@
     class WOFFHeader {
         constructor(dataview) {
             const p = new Parser("woff", { offset: 0, length: 44 }, dataview);
-            const s = p.uint32;
-            this.signature = asText([s>>24, s>>16 & 255, s>>8 & 255, s & 255]);
+            this.signature = p.tag;
             this.flavor = p.uint32;
             this.length = p.uint32;
             this.numTables = p.uint16;
@@ -476,9 +521,7 @@
 
             const tagNumber  = this.tagNumber = this.flags & 63;
             if (tagNumber === 63) {
-                const t = p.uint32;
-                const letters = [t >> 24, t >> 16 & 255, t >> 8 & 255, t & 255];
-                this.tag = asText(letters);
+                this.tag = p.tag;
             } else {
                 this.tag = getWOFF2Tag(tagNumber);
             }
@@ -499,8 +542,7 @@
     class WOFF2Header {
         constructor(dataview) {
             const p = new Parser("woff2", { offset: 0, length: 48 }, dataview);
-            const s = p.uint32;
-            this.signature = asText([s>>24, s>>16 & 255, s>>8 & 255, s & 255]);
+            this.signature = p.tag;
             this.flavor = p.uint32;
             this.length = p.uint32;
 
