@@ -93,15 +93,65 @@
         .join(``);
     }
 
-    function lazy(object, property, getter) {
-        Object.defineProperty(object, property, {
-            get: getter
+    function buildWoffLazyLookups(woff, dataview, decoded) {
+        woff.tables = {};
+        woff.directory.forEach(entry => {
+            let table = false;
+            let tableFn = () => {};
+            if (decoded) {
+                tableFn = () => {
+                    if (entry.origOffset > decoded.length) {
+                        console.log(
+                            "original offset is past the decoded data length?",
+                            "offset:", entry.origOffset,
+                            "data length:", decoded.length
+                        );
+                    }
+                    let data = decoded.slice(entry.origOffset, entry.origOffset + entry.origLength);
+                    table = createTable({
+                        tag: entry.tag,
+                        offset: 0,
+                        length: entry.origLength
+                    }, new DataView(data.buffer));
+                };
+            } else {
+                tableFn = () => {
+                    // Is this a compressed table?
+                    if (entry.compLength !== entry.origLength) {
+                        let unpacked = gzipDecode(
+                            new Uint8Array(
+                                dataview.buffer.slice(
+                                    entry.offset,
+                                    entry.offset + entry.compLength
+                                )
+                            )
+                        );
+                        table = createTable({
+                            tag: entry.tag,
+                            offset: 0,
+                            length: entry.origLength
+                        }, new DataView(unpacked.buffer));
+                    }
+                    
+                    // no, this is not a compressed table
+                    else {
+                        table = createTable({
+                            tag: entry.tag,
+                            offset: entry.offset,
+                            length: entry.origLength
+                        }, dataview);
+                    }
+                };
+            }
+            Object.defineProperty(woff.tables, entry.tag.trim(), {
+                get: () => { if (table) return table; tableFn(); return table; }
+            });
         });
     }
 
     function createTable(dict, dataview) {
         if (dict.tag === `head`) return new head(dict, dataview);
-        // further code goes here
+        // further code goes here once more table parsers exist
         return {};
     }
 
@@ -303,24 +353,7 @@
                 new WoffTableDirectoryEntry(dataview, dictOffset + i * 20)
             );
 
-            // build lazy lookups
-            this.tables = {};
-            this.directory.forEach(entry => {
-                let table = false;
-                Object.defineProperty(this.tables, entry.tag.trim(), {
-                    get: () => {
-                        if (table) return table;
-
-                        let unpacked = gzipDecode(new Uint8Array(dataview.buffer.slice(entry.offset, entry.offset + entry.compLength)));
-                        table = createTable({
-                            tag: entry.tag,
-                            offset: 0,
-                            length: entry.origLength
-                        }, new DataView(unpacked.buffer));
-                        return table;
-                    }
-                });
-            });
+            buildWoffLazyLookups(this, dataview);
         }
     }
 
@@ -357,14 +390,11 @@
             }
 
             this.origLength = p.uint128;
-
             const pptVersion = this.flags >> 6;
             if (pptVersion !== 0 || ((this.tag === 'glyf' || this.tag === 'loca') && pptVersion !== 3)) {
                 this.transformLength = p.uint128;
             }
-
             this.length = p.offset;
-            // lazy(this, `table`, () => createTable(this, dataview));
         }
     }
 
@@ -409,31 +439,10 @@
                 if (t) t.origOffset = e.origOffset + e.origLength;
             });
 
-            // then decompress the original data
+            // then decompress the original data and lazy-bind
             this.compressedDataStart = dictOffset;
-            let decoded = brotliDecode(
-                new Uint8Array(dataview.buffer.slice(dictOffset))
-            );
-
-            // finally, build lazy lookups
-            this.tables = {};
-            this.directory.forEach(entry => {
-                let table = false;
-                Object.defineProperty(this.tables, entry.tag.trim(), {
-                    get: () => {
-                        if (table) return table;
-
-                        let data = decoded.slice(entry.origOffset, entry.origOffset + entry.origLength);
-                        table = createTable({
-                            tag: entry.tag,
-                            offset: 0,
-                            length: entry.origLength
-                        }, new DataView(data.buffer));
-
-                        return table;
-                    }
-                });
-            });
+            let decoded = brotliDecode(new Uint8Array(dataview.buffer.slice(dictOffset)));
+            buildWoffLazyLookups(this, false, decoded);
         }
     }
 
