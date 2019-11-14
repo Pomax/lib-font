@@ -30,9 +30,9 @@ import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 
         let msg = {
             eot: `The .eot format is not supported: it died in January 12, 2016, when Microsoft retired all versions of IE that didn't already support WOFF.`,
-            svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again`,
-            fon: `The .fon format is not supported: these are an ancient Windows bitmap font format`,
-            ttc: `Font collections are not supported by browsers, as no CSS instructions exist to indicate which font inside a collection to use in a @font-face declaration.`
+            svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again.`,
+            fon: `The .fon format is not supported: this is an ancient Windows bitmap font format.`,
+            ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`
         }[ext];
 
         if (!msg) msg = `${url} is not a font.`;
