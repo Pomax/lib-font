@@ -126,14 +126,30 @@ import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
          */
         async parseBasicData(type) {
             if (type === `truetype` || type === `opentype`) {
-                this.sfnt = new SFNT(this.fontData);
+                this.font = new SFNT(this.fontData);
             }
             if (type === `woff`) {
-                this.woff = new WOFF(this.fontData);
+                this.font = new WOFF(this.fontData);
             }
             if (type === `woff2`) {
-                this.woff2 = new WOFF2(this.fontData);
+                this.font = new WOFF2(this.fontData);
             }
+        }
+
+        /**
+         * Does this font support the specified character?
+         * @param {*} char
+         */
+        supports(char) {
+            return this.font.tables.cmap.supports(char) !== false;
+        }
+
+        /**
+         * Does this font support the specified unicode variation?
+         * @param {*} variation
+         */
+        supportsVariation(variation) {
+            return this.font.tables.cmap.supportsVariation(variation) !== false;
         }
     }
 

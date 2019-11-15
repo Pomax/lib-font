@@ -75,6 +75,11 @@ class Parser {
         return parseFloat(`${major}.${minor}`);
     }
 
+    get uint24() {
+        // Why does DataView not have a 24 bit value getters?
+        return (this.uint8 << 16) + (this.uint8 << 8) + (this.uint8);
+    }
+
     get uint128() {
         // I have no idea why the variable uint128 was chosen over a
         // fixed-width uint32, but it was, and so we need to decode it.

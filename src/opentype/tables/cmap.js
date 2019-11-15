@@ -11,12 +11,12 @@ class cmap {
     constructor(dict, dataview) {
         const p = new Parser(`fvar2`, dict, dataview);
         this.version = p.uint16;
-        this.numTables = p.uint16;
+        this.numTables = p.uint16;``
 
         const getter = () => [...new Array(this.numTables)].map(_ => new EncodingRecord(p));
         lazy(this, `encodingRecords`, getter);
 
-        // cache these values for use in `.get(nameID)`
+        // cache these values for use in `.get(tableID)`
         this.start = dict.offset;
         this.data = dataview;
     }
@@ -29,6 +29,20 @@ class cmap {
             const format = p.uint16;
             return createSubTable(format, p);
         }
+    }
+
+    supports(char) {
+        return this.encodingRecords.some((_,tableID) => {
+            const t = this.get(tableID);
+            return t.supports && t.supports(char) !== false;
+        });
+    }
+
+    supportsVariation(variation) {
+        return this.encodingRecords.some((_,tableID) => {
+            const t = this.get(tableID);
+            return t.supportsVariation && t.supportsVariation(variation) !== false;
+        });
     }
 }
 
