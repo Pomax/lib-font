@@ -1,12 +1,26 @@
 class LookupList {
-    constructor(p) {
+    constructor(table, p) {
+        this.table = table;
+        this.parser = p;
+        this.start = p.currentPosition;
+
         this.lookupCount = p.uint16;
         this.lookups = [...new Array(this.lookupCount)].map(_ => p.offset16); // Array of offsets to Lookup tables, from beginning of LookupList
+    }
+
+    getLookup(lookupIndex) {
+        let lookupOffset = this.lookups[lookupIndex];
+        this.parser.currentPosition = this.start + lookupOffset;
+        return new LookupTable(this.table, this.parser);
     }
 }
 
 class LookupTable {
-    constructor(p) {
+    constructor(table, p) {
+        this.table = table;
+        this.parser = p;
+        this.start = p.currentPosition;
+
         this.lookupType = p.uint16;
         this.lookupFlag = p.uint16;
         this.subTableCount = p.uint16;
@@ -30,6 +44,43 @@ class LookupTable {
     }
     get markAttachmentType() {
         return this.lookupFlag & 0xFF00 === 0xFF00;
+    }
+
+    getSubTables() {
+        return this.subtableOffsets.map(offset => {
+            this.parser.currentPosition = this.start + offset;
+            return new CoverageTable(this.table, this.parser);
+        });
+    }
+}
+
+class CoverageTable {
+    constructor(table, p) {
+        this.table = table;
+        this.parser = p;
+        this.start = p.currentPosition;
+
+        this.coverageFormat = p.uint16;
+
+        if (this.coverageFormat === 1) {
+            this.glyphCount = p.uint16;
+            // TODO: make lazy?
+            this.glyphArray = [...new Array(this.glyphCount)].map(_ => p.uint16);
+        }
+
+        if (this.coverageFormat === 2) {
+            this.rangeCount = p.uint16;
+            // TODO: definitely make lazy!
+            this.rangeRecords = [...new Array(this.rangeCount)].map(_ => new CoverageRangeRecord(p));
+        }
+    }
+}
+
+class CoverageRangeRecord {
+    constructor(p) {
+        this.startGlyphID = p.uint16;
+        this.endGlyphID = p.uint16;
+        this.startCoverageIndex = p.uint16;
     }
 }
 

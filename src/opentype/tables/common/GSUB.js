@@ -24,25 +24,25 @@ class GSUB {
             this.featureVariationsOffset = p.offset32;
         }
 
-        lazy(this, `scriptListTable`, () => {
+        lazy(this, `scriptList`, () => {
             p.currentPosition = tableStart + this.scriptListOffset;
-            return new ScriptList(p);
+            return new ScriptList(this, p);
         });
 
-        lazy(this, `featureListTable`, () => {
+        lazy(this, `featureList`, () => {
             p.currentPosition = tableStart + this.featureListOffset;
-            return new FeatureList(p);
+            return new FeatureList(this, p);
         });
 
-        lazy(this, `lookupListTable`, () => {
+        lazy(this, `lookupList`, () => {
             p.currentPosition = tableStart + this.lookupListOffset;
-            return new LookupList(p);
+            return new LookupList(this, p);
         });
 
         if (this.featureVariationsOffset) {
-            lazy(this, `featureVariationsTable`, () => {
+            lazy(this, `featureVariations`, () => {
                 p.currentPosition = tableStart + this.featureVariationsOffset;
-                return new FeatureVariations(p);
+                return new FeatureVariations(this, p);
             });
         }
     }
