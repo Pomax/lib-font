@@ -52,7 +52,7 @@ class OS2 {
         this.usBreakChar = p.uint16;
         this.usMaxContext = p.uint16;
 
-        if (this.version > 1 && this.version <= 4) return p.verifyLength();
+        if (this.version <= 4) return p.verifyLength();
 
         this.usLowerOpticalPointSize = p.uint16;
         this.usUpperOpticalPointSize = p.uint16;

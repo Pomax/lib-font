@@ -61,6 +61,7 @@ import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
             super();
             this.name = name;
             this.options = options;
+            this.metrics = false;
         }
 
         /**
@@ -134,6 +135,18 @@ import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
             if (type === `woff2`) {
                 this.font = new WOFF2(this.fontData);
             }
+
+            if (this.font) {
+                const tables = this.font.tables;
+                const em = tables.head.unitsPerEm;
+                this.metrics = {
+                    quadsize: em,
+                    leading: tables.hhea.lineGap / em,
+                    ascent: tables.hhea.ascender / em,
+                    decent: tables.hhea.descender / em,
+                    weightclass: tables["OS/2".usWeightClass]
+                };
+            }
         }
 
         /**
@@ -150,6 +163,42 @@ import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
          */
         supportsVariation(variation) {
             return this.font.tables.cmap.supportsVariation(variation) !== false;
+        }
+
+        /**
+         * Effectively, be https://html.spec.whatwg.org/multipage/canvas.html#textmetrics
+         * @param {*} text 
+         * @param {*} size 
+         */
+        measureText(text, size=16) {
+            let d = document.createElement('div');
+            d.textContent = text;
+            d.style.fontFamily = this.name;
+            d.style.fontSize = `${size}px`;
+            d.style.color = `transparent`;
+            d.style.background = `transparent`;
+            d.style.top = `0`;
+            d.style.left = `0`;
+            d.style.position = `absolute`;
+            document.body.appendChild(d);
+            let box = d.getBoundingClientRect();
+            document.body.removeChild(d);
+            const OS2 = this.tables["OS/2"];
+            return {
+                // FIXME: actually use real values
+                width: box.width,
+                actualBoundingBoxLeft: box.x,
+                actualBoundingBoxRight: box.x + box.width,
+                fontBoundingBoxAscent: OS2.sTypoAscender,
+                fontBoundingBoxDescent: OS2.sTypoDescender,
+                actualBoundingBoxAscent: box.y + box.height,
+                actualBoundingBoxDescent: box.y,
+                emHeightAscent: false,
+                emHeightDescent: false,
+                hangingBaseline: false,
+                alphabeticBaseline: false,
+                ideographicBaseline: false
+            };
         }
     }
 

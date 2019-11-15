@@ -10,6 +10,8 @@ import { name } from "./tables/name.js";
 import { OS2  } from "./tables/OS2.js";
 import { post } from "./tables/post.js";
 
+import { GSUB } from "./tables/common/GSUB.js";
+
 /**
  * Table factory
  * @param {*} dict an object of the form: { tag: "string", offset: <number>, [length: <number>]}
@@ -26,6 +28,8 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `name`) return new name(dict, dataview);
     if (dict.tag === `OS/2`) return new OS2(dict, dataview);
     if (dict.tag === `post`) return new post(dict, dataview);
+
+    if (dict.tag === `GSUB`) return new GSUB(dict, dataview);
     // further code goes here once more table parsers exist
     return {};
 };
