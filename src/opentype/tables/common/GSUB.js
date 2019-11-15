@@ -12,6 +12,8 @@ import lazy from "../../../lazy.js";
 class GSUB {
     constructor(dict, dataview) {
         const p = new Parser(`GSUB`, dict, dataview);
+        const tableStart = p.currentPosition;
+
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
         this.scriptListOffset = p.offset16;
@@ -23,23 +25,23 @@ class GSUB {
         }
 
         lazy(this, `scriptListTable`, () => {
-            p.offset = this.scriptListOffset;
+            p.currentPosition = tableStart + this.scriptListOffset;
             return new ScriptList(p);
         });
 
         lazy(this, `featureListTable`, () => {
-            p.offset = this.featureListOffset;
+            p.currentPosition = tableStart + this.featureListOffset;
             return new FeatureList(p);
         });
 
         lazy(this, `lookupListTable`, () => {
-            p.offset = this.lookupListOffset;
+            p.currentPosition = tableStart + this.lookupListOffset;
             return new LookupList(p);
         });
 
         if (this.featureVariationsOffset) {
             lazy(this, `featureVariationsTable`, () => {
-                p.offset = this.featureVariationsOffset;
+                p.currentPosition = tableStart + this.featureVariationsOffset;
                 return new FeatureVariations(p);
             });
         }

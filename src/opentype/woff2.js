@@ -65,7 +65,7 @@ class Woff2TableDirectoryEntry {
         if (pptVersion !== 0 || ((this.tag === 'glyf' || this.tag === 'loca') && pptVersion !== 3)) {
             this.transformLength = p.uint128;
         }
-        this.length = p.offset;
+        this.length = p.offset; // FIXME: we can probably calculat this without asking the parser
     }
 }
 
@@ -95,7 +95,7 @@ class WOFF2 {
         p.verifyLength();
 
         // parse the dictionary
-        let dictOffset = p.offset;
+        let dictOffset = p.currentPosition;
         this.directory = [... new Array(this.numTables)].map((_,i) => {
             let entry = new Woff2TableDirectoryEntry(dataview, dictOffset);
             dictOffset += entry.length;

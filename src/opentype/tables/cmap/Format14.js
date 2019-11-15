@@ -2,7 +2,7 @@ import lazy from "../../../lazy.js";
 
 class Format14 {
     constructor(p) {
-        this.subTableStart = p.offset;
+        this.subTableStart = p.currentPosition;
         this.format = 14;
         this.length = p.uint32;
         this.numVarSelectorRecords = p.uint32;

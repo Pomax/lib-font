@@ -37,6 +37,15 @@ class Parser {
         });
     }
 
+    get currentPosition() {
+        return this.start + this.offset;
+    }
+
+    set currentPosition(position) {
+        this.start = position;
+        this.offset = 0;
+    }
+
     getValue(type, increment) {
         let pos = this.start + this.offset;
         this.offset += increment;

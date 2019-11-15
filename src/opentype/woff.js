@@ -74,7 +74,7 @@ class WOFF {
         p.verifyLength();
 
         // parse the dictionary
-        let dictOffset = p.offset;
+        let dictOffset = p.currentPosition;
         this.directory = [... new Array(this.numTables)].map((_,i) =>
             new WoffTableDirectoryEntry(dataview, dictOffset + i * 20)
         );
