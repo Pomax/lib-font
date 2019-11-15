@@ -11,35 +11,38 @@ That's what this is for:
 // Create a font object
 const myFont = new Font(`Adobe Source Code Pro`);
 
-// Assign event handling (.addEventListener version supported too, of course)
-myFont.onerror = console.error;
-myFont.onload = doSomeFontThings(evt);
-
-// Kick off the font load by setting a source file
-myFont.src = `./test/SourceCodePro-Regular.otf`;
-
 // When the font's up and loaded in, let's do some testing!
 function doSomeFontThings(evt) {
-    const font = evt.font;
+    const font = evt.detail.font;
 
     // First, let's test some characters:
     [`a`, `→`, `嬉`].forEach(char => console.log(`Font supports '${char}': ${
         font.supports(char)
     }`));
 
-    // Then, let's figure out which writing scripts this font supports.
+    // Then, let's check some OpenType things
+    const GSUB = font.opentype.tables.GSUB;
+
+    // Let's figure out which writing scripts this font supports:
     console.log(`This font supports the following scripts: ${
-        font.tables.GSUB.scriptList.getSupportedScripts()
+        `"${GSUB.scriptList.getSupportedScripts().join(`", "`)}"`
     }`);
 
     // DFLT is a given, but let's see if `latn` has any special language/system rules...
-    console.log(`Special langsys for 'latn': ${
-        font.tables.GSUB.scriptList.getTable('latn').getSupportedLangSys()
+    console.log(`Special langsys for "latn": ${
+        `"${GSUB.scriptList.getTable('latn').getSupportedLangSys().join(`", "`)}"`
     }`);
 
     // Wow, "Northern Sami" support? Really? Which OpenType features does that use?
     console.log(`OpenType features for the Northern Sami version of latin script:`,
-        font.tables.GSUB.scriptList.getTable('latn').getLangSys("NSM ").getFeatures()
+        GSUB.scriptList.getTable('latn').getLangSys("NSM ").getFeatures()
     );
 }
+
+// Assign event handling (.addEventListener version supported too, of course)
+myFont.onerror = evt => console.error(evt);
+myFont.onload = evt => doSomeFontThings(evt);
+
+// Kick off the font load by setting a source file
+myFont.src = `./test/SourceCodePro-Regular.otf`;
 ```

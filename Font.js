@@ -122,13 +122,13 @@ class Font extends EventManager {
      */
     async parseBasicData(type) {
         if (type === `truetype` || type === `opentype`) {
-            this.font = new SFNT(this.fontData);
+            this.opentype = new SFNT(this.fontData);
         }
         if (type === `woff`) {
-            this.font = new WOFF(this.fontData);
+            this.opentype = new WOFF(this.fontData);
         }
         if (type === `woff2`) {
-            this.font = new WOFF2(this.fontData);
+            this.opentype = new WOFF2(this.fontData);
         }
     }
 
@@ -137,7 +137,7 @@ class Font extends EventManager {
      * @param {*} char
      */
     supports(char) {
-        return this.font.tables.cmap.supports(char) !== false;
+        return this.opentype.tables.cmap.supports(char) !== false;
     }
 
     /**
@@ -145,7 +145,7 @@ class Font extends EventManager {
      * @param {*} variation
      */
     supportsVariation(variation) {
-        return this.font.tables.cmap.supportsVariation(variation) !== false;
+        return this.opentype.tables.cmap.supportsVariation(variation) !== false;
     }
 
     /**
@@ -167,7 +167,7 @@ class Font extends EventManager {
         document.body.appendChild(d);
         let bbox = d.getBoundingClientRect();
         document.body.removeChild(d);
-        const OS2 = this.tables["OS/2"];
+        const OS2 = this.opentype.tables["OS/2"];
         bbox.fontSize = size;
         bbox.ascender = OS2.sTypoAscender;
         bbox.descender = OS2.sTypoDescender;

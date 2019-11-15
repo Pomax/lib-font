@@ -97,3 +97,42 @@ if (matrix.shift()) {
     varTTfWoff2.onload = evt => console.log(`loaded ttf.woff2 (var)`);
     varTTfWoff2.src = `./test/SourceCodeVariable-Roman.ttf.woff2`;
 }
+
+// Real testing
+
+// Create a font object
+const myFont = new Font(`Adobe Source Code Pro`);
+
+// When the font's up and loaded in, let's do some testing!
+function doSomeFontThings(evt) {
+    const font = evt.detail.font;
+
+    // First, let's test some characters:
+    [`a`, `→`, `嬉`].forEach(char => console.log(`Font supports '${char}': ${
+        font.supports(char)
+    }`));
+
+    const GSUB = font.opentype.tables.GSUB;
+
+    // Then, let's figure out which writing scripts this font supports.
+    console.log(`This font supports the following scripts: ${
+        `"${GSUB.scriptList.getSupportedScripts().join(`", "`)}"`
+    }`);
+
+    // DFLT is a given, but let's see if `latn` has any special language/system rules...
+    console.log(`Special langsys for "latn": ${
+        `"${GSUB.scriptList.getTable('latn').getSupportedLangSys().join(`", "`)}"`
+    }`);
+
+    // Wow, "Northern Sami" support? Really? Which OpenType features does that use?
+    console.log(`OpenType features for the Northern Sami version of latin script:`,
+        GSUB.scriptList.getTable('latn').getLangSys("NSM ").getFeatures()
+    );
+}
+
+// Assign event handling (.addEventListener version supported too, of course)
+myFont.onerror = evt => console.error(evt);
+myFont.onload = evt => doSomeFontThings(evt);
+
+// Kick off the font load by setting a source file
+myFont.src = `./test/SourceCodePro-Regular.otf`;
