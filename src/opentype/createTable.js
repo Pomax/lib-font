@@ -11,6 +11,7 @@ import { OS2  } from "./tables/OS2.js";
 import { post } from "./tables/post.js";
 
 import { GSUB } from "./tables/common/GSUB.js";
+import { GPOS } from "./tables/common/GPOS.js";
 
 /**
  * Table factory
@@ -30,6 +31,7 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `post`) return new post(dict, dataview);
 
     if (dict.tag === `GSUB`) return new GSUB(dict, dataview);
+    if (dict.tag === `GPOS`) return new GPOS(dict, dataview);
     // further code goes here once more table parsers exist
     return {};
 };

@@ -82,13 +82,13 @@ class LangSysTable {
         this.featureIndices = [...new Array(this.featureIndexCount)].map(_ => p.uint16);
     }
 
+    getFeatures() {
+        return (this.featureIndices).map(index => this.table.featureList.getFeature(index));
+    }
+
     getFeature(feature) {
         const features = this.getFeatures();
         return features.find(f => f.featureTag === feature);
-    }
-
-    getFeatures() {
-        return (this.featureIndices).map(index => this.table.featureList.getFeature(index));
     }
 }
 
