@@ -1,78 +1,14 @@
 import { Parser } from "../parser.js";
 import createTable from "./createTable.js";
+import lazy from "../lazy.js";
 
 const brotliDecode = window.unbrotli;
 
+
 /**
- * Build late-evaluating properties for each table in a
- * woff/woff2 font, so that accessing a table via the
- * woff.tables.tableName or woff2.tables.tableName
- * property kicks off a table parse on first access.
- *
- * @param {*} woff the woff or woff2 font object
- * @param {DataView} dataview passed when dealing with woff
- * @param {buffer} decoded passed when dealing with woff2
+ * The WOFF2 header
+ * See https://www.w3.org/TR/WOFF2 for more information
  */
-function buildWoff2LazyLookups(woff2, decoded) {
-    woff2.tables = {};
-    woff2.directory.forEach(entry => {
-        let table = false;
-
-        Object.defineProperty(woff2.tables, entry.tag.trim(), {
-            get: () => {
-                if (table) return table;
-                const useTransform = typeof entry.transformLength !== "undefined";
-                const data = decoded.slice(entry.origOffset, entry.origOffset + (useTransform ? entry.transformLength : entry.origLength));
-                table = createTable(woff2.tables, { tag: entry.tag, offset: 0, length: entry.origLength }, new DataView(data.buffer));
-                return table;
-            }
-        });
-    });
-}
-
-/**
-    * WOFF2 uses a numbered tag registry, such that only unknown tables require a 4 byte tag
-    * in the WOFF directory entry struct. Everything else uses a uint8. Nice and tidy.
-    * @param {*} flag
-    */
-function getWOFF2Tag(flag) {
-    return [
-        `cmap`,`head`,`hhea`,`hmtx`,`maxp`,`name`,`OS/2`,`post`,`cvt `,`fpgm`,`glyf`,`loca`,`prep`,
-        `CFF `,`VORG`,`EBDT`,`EBLC`,`gasp`,`hdmx`,`kern`,`LTSH`,`PCLT`,`VDMX`,`vhea`,`vmtx`,`BASE`,
-        `GDEF`,`GPOS`,`GSUB`,`EBSC`,`JSTF`,`MATH`,`CBDT`,`CBLC`,`COLR`,`CPAL`,`SVG `,`sbix`,`acnt`,
-        `avar`,`bdat`,`bloc`,`bsln`,`cvar`,`fdsc`,`feat`,`fmtx`,`fvar`,`gvar`,`hsty`,`just`,`lcar`,
-        `mort`,`morx`,`opbd`,`prop`,`trak`,`Zapf`,`Silf`,`Glat`,`Gloc`,`Feat`,`Sill`
-    ][flag];
-}
-
-/**
-    * WOFF2 Table Directory Entry
-    */
-class Woff2TableDirectoryEntry {
-    constructor(dataview, offset) {
-        const p = new Parser("WOFF2 table record", { offset }, dataview);
-        this.flags = p.uint8;
-
-        const tagNumber  = this.tagNumber = this.flags & 63;
-        if (tagNumber === 63) {
-            this.tag = p.tag;
-        } else {
-            this.tag = getWOFF2Tag(tagNumber);
-        }
-
-        this.origLength = p.uint128;
-        const pptVersion = this.pptVersion = this.flags >> 6;
-        if (pptVersion !== 0 || ((this.tag === 'glyf' || this.tag === 'loca') && pptVersion !== 3)) {
-            this.transformLength = p.uint128;
-        }
-        this.length = p.offset; // FIXME: we can probably calculat this without asking the parser
-    }
-}
-
-/**
-    * The WOFF2 header
-    * See https://www.w3.org/TR/WOFF2 for more information
-    */
 class WOFF2 {
     constructor(dataview) {
         const p = new Parser("woff2", { offset: 0, length: 48 }, dataview);
@@ -95,12 +31,8 @@ class WOFF2 {
         p.verifyLength();
 
         // parse the dictionary
+        this.directory = [... new Array(this.numTables)].map(_ => new Woff2TableDirectoryEntry(p));
         let dictOffset = p.currentPosition;
-        this.directory = [... new Array(this.numTables)].map((_,i) => {
-            let entry = new Woff2TableDirectoryEntry(dataview, dictOffset);
-            dictOffset += entry.length;
-            return entry;
-        });
 
         // compute table byte offsets in the decompressed data
         this.directory[0].origOffset = 0;
@@ -116,6 +48,65 @@ class WOFF2 {
         let decoded = brotliDecode(new Uint8Array(dataview.buffer.slice(dictOffset)));
         buildWoff2LazyLookups(this, decoded);
     }
+}
+
+/**
+ * WOFF2 Table Directory Entry
+ */
+class Woff2TableDirectoryEntry {
+    constructor(p) {
+        this.flags = p.uint8;
+
+        const tagNumber  = this.tagNumber = this.flags & 63;
+        if (tagNumber === 63) {
+            this.tag = p.tag;
+        } else {
+            this.tag = getWOFF2Tag(tagNumber);
+        }
+
+        this.origLength = p.uint128;
+        const pptVersion = this.pptVersion = this.flags >> 6;
+        if (pptVersion !== 0 || ((this.tag === 'glyf' || this.tag === 'loca') && pptVersion !== 3)) {
+            this.transformLength = p.uint128;
+        }
+        this.length = p.offset; // FIXME: we can probably calculat this without asking the parser
+    }
+}
+
+/**
+ * Build late-evaluating properties for each table in a
+ * woff/woff2 font, so that accessing a table via the
+ * woff.tables.tableName or woff2.tables.tableName
+ * property kicks off a table parse on first access.
+ *
+ * @param {*} woff the woff or woff2 font object
+ * @param {DataView} dataview passed when dealing with woff
+ * @param {buffer} decoded passed when dealing with woff2
+ */
+function buildWoff2LazyLookups(woff2, decoded) {
+    woff2.tables = {};
+    woff2.directory.forEach(entry => {
+        lazy(woff2.tables, entry.tag.trim(), () => {
+            const useTransform = typeof entry.transformLength !== "undefined";
+            const data = decoded.slice(entry.origOffset, entry.origOffset + (useTransform ? entry.transformLength : entry.origLength));
+            return createTable(woff2.tables, { tag: entry.tag, offset: 0, length: entry.origLength }, new DataView(data.buffer));
+        });
+    });
+}
+
+/**
+ * WOFF2 uses a numbered tag registry, such that only unknown tables require a 4 byte tag
+ * in the WOFF directory entry struct. Everything else uses a uint8. Nice and tidy.
+ * @param {*} flag
+ */
+function getWOFF2Tag(flag) {
+    return [
+        `cmap`,`head`,`hhea`,`hmtx`,`maxp`,`name`,`OS/2`,`post`,`cvt `,`fpgm`,`glyf`,`loca`,`prep`,
+        `CFF `,`VORG`,`EBDT`,`EBLC`,`gasp`,`hdmx`,`kern`,`LTSH`,`PCLT`,`VDMX`,`vhea`,`vmtx`,`BASE`,
+        `GDEF`,`GPOS`,`GSUB`,`EBSC`,`JSTF`,`MATH`,`CBDT`,`CBLC`,`COLR`,`CPAL`,`SVG `,`sbix`,`acnt`,
+        `avar`,`bdat`,`bloc`,`bsln`,`cvar`,`fdsc`,`feat`,`fmtx`,`fvar`,`gvar`,`hsty`,`just`,`lcar`,
+        `mort`,`morx`,`opbd`,`prop`,`trak`,`Zapf`,`Silf`,`Glat`,`Gloc`,`Feat`,`Sill`
+    ][flag];
 }
 
 export { WOFF2 };
