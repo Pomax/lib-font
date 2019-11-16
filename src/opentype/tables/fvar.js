@@ -21,6 +21,14 @@ class fvar {
         const getter = () => [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
         lazy(this, `axes`, getter);
     }
+    
+    getSupportedAxes() {
+        return (this.axes).map(a => a.tag);
+    }
+
+    getAxis(name) {
+        return (this.axes).find(a => a.tag === name);
+    }
 }
 
 /**

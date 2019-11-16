@@ -82,7 +82,12 @@ class Font extends EventManager {
         let style = document.createElement(`style`);
         style.className = `injected by Font.js`;
         let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
-        style.textContent = `@font-face {\n\tfont-family: "${name}";\n\t${rules}\n\tsrc: url("${url}") format("${format}");\n}`;
+        style.textContent = `
+@font-face {
+    font-family: "${name}";
+    ${rules}
+    src: url("${url}") format("${format}");
+}`;
         this.styleElement = style;
         document.head.appendChild(style);
     }
