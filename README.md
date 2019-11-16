@@ -37,6 +37,14 @@ function doSomeFontThings(evt) {
     console.log(`OpenType features for the Northern Sami version of latin script:`,
         GSUB.scriptList.getTable('latn').getLangSys("NSM ").getFeatures()
     );
+
+    // Oh wait, this is a variable font, isn't it.
+    console.log(`This is a variable font: ${!!font.opentype.tables.fvar}`);
+
+    // Which axes does it support?
+    console.log(`This variable font supposed the following axes: ${
+        `"${font.opentype.tables.fvar.getSupportedAxes().join(`", "`)}"`
+    }`);
 }
 
 // Assign event handling (.addEventListener version supported too, of course)
@@ -44,7 +52,7 @@ myFont.onerror = evt => console.error(evt);
 myFont.onload = evt => doSomeFontThings(evt);
 
 // Kick off the font load by setting a source file
-myFont.src = `./test/SourceCodePro-Regular.otf`;
+myFont.src = `./test/SourceCodeVariable-Roman.otf.woff2`;
 ```
 
 ## API
