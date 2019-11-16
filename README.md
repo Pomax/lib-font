@@ -1,5 +1,5 @@
-Font.js - lifting the hood on your fonts
-===
+# Font.js - lifting the hood on your fonts
+
 
 If you're looking for the (really) old version of Font.js, [go here](https://github.com/Pomax/Font.js/tree/v2015).
 
@@ -46,3 +46,19 @@ myFont.onload = evt => doSomeFontThings(evt);
 // Kick off the font load by setting a source file
 myFont.src = `./test/SourceCodePro-Regular.otf`;
 ```
+
+## API
+
+The API has not yet been fully settled on - right now a lot of it is fairly easy to find in the source, but that's the only place atm.
+
+## Why can't this draw stuff??
+
+Because you already have a text shaping engine available: your browser. You can already draw all the text you need, properly shaped and typeset, both in HTML and on a Canvas. There is no reason for this library to try to do that, when it's guaranteed to do it worse.
+
+## Why wouldn't I use OpenType.js, or Fontkit?
+
+I don't have a good answer to that. Those are some great projects, you probably _should_ use them if they do what you need? The reason _I_ needed this is because it doesn't do text shaping: it just lets me query the opentype data to get me the information I need, without being too big of a library. And I've written enough OpenType parsers to know how much code goes into the actual shaping. 
+
+## Alright, what if I have opinions?
+
+Tweet at me! [@TheRealPomax](http://twitter.com/TheRealPomax) or [@TheRealPomax@Mastodon.social](https://mastodon.social/@TheRealPomax) should do nicely, but if you want to have an in-depth discussion, I'd recommend filing an issue, since 280 characters per message is not really sufficient to dig into OpenType details.
