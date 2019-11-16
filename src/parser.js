@@ -10,8 +10,8 @@ function asText(data) {
 }
 
 /**
-    * A data parser for table data, with auto-advancing pointer.
-    */
+ * A data parser for table data, with auto-advancing pointer.
+ */
 class Parser {
     constructor(name, dict, dataview) {
         this.name = name;
