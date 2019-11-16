@@ -1,8 +1,8 @@
 /**
-    * Simple event object so people can write the
-    * same code they would for anything else.
-    */
-   class Event {
+ * Simple event object so people can write the
+ * same code they would for anything else.
+ */
+class Event {
     constructor(type, detail={}, msg) {
         this.type = type;
         this.detail = detail;
@@ -18,9 +18,9 @@
 
 
 /**
-    * Simple event manager so people can write the
-    * same code they would for anything else.
-    */
+ * Simple event manager so people can write the
+ * same code they would for anything else.
+ */
 class EventManager {
     constructor() {
         this.listeners = {};
