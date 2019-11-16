@@ -10,6 +10,7 @@ import { name } from "./tables/name.js";
 import { OS2  } from "./tables/OS2.js";
 import { post } from "./tables/post.js";
 
+import { BASE } from "./tables/common/BASE.js";
 import { GSUB } from "./tables/common/GSUB.js";
 import { GPOS } from "./tables/common/GPOS.js";
 
@@ -30,6 +31,7 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `OS/2`) return new OS2(dict, dataview);
     if (dict.tag === `post`) return new post(dict, dataview);
 
+    if (dict.tag === `BASE`) return new BASE(dict, dataview);
     if (dict.tag === `GSUB`) return new GSUB(dict, dataview);
     if (dict.tag === `GPOS`) return new GPOS(dict, dataview);
     // further code goes here once more table parsers exist
