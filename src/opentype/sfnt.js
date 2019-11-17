@@ -1,5 +1,5 @@
-import { Parser } from "../parser.js";
-import createTable from "./createTable.js";
+import { SimpleTable } from "./tables/simple-table.js";
+import createTable from "./tables/createTable.js";
 import lazy from "../lazy.js";
 
 /**
@@ -7,14 +7,18 @@ import lazy from "../lazy.js";
  *
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for more information
  */
-class SFNT {
+class SFNT extends SimpleTable {
     constructor(dataview) {
-        const p = new Parser("sfnt", { offset: 0 }, dataview);
+        const { p } = super("sfnt", { offset: 0, length: 12}, dataview);
+
         this.version = p.uint32;
         this.numTables = p.uint16;
         this.searchRange = p.uint16;
         this.entrySelector = p.uint16;
         this.rangeShift = p.uint16;
+
+        p.verifyLength();
+
         this.directory = [... new Array(this.numTables)].map(_ => new TableRecord(p));
 
         // add convenience bindings for each table, with lazy loading

@@ -1,6 +1,6 @@
-import { GSTAR } from "./gstar.js";
+import { CommonLayoutTable } from "../common-layout-table.js";
 
-class GPOS extends GSTAR {
+class GPOS extends CommonLayoutTable {
     constructor(dict, dataview) {
         super(`GPOS`, dict, dataview);
     }

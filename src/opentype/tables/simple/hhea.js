@@ -1,13 +1,14 @@
-import { Parser } from "../../parser.js";
+import { SimpleTable } from "../simple-table.js";
 
 /**
 * The OpenType `hhea` table.
 *
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/hhea
 */
-class hhea {
+class hhea extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`hhea`, dict, dataview);
+        const { p } = super(`hhea`, dict, dataview);
+
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
         this.ascender = p.fword;
@@ -26,6 +27,7 @@ class hhea {
         p.int16;
         this.metricDataFormat = p.int16;
         this.numberOfHMetrics = p.uint16;
+
         p.verifyLength();
     }
 }

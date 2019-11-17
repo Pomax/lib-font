@@ -1,14 +1,15 @@
-import { Parser } from "../../../parser.js";
 import lazy from "../../../lazy.js";
+import { SimpleTable } from "../simple-table.js";
 
 /**
  * The OpenType `BASE` table.
  *
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/BASE
  */
-class BASE {
+class BASE extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`BASE`, dict, dataview);
+        const { p } = super(`BASE`, dict, dataview);
+
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
         this.horizAxisOffset = p.offset16; // from beginning of BASE table
@@ -27,9 +28,9 @@ class BASE {
 /**
  * Axis table
  */
-class AxisTable {
+class AxisTable extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`AxisTable`, dict, dataview);
+        const { p } = super(`AxisTable`, dict, dataview);
 
         this.baseTagListOffset = p.offset16;    // from beginning of Axis table
         this.baseScriptListOffset = p.offset16; // from beginning of Axis table
@@ -39,18 +40,18 @@ class AxisTable {
     }
 }
 
-class BaseTagListTable {
+class BaseTagListTable extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`AxisTable`, dict, dataview);
+        const { p } = super(`AxisTable`, dict, dataview);
         this.baseTagCount = p.uint16;
         // TODO: make lazy?
         this.baselineTags = [...new Array(this.baseTagCount)].map(_ => p.tag);
     }
 }
 
-class BaseScriptListTable {
+class BaseScriptListTable extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`AxisTable`, dict, dataview);
+        const { p } = super(`AxisTable`, dict, dataview);
         this.baseScriptCount = p.uint16
 
         const recordStart = p.currentPosition;

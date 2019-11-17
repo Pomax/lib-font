@@ -65,8 +65,16 @@ Because you already have a text shaping engine available: your browser. You can 
 
 ## Why wouldn't I use OpenType.js, or Fontkit?
 
-I don't have a good answer to that. Those are some great projects, you probably _should_ use them if they do what you need? The reason _I_ needed this is because it doesn't do text shaping: it just lets me query the opentype data to get me the information I need, without being too big of a library. And I've written enough OpenType parsers to know how much code goes into the actual shaping. 
+I don't have a good answer to that. Those are some great projects, you probably _should_ use them if they do what you need? The reason _I_ needed this is because it doesn't do text shaping: it just lets me query the opentype data to get me the information I need, without being too big of a library. And I've written enough OpenType parsers to know how much code goes into the actual shaping.
 
 ## Alright, what if I have opinions?
 
 Tweet at me! [@TheRealPomax](http://twitter.com/TheRealPomax) or [@TheRealPomax@Mastodon.social](https://mastodon.social/@TheRealPomax) should do nicely, but if you want to have an in-depth discussion, I'd recommend filing an issue, since 280 characters per message is not really sufficient to dig into OpenType details.
+
+# Dev work
+
+I use `rollup` and `babel-minify` to pack stuff for browser distribution:
+
+```
+> rollup --format=esm --no-treeshake Font.js > font.min.js && minify font.min.js .
+```

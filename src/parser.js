@@ -126,4 +126,16 @@ class Parser {
     }
 }
 
-export { Parser };
+class ParsedData {
+    constructor(parser) {
+        const pGetter = { enumerable: false, get:() => parser };
+        Object.defineProperty(this, `parser`, pGetter);
+
+        const start = parser.currentPosition;
+        const startGetter = { enumerable: false, get:() => start }
+        Object.defineProperty(this, `start`, startGetter);
+    }
+}
+
+export { Parser, ParsedData };
+

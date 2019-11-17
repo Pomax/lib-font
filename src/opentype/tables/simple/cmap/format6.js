@@ -1,4 +1,4 @@
-import lazy from "../../../lazy.js";
+import lazy from "../../../../lazy.js";
 
 class Format6 {
     constructor(p) {

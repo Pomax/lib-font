@@ -1,14 +1,15 @@
-import { Parser } from "../../parser.js";
-import lazy from "../../lazy.js";
+import { SimpleTable } from "../simple-table.js";
+import lazy from "../../../lazy.js";
 
 /**
  * The OpenType `gasp` table.
  *
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/gasp
  */
-class gasp {
+class gasp extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`gasp`, dict, dataview);
+        const { p } = super(`gasp`, dict, dataview);
+
         this.version = p.uint16;
         this.numRanges = p.uint16;
 

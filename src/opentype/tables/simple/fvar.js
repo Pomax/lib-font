@@ -1,14 +1,15 @@
-import { Parser } from "../../parser.js";
-import lazy from "../../lazy.js";
+import { SimpleTable } from "../simple-table.js";
+import lazy from "../../../lazy.js";
 
 /**
  * The OpenType `fvar` table.
  *
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/fvar
  */
-class fvar {
+class fvar extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`fvar2`, dict, dataview);
+        const { p } = super(`fvar2`, dict, dataview);
+
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
         this.axesArrayOffset = p.uint16;
@@ -21,7 +22,7 @@ class fvar {
         const getter = () => [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
         lazy(this, `axes`, getter);
     }
-    
+
     getSupportedAxes() {
         return (this.axes).map(a => a.tag);
     }

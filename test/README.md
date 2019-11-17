@@ -1,1 +1,2 @@
-All fonts retrieved from https://github.com/adobe-fonts/source-code-pro and used for testing purposes only.
+This directory contains a battery of tests that are used to verify
+that the parser correctly interprets the various font formats.

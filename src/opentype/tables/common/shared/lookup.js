@@ -1,26 +1,16 @@
-class LookupList {
-    constructor(table, p) {
-        this.table = table;
-        this.parser = p;
-        this.start = p.currentPosition;
+import { ParsedData } from "../../../../parser.js";
 
+class LookupList extends ParsedData {
+    constructor(p) {
+        super(p);
         this.lookupCount = p.uint16;
         this.lookups = [...new Array(this.lookupCount)].map(_ => p.offset16); // Array of offsets to Lookup tables, from beginning of LookupList
     }
-
-    getLookup(lookupIndex) {
-        let lookupOffset = this.lookups[lookupIndex];
-        this.parser.currentPosition = this.start + lookupOffset;
-        return new LookupTable(this.table, this.parser);
-    }
 }
 
-class LookupTable {
-    constructor(table, p) {
-        this.table = table;
-        this.parser = p;
-        this.start = p.currentPosition;
-
+class LookupTable extends ParsedData {
+    constructor(p) {
+        super(p);
         this.lookupType = p.uint16;
         this.lookupFlag = p.uint16;
         this.subTableCount = p.uint16;
@@ -49,28 +39,24 @@ class LookupTable {
     getSubTables() {
         return this.subtableOffsets.map(offset => {
             this.parser.currentPosition = this.start + offset;
-            return new CoverageTable(this.table, this.parser);
+            return new CoverageTable(this.parser);
         });
     }
 }
 
-class CoverageTable {
-    constructor(table, p) {
-        this.table = table;
-        this.parser = p;
-        this.start = p.currentPosition;
+class CoverageTable extends ParsedData {
+    constructor(p) {
+        super(p);
 
         this.coverageFormat = p.uint16;
 
         if (this.coverageFormat === 1) {
             this.glyphCount = p.uint16;
-            // TODO: make lazy?
             this.glyphArray = [...new Array(this.glyphCount)].map(_ => p.uint16);
         }
 
         if (this.coverageFormat === 2) {
             this.rangeCount = p.uint16;
-            // TODO: definitely make lazy!
             this.rangeRecords = [...new Array(this.rangeCount)].map(_ => new CoverageRangeRecord(p));
         }
     }

@@ -21,7 +21,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded otf`);
     };
-    otf.src = `./test/SourceCodePro-Regular.otf`;
+    otf.src = `./fonts/SourceCodePro-Regular.otf`;
 }
 
 if (matrix.shift()) {
@@ -35,7 +35,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded otf.woff`);
     };
-    otfWoff.src = `./test/SourceCodePro-Regular.otf.woff`;
+    otfWoff.src = `./fonts/SourceCodePro-Regular.otf.woff`;
 }
 
 if (matrix.shift()) {
@@ -49,7 +49,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded otf.woff2`);
     };
-    otfWoff2.src = `./test/SourceCodePro-Regular.otf.woff2`;
+    otfWoff2.src = `./fonts/SourceCodePro-Regular.otf.woff2`;
 }
 
 // OTF variable font tests
@@ -65,7 +65,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded otf (var)`);
     };
-    varOtf.src = `./test/SourceCodeVariable-Roman.otf`;
+    varOtf.src = `./fonts/SourceCodeVariable-Roman.otf`;
 }
 
 if (matrix.shift()) {
@@ -79,7 +79,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded otf.woff (var)`);
     };
-    varOtfWoff.src = `./test/SourceCodeVariable-Roman.otf.woff`;
+    varOtfWoff.src = `./fonts/SourceCodeVariable-Roman.otf.woff`;
 }
 
 if (matrix.shift()) {
@@ -93,7 +93,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded otf.woff2 (var)`);
     };
-    varOtfWoff2.src = `./test/SourceCodeVariable-Roman.otf.woff2`;
+    varOtfWoff2.src = `./fonts/SourceCodeVariable-Roman.otf.woff2`;
 }
 
 // TTF tests
@@ -109,7 +109,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded ttf`);
     };
-    ttf.src = `./test/SourceCodePro-Regular.ttf`;
+    ttf.src = `./fonts/SourceCodePro-Regular.ttf`;
 }
 
 if (matrix.shift()) {
@@ -123,7 +123,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded ttf.woff`);
     };
-    ttfWoff.src = `./test/SourceCodePro-Regular.ttf.woff`;
+    ttfWoff.src = `./fonts/SourceCodePro-Regular.ttf.woff`;
 }
 
 if (matrix.shift()) {
@@ -137,7 +137,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded ttf.woff2`);
     };
-    ttfWoff2.src = `./test/SourceCodePro-Regular.ttf.woff2`;
+    ttfWoff2.src = `./fonts/SourceCodePro-Regular.ttf.woff2`;
 }
 
 // TTF variable font tests
@@ -153,7 +153,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded ttf (var)`);
     };
-    varTTf.src = `./test/SourceCodeVariable-Roman.ttf`;
+    varTTf.src = `./fonts/SourceCodeVariable-Roman.ttf`;
 }
 
 if (matrix.shift()) {
@@ -167,7 +167,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded ttf.woff (var)`);
     };
-    varTTfWoff.src = `./test/SourceCodeVariable-Roman.ttf.woff`;
+    varTTfWoff.src = `./fonts/SourceCodeVariable-Roman.ttf.woff`;
 }
 
 if (matrix.shift()) {
@@ -181,7 +181,7 @@ if (matrix.shift()) {
         container.appendChild(p);
         console.log(`loaded ttf.woff2 (var)`);
     };
-    varTTfWoff2.src = `./test/SourceCodeVariable-Roman.ttf.woff2`;
+    varTTfWoff2.src = `./fonts/SourceCodeVariable-Roman.ttf.woff2`;
 }
 
 
@@ -232,6 +232,6 @@ myFont.onload = evt => {
 };
 
 // Kick off the font load by setting a source file
-myFont.src = `./test/SourceCodePro-Regular.otf`;
+myFont.src = `./fonts/SourceCodePro-Regular.otf`;
 
 */

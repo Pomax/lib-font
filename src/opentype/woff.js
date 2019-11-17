@@ -1,16 +1,19 @@
-import { Parser } from "../parser.js";
-import createTable from "./createTable.js";
+import { SimpleTable } from "./tables/simple-table.js";
+import createTable from "./tables/createTable.js";
 import lazy from "../lazy.js";
 
 const gzipDecode = (window.pako ? window.pako.inflate : undefined);
 
 /**
  * The WOFF header
- * See https://www.w3.org/TR/WOFF for more information
+ *
+ * See https://www.w3.org/TR/WOFF for WOFF information
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for font information
  */
-class WOFF {
+class WOFF extends SimpleTable {
     constructor(dataview) {
-        const p = new Parser("woff", { offset: 0, length: 44 }, dataview);
+        const { p } = super("woff", { offset: 0, length: 44 }, dataview);
+
         this.signature = p.tag;
         this.flavor = p.uint32;
         this.length = p.uint32;
@@ -24,6 +27,7 @@ class WOFF {
         this.metaOrigLength = p.uint32;
         this.privOffset = p.uint32;
         this.privLength = p.uint32;
+
         p.verifyLength();
 
         this.directory = [... new Array(this.numTables)].map(_ => new WoffTableDirectoryEntry(p));

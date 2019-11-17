@@ -1,18 +1,19 @@
 // opentype tables
-import { cmap } from "./tables/cmap.js";
-import { fvar } from "./tables/fvar.js";
-import { gasp } from "./tables/gasp.js";
-import { head } from "./tables/head.js";
-import { hhea } from "./tables/hhea.js";
-import { hmtx } from "./tables/hmtx.js";
-import { maxp } from "./tables/maxp.js";
-import { name } from "./tables/name.js";
-import { OS2  } from "./tables/OS2.js";
-import { post } from "./tables/post.js";
+import { cmap } from "./simple/cmap.js";
+import { fvar } from "./simple/fvar.js";
+import { gasp } from "./simple/gasp.js";
+import { head } from "./simple/head.js";
+import { hhea } from "./simple/hhea.js";
+import { hmtx } from "./simple/hmtx.js";
+import { maxp } from "./simple/maxp.js";
+import { name } from "./simple/name.js";
+import { OS2  } from "./simple/OS2.js";
+import { post } from "./simple/post.js";
 
-import { BASE } from "./tables/common/BASE.js";
-import { GSUB } from "./tables/common/GSUB.js";
-import { GPOS } from "./tables/common/GPOS.js";
+// opentype tables that rely on the "common layout tables" data structures
+import { BASE } from "./common/BASE.js";
+import { GSUB } from "./common/GSUB.js";
+import { GPOS } from "./common/GPOS.js";
 
 /**
  * Table factory
@@ -25,7 +26,7 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `gasp`) return new gasp(dict, dataview);
     if (dict.tag === `head`) return new head(dict, dataview);
     if (dict.tag === `hhea`) return new hhea(dict, dataview);
-    if (dict.tag === `hmtx`) return new hmtx(tables, dict, dataview);
+    if (dict.tag === `hmtx`) return new hmtx(dict, dataview, tables);
     if (dict.tag === `maxp`) return new maxp(dict, dataview);
     if (dict.tag === `name`) return new name(dict, dataview);
     if (dict.tag === `OS/2`) return new OS2(dict, dataview);

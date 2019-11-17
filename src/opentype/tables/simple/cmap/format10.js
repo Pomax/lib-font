@@ -1,4 +1,4 @@
-import lazy from "../../../lazy.js";
+import lazy from "../../../../lazy.js";
 
 // basically Format 6, but for 32 bit characters
 class Format10 {

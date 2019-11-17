@@ -1,17 +1,18 @@
-import { Parser } from "../../parser.js";
-import lazy from "../../lazy.js";
+import { SimpleTable } from "../simple-table.js";
+import lazy from "../../../lazy.js";
 
 /**
 * The OpenType `hmtx` table.
 *
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/hmtx
 */
-class hmtx {
-    constructor(tables, dict, dataview) {
+class hmtx extends SimpleTable {
+    constructor(dict, dataview, tables) {
+        const { p } =  super(`head`, dict, dataview);
+
         const numberOfHMetrics = tables.hhea.numberOfHMetrics;
         const numGlyphs = tables.maxp.numGlyphs;
 
-        const p = new Parser(`head`, dict, dataview);
         const hMetricGetter = () => [...new Array(numberOfHMetrics)].map(_ => new LongHorMetric(p.uint16, p.int16));
         lazy(this, `hMetrics`, hMetricGetter);
 

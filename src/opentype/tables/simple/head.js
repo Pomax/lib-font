@@ -1,13 +1,14 @@
-import { Parser } from "../../parser.js";
+import { SimpleTable } from "../simple-table.js";
 
 /**
 * The OpenType `head` table.
 *
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/head
 */
-class head {
+class head extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`head`, dict, dataview);
+        const { p } = super(`head`, dict, dataview);
+
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
         this.fontRevision = p.fixed;
@@ -26,6 +27,7 @@ class head {
         this.fontDirectionHint = p.uint16;
         this.indexToLocFormat = p.uint16;
         this.glyphDataFormat = p.uint16;
+
         p.verifyLength();
     }
 }

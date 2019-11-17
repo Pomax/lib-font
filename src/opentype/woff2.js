@@ -1,5 +1,5 @@
-import { Parser } from "../parser.js";
-import createTable from "./createTable.js";
+import { SimpleTable } from "./tables/simple-table.js";
+import createTable from "./tables/createTable.js";
 import lazy from "../lazy.js";
 
 const brotliDecode = window.unbrotli;
@@ -7,18 +7,18 @@ const brotliDecode = window.unbrotli;
 
 /**
  * The WOFF2 header
- * See https://www.w3.org/TR/WOFF2 for more information
+ *
+ * See https://www.w3.org/TR/WOFF2 for WOFF2 information
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for font information
  */
-class WOFF2 {
+class WOFF2 extends SimpleTable {
     constructor(dataview) {
-        const p = new Parser("woff2", { offset: 0, length: 48 }, dataview);
+        const { p } = super("woff2", { offset: 0, length: 48 }, dataview);
         this.signature = p.tag;
         this.flavor = p.uint32;
         this.length = p.uint32;
-
         this.numTables = p.uint16;
         p.uint16 // why woff2 even has any reserved bytes is a complete mystery. But it does.
-
         this.totalSfntSize = p.uint32;
         this.totalCompressedSize = p.uint32;
         this.majorVersion = p.uint16;
@@ -28,6 +28,7 @@ class WOFF2 {
         this.metaOrigLength = p.uint32;
         this.privOffset = p.uint32;
         this.privLength = p.uint32;
+
         p.verifyLength();
 
         // parse the dictionary

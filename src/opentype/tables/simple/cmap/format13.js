@@ -1,14 +1,13 @@
-import lazy from "../../../lazy.js";
+import lazy from "../../../../lazy.js";
 
-// basically Format 8, but for 32 bit characters
-class Format12 {
+class Format13 {
     constructor(p) {
-        this.format = 12;
+        this.format = 13;
         p.uint16;
         this.length = p.uint32;
         this.language = p.uint32;
         this.numGroups = p.uint32;
-        const getter = () => [...new Array(this.numGroups)].map(_ => new SequentialMapGroup(p));
+        const getter = [...new Array(this.numGroups)].map(_ => new ConstantMapGroup(p));
         lazy(this, `groups`, getter);
     }
 
@@ -20,16 +19,16 @@ class Format12 {
         if (i===-1) i = groups.length;
         let g = groups[i-1];
         if (g.endCharCode < charcode) return false;
-        return charcode - g.startCharCode + g.startGlyphID;
+        return g.glyphId;
     }
 }
 
-class SequentialMapGroup {
+class ConstantMapGroup {
     constructor(p) {
         this.startCharCode = p.uint32;
         this.endCharCode = p.uint32;
-        this.startGlyphID = p.uint32;
+        this.glyphID = p.uint32;
     }
 }
 
-export { Format12 };
+export { Format13 };

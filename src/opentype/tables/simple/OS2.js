@@ -1,13 +1,14 @@
-import { Parser } from "../../parser.js";
+import { SimpleTable } from "../simple-table.js";
 
 /**
  * The OpenType `OS/2` table.
  *
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/OS2
  */
-class OS2 {
+class OS2 extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`OS/2`, dict, dataview);
+        const { p } = super(`OS/2`, dict, dataview);
+
         this.version = p.uint16;
         this.xAvgCharWidth = p.int16;
         this.usWeightClass = p.uint16;

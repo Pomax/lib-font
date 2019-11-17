@@ -1,15 +1,17 @@
-import { Parser } from "../../parser.js";
+import { SimpleTable } from "../simple-table.js";
 
 /**
 * The OpenType `maxp` table.
 *
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/maxp
 */
-class maxp {
+class maxp extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`maxp`, dict, dataview);
+        const { p } = super(`maxp`, dict, dataview);
+
         this.version = p.legacyFixed;
         this.numGlyphs = p.uint16;
+
         if (this.version === 1) {
             this.maxPoints = p.uint16;
             this.maxContours = p.uint16;
@@ -25,6 +27,7 @@ class maxp {
             this.maxComponentElements = p.uint16;
             this.maxComponentDepth = p.uint16;
         }
+
         p.verifyLength();
     }
 }

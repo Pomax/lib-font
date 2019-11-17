@@ -1,13 +1,13 @@
-import { Parser } from "../../parser.js";
+import { SimpleTable } from "../simple-table.js";
 
 /**
 * The OpenType `name` table.
 *
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/name
 */
-class name {
+class name extends SimpleTable {
     constructor(dict, dataview) {
-        const p = new Parser(`name`, dict, dataview);
+        const { p } = super(`name`, dict, dataview);
 
         this.format = p.uint16;
         this.count = p.uint16;
