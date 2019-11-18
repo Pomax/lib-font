@@ -1,3 +1,5 @@
+let logPad = [];
+
 function arrayEqual(a,b) {
     if(!b.map) return false;
     if (a.length !== b.length) return false;
@@ -11,15 +13,24 @@ function equal(a, b) {
 
 function assertEqual(a, b, why) {
     if (equal(a,b)) {
-        console.log(`✔️`, why);
+        console.log(logPad.join(''), `✔️`, why);
     } else {
-        console.error(`❌`, why, `is false: ${a} is not ${b}`);
+        console.error(logPad.join(''), `❌`, why, `is false: ${a} is not ${b}`);
     }
 }
 
 function assertNotEqual(a, b, why) {
-    if (a === b) { console.error(`❌`, why, `${a} should not be ${b}`); }
-    else { console.log(`✔️`, why); }
+    if (a === b) { console.error(logPad.join(''), `❌`, why, `${a} should not be ${b}`); }
+    else { console.log(logPad.join(''), `✔️`, why); }
 }
 
-export { assertEqual, assertNotEqual };
+function indent() {
+    logPad.push('  ');
+}
+
+function unindent(full) {
+    logPad.pop();
+    if(full) logPad = [];
+}
+
+export { indent, unindent, assertEqual, assertNotEqual };

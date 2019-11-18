@@ -7,6 +7,8 @@ import createSubTable from "./cmap/createSubTable.js";
  * The OpenType `cmap` main table.
  *
  * Subtables are found in the ./cmap directory
+ *
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/cmap for more information
  */
 class cmap extends SimpleTable {
     constructor(dict, dataview) {
@@ -14,18 +16,13 @@ class cmap extends SimpleTable {
 
         this.version = p.uint16;
         this.numTables = p.uint16;
-
-        const getter = () => [...new Array(this.numTables)].map(_ => new EncodingRecord(p));
-        lazy(this, `encodingRecords`, getter);
-
-        // cache these values for use in `.get(tableID)`
-        this.subTableStart = dict.offset;
+        this.encodingRecords = [...new Array(this.numTables)].map(_ => new EncodingRecord(p));
     }
 
     get(tableID) {
         let record = this.encodingRecords[tableID];
         if (record) {
-            const dict = { offset: this.subTableStart + record.offset };
+            const dict = { offset: this.tableStart + record.offset };
             const p = new Parser(`Cmap subtable record ${tableID}`, dict, this.parser.data);
             const format = p.uint16;
             return createSubTable(format, p);

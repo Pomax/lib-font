@@ -7,6 +7,7 @@ class Format6 {
         this.language = p.uint16;
         this.firstCode = p.uint16;
         this.entryCount = p.uint16;
+
         const getter = () => [...new Array(this.entryCount)].map(_ => p.uint16);
         lazy(this, `glyphIdArray`, getter);
     }
