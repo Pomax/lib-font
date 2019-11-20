@@ -7,8 +7,19 @@
         <script src="../lib/unbrotli.js" defer></script>
         <script src="../Font.js" type="module" defer></script>
         <script src="./test.otf.js" type="module" defer></script>
+        <style>
+            div {
+                white-space: pre-wrap;
+                border: 1px solid black;
+                border-bottom: none;
+            }
+            div:first-child { border-bottom: none; }
+            div:last-child { border-bottom: 1px solid black; }
+            div:nth-child(2n-1) { background-color: #EEE; }
+        </style>
     </head>
     <body>
-        <p>Please see the console to examine the test results or <a href="/index.html">click here</a> to return to the main page.<p>
+        <h1>Test Results</h1>
+        <h3>Back to <a href="../index.html">index.html</a></h3>
     </body>
 </html>

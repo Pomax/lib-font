@@ -1,3 +1,4 @@
+import { Parser } from "../../../parser.js";
 import { SimpleTable } from "../simple-table.js";
 
 /**
@@ -23,8 +24,7 @@ class name extends SimpleTable {
         }
 
         // cache these values for use in `.get(nameID)`
-        this.start = dict.offset + this.stringOffset;
-        this.data = dataview;
+        this.stringStart = this.tableStart + this.stringOffset;
     }
 
     /**
@@ -34,8 +34,8 @@ class name extends SimpleTable {
     get(nameID) {
         let record = this.nameRecords.find(record => record.nameID === nameID);
         if (record) {
-            const dict = { offset: this.start + record.offset, length: record.length };
-            const p = new Parser(`Name record ${nameID}`, dict, this.data);
+            const dict = { offset: this.stringStart + record.offset, length: record.length };
+            const p = new Parser(`Name record ${nameID}`, dict, this.parser.data);
             const bytes = new Uint8Array(p.toBytes());
             return [...bytes].map(v => String.fromCharCode(v)).join(``);
         }

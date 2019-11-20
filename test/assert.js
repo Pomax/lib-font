@@ -1,3 +1,4 @@
+let rollout = document.body;
 let logPad = [];
 
 function arrayEqual(a,b) {
@@ -11,21 +12,36 @@ function equal(a, b) {
     return (a === b);
 }
 
+function note(msg) {
+    let div = document.createElement('div')
+    div.textContent = msg;
+    rollout.appendChild(div);
+}
+
+function pass(why) {
+    note(`${logPad.join('')}✔️${why}`);
+}
+
+function fail (a, b, why) {
+    note(`${logPad.join('')}❌${why} is false: ${a} is not ${b}`);
+}
+
+
 function assertEqual(a, b, why) {
     if (equal(a,b)) {
-        console.log(logPad.join(''), `✔️`, why);
+        pass(why);
     } else {
-        console.error(logPad.join(''), `❌`, why, `is false: ${a} is not ${b}`);
+        fail(a, b, why);
     }
 }
 
 function assertNotEqual(a, b, why) {
-    if (a === b) { console.error(logPad.join(''), `❌`, why, `${a} should not be ${b}`); }
-    else { console.log(logPad.join(''), `✔️`, why); }
+    if (a === b) { fail(a, b, why); }
+    else { pass(why); }
 }
 
 function indent() {
-    logPad.push('  ');
+    logPad.push('\t');
 }
 
 function unindent(full) {
