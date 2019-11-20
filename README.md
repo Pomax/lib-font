@@ -87,6 +87,8 @@ This library was designed specifically for use in the browser.
 
 It won't work in Node right now, because Node doesn't have its own `window`, `document`, and Fetch API implementation, but most important: Node.js is absolutely stupid when it comes to loading es modules, and for some idiotic reason demands you call module files `.mjs` instead of just looking for ES import/export statements in `.js` files. And I'm not renaming every file to an `.mjs` extension...
 
+Of course, you can always run the code through whatever babel+webpack solution you probably already have set up, but you'll have to do that yourself. I'm having too much fun writing nice, clean, pure browser code.
+
 ## API
 
 The API has not yet been fully settled on - right now a lot of it is fairly easy to find in the source, but that's the only place atm.
