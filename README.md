@@ -77,6 +77,12 @@ Note that this still requires the `inflate` and `unbrotli` libraries from the `.
 
 Also, if you wish to minify the rolled up version of Font.js, I would recommend using `babel-minify` (`npm install babel-minify` after which it's `npx minify font.rolled.js -d minified`). Again, this won't do antyhing to make the `inflate` or `unbrotli` libraries smaller, but it will reduce the size of Font.js to around 50% its original size.
 
+## Compatibility
+
+This library was designed specifically for use in the browser.
+
+It won't work in Node right now, because Node doesn't have its own `window`, `document`, and Fetch API implementation, but most important: Node.js is absolutely stupid when it comes to loading es modules, and for some idiotic reason demands you call module files `.mjs` instead of just looking for ES import/export statements in `.js` files. And I'm not renaming every file to an `.mjs` extension...
+
 ## API
 
 The API has not yet been fully settled on - right now a lot of it is fairly easy to find in the source, but that's the only place atm.
@@ -92,11 +98,3 @@ I don't have a good answer to that. Those are some great projects, you probably 
 ## Alright, what if I have opinions?
 
 Tweet at me! [@TheRealPomax](http://twitter.com/TheRealPomax) or [@TheRealPomax@Mastodon.social](https://mastodon.social/@TheRealPomax) should do nicely, but if you want to have an in-depth discussion, I'd recommend filing an issue, since 280 characters per message is not really sufficient to dig into OpenType details.
-
-# Dev work
-
-I use `rollup` and `babel-minify` to pack stuff for browser distribution:
-
-```
-> rollup --format=esm --no-treeshake Font.js > font.min.js && minify font.min.js .
-```
