@@ -191,7 +191,7 @@ if (matrix.shift()) {
 /*
 
 // Create a font object
-const myFont = new Font(`Adobe Source Code Pro `);
+const myFont = new Font(`Adobe Source Code Pro`);
 
 // When the font's up and loaded in, let's do some testing!
 function doSomeFontThings(evt) {
@@ -202,36 +202,40 @@ function doSomeFontThings(evt) {
         font.supports(char)
     }`));
 
+    // Then, let's check some OpenType things
     const GSUB = font.opentype.tables.GSUB;
 
-    // Then, let's figure out which writing scripts this font supports.
+    // Let's figure out which writing scripts this font supports:
     console.log(`This font supports the following scripts: ${
-        `"${GSUB.scriptList.getSupportedScripts().join(`", "`)}"`
+        `"${GSUB.getSupportedScripts().join(`", "`)}"`
     }`);
 
     // DFLT is a given, but let's see if `latn` has any special language/system rules...
+    const latn = GSUB.getScriptTable('latn');
     console.log(`Special langsys for "latn": ${
-        `"${GSUB.scriptList.getTable('latn').getSupportedLangSys().join(`", "`)}"`
+        `"${GSUB.getSupportedLangSys(latn).join(`", "`)}"`
     }`);
 
     // Wow, "Northern Sami" support? Really? Which OpenType features does that use?
+    const nsm = GSUB.getLangSysTable(latn, "NSM ");
     console.log(`OpenType features for the Northern Sami version of latin script:`,
-        GSUB.scriptList.getTable('latn').getLangSys("NSM ").getFeatures()
+        `"${GSUB.getFeatures(nsm).map(f => f.featureTag).join(`", "`)}"`
     );
+
+    // Oh wait, this is a variable font, isn't it.
+    console.log(`This is a variable font: ${!!font.opentype.tables.fvar}`);
+
+    // Which axes does it support?
+    console.log(`This variable font supposed the following axes: ${
+        `"${font.opentype.tables.fvar.getSupportedAxes().join(`", "`)}"`
+    }`);
 }
 
 // Assign event handling (.addEventListener version supported too, of course)
 myFont.onerror = evt => console.error(evt);
-myFont.onload = evt => {
-    let font = evt.detail.font;
-    let p = document.createElement('p');
-    p.setAttribute('style', `font-family: "${font.name}";`);
-    p.textContent = `Test line for ${font.name}`;
-    container.appendChild(p);
-    doSomeFontThings(evt);
-};
+myFont.onload = evt => doSomeFontThings(evt);
 
 // Kick off the font load by setting a source file
-myFont.src = `./fonts/SourceCodePro-Regular.otf`;
+myFont.src = `./fonts/SourceCodeVariable-Roman.otf.woff2`;
 
 */
