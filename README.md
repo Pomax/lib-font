@@ -55,6 +55,28 @@ myFont.onload = evt => doSomeFontThings(evt);
 myFont.src = `./test/SourceCodeVariable-Roman.otf.woff2`;
 ```
 
+## Running this code
+
+I'd recommend using the Node.js `live-server` package (`npm install live-server` after which it's `npx live-server`), which will start up a server _and_ open your browser to the server's index.html page, live-reloading whenever you change things in the code.
+
+Barring that, you can of course use one of the many ways to fire up a quick http server:
+- `http-server` (Node.js package)
+- `python -m SimpleHTTPServer` (when still using python 2.7 - please stop using that btw) 
+- `python -m http.server` (when using Python 3)
+- `php -S localhost:8000` (if you happen to still have PHP installed)
+
+## Building this code
+
+If you want to build this code for use in  the browser, you can use `rollup` (`npm install rollup`, after which it's `npx rollup`) to turn Font.js into a single file:
+
+```bash
+$ npx rollup --no-treeshaking --format=esm Font.js > Font.rolled.js
+```
+
+Note that this still requires the `inflate` and `unbrotli` libraries from the `./lib` directory, which I'm intentionally leaving out: without them plain opentype parsing will still work fine, but woff and woff2 parsing obviously wont.
+
+Also, if you wish to minify the rolled up version of Font.js, I would recommend using `babel-minify` (`npm install babel-minify` after which it's `npx minify font.rolled.js -d minified`). Again, this won't do antyhing to make the `inflate` or `unbrotli` libraries smaller, but it will reduce the size of Font.js to around 50% its original size.
+
 ## API
 
 The API has not yet been fully settled on - right now a lot of it is fairly easy to find in the source, but that's the only place atm.
