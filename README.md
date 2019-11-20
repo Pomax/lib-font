@@ -71,7 +71,7 @@ Barring that, you can of course use one of the many ways to fire up a quick http
 
 ## Building this code
 
-If you want to build this code for use in  the browser, you can use `rollup` (`npm install rollup`, after which it's `npx rollup`) to turn Font.js into a single file:
+While the whole point of ES modules is that you don't need to bundle anything, if you _want_ to turn Font.js into a single file, you can do so using `rollup` (`npm install rollup`, after which it's `npx rollup`):
 
 ```bash
 $ npx rollup --no-treeshaking --format=esm Font.js > Font.rolled.js
@@ -79,13 +79,15 @@ $ npx rollup --no-treeshaking --format=esm Font.js > Font.rolled.js
 
 Note that this does not include the `inflate` and `unbrotli` libraries from the `./lib` directory: as optional dependencies, they're intentionally left out when you roll up the code. Without them, plain opentype parsing will still work perfectly fine, but woff and woff2 parsing obviously won't.
 
-Also, if you wish to minify the rolled up version of Font.js, I would recommend using `babel-minify` (`npm install babel-minify` after which it's `npx minify font.rolled.js -d minified`). Again, this won't do antyhing to make the `inflate` or `unbrotli` libraries smaller, but it will reduce the size of Font.js to around 50% its original size.
+Also, if you wish to minify the rolled up version of Font.js, I would recommend using `babel-minify` (`npm install babel-minify` after which it's `npx minify font.rolled.js -d minified`). Again, this won't do anything to make the `inflate` or `unbrotli` libraries smaller, but it will reduce the size of Font.js to around 50% its original size.
 
 ## Compatibility
 
 This library was designed specifically for use in the browser.
 
 It won't work in Node right now, because Node doesn't have its own `window`, `document`, and Fetch API implementation, but most important: Node.js is absolutely stupid when it comes to loading es modules, and for some idiotic reason demands you call module files `.mjs` instead of just looking for ES import/export statements in `.js` files. And I'm not renaming every file to an `.mjs` extension...
+
+Of course, you can always run the code through whatever babel+webpack solution you probably already have set up, but you'll have to do that yourself. I'm having too much fun writing nice, clean, pure browser code.
 
 ## API
 
