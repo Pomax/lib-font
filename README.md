@@ -66,6 +66,8 @@ Barring that, you can of course use one of the many ways to fire up a quick http
 - `python -m SimpleHTTPServer` (when still using python 2.7 - please stop using that btw) 
 - `python -m http.server` (when using Python 3)
 - `php -S localhost:8000` (if you happen to still have PHP installed)
+- `ruby -run -e httpd . -p 8000` (ruby, obviously)
+
 
 ## Building this code
 
