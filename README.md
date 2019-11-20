@@ -87,6 +87,17 @@ It won't work in Node right now, because Node doesn't have its own `window`, `do
 
 The API has not yet been fully settled on - right now a lot of it is fairly easy to find in the source, but that's the only place atm.
 
+## Why don't woff/woff2 work?
+
+They do, but they rely on having the gzip inflater and brotli decoder libraries loaded. You can find those in the `./lib` dir, as they are optional: without them regular parsing still works fine, but with `inflate` loaded, woff parsing will succeed, and with `unbrotli` loaded, woff2 parsing will succeed.
+
+To make this work on your own pages, add the following bit to your document head, with the appropriate path to these two libraries, of course:
+
+```html
+    <script src="./lib/inflate.js" defer></script>
+    <script src="./lib/unbrotli.js" defer></script>
+```
+
 ## Why can't this draw stuff??
 
 Because you already have a text shaping engine available: your browser. You can already draw all the text you need, properly shaped and typeset, both in HTML and on a Canvas. There is no reason for this library to try to do that, when it's guaranteed to do it worse.
