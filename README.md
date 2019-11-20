@@ -25,17 +25,19 @@ function doSomeFontThings(evt) {
 
     // Let's figure out which writing scripts this font supports:
     console.log(`This font supports the following scripts: ${
-        `"${GSUB.scriptList.getSupportedScripts().join(`", "`)}"`
+        `"${GSUB.getSupportedScripts().join(`", "`)}"`
     }`);
 
     // DFLT is a given, but let's see if `latn` has any special language/system rules...
+    const latn = GSUB.getScriptTable('latn');
     console.log(`Special langsys for "latn": ${
-        `"${GSUB.scriptList.getTable('latn').getSupportedLangSys().join(`", "`)}"`
+        `"${GSUB.getSupportedLangSys(latn).join(`", "`)}"`
     }`);
 
     // Wow, "Northern Sami" support? Really? Which OpenType features does that use?
+    const nsm = GSUB.getLangSysTable(latn, "NSM ");
     console.log(`OpenType features for the Northern Sami version of latin script:`,
-        GSUB.scriptList.getTable('latn').getLangSys("NSM ").getFeatures()
+        `"${GSUB.getFeatures(nsm).map(f => f.featureTag).join(`", "`)}"`
     );
 
     // Oh wait, this is a variable font, isn't it.
@@ -52,7 +54,7 @@ myFont.onerror = evt => console.error(evt);
 myFont.onload = evt => doSomeFontThings(evt);
 
 // Kick off the font load by setting a source file
-myFont.src = `./test/SourceCodeVariable-Roman.otf.woff2`;
+myFont.src = `./fonts/SourceCodeVariable-Roman.otf.woff2`;
 ```
 
 ## Running this code
