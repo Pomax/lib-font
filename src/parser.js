@@ -118,10 +118,13 @@ class Parser {
         }
     }
 
-    toBytes() {
+    readBytes(n=0) {
         // Get the entire datablock out.
+        n = n || this.length;
+        if (n === 0) return [];
+
         const start = this.start + this.offset;
-        const end = start + this.length;
+        const end = start + n;
         return this.data.buffer.slice(start, end);
     }
 }

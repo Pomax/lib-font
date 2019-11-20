@@ -34,9 +34,9 @@ class name extends SimpleTable {
     get(nameID) {
         let record = this.nameRecords.find(record => record.nameID === nameID);
         if (record) {
-            const dict = { offset: this.stringStart + record.offset, length: record.length };
+            const dict = { offset: this.stringStart + record.offset };
             const p = new Parser(`Name record ${nameID}`, dict, this.parser.data);
-            const bytes = new Uint8Array(p.toBytes());
+            const bytes = new Uint8Array(p.readBytes(record.length));
             return [...bytes].map(v => String.fromCharCode(v)).join(``);
         }
     }

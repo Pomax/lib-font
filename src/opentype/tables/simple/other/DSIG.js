@@ -1,0 +1,14 @@
+import { SimpleTable } from "../simple-table.js";
+
+/**
+* The OpenType `DSIG` table.
+*
+* See https://docs.microsoft.com/en-us/typography/opentype/spec/DSIG
+*/
+class DSIG extends SimpleTable {
+    constructor(dict, dataview, tables) {
+        const { p } =  super(`DSIG`, dict, dataview);
+    }
+}
+
+export { DSIG };

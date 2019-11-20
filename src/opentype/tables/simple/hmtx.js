@@ -8,7 +8,7 @@ import lazy from "../../../lazy.js";
 */
 class hmtx extends SimpleTable {
     constructor(dict, dataview, tables) {
-        const { p } =  super(`head`, dict, dataview);
+        const { p } =  super(`hmtx`, dict, dataview);
 
         const numberOfHMetrics = tables.hhea.numberOfHMetrics;
         const numGlyphs = tables.maxp.numGlyphs;

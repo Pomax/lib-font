@@ -1,0 +1,15 @@
+import { SimpleTable } from "../simple-table.js";
+import lazy from "../../../lazy.js";
+
+/**
+ * The OpenType `gvar` table.
+ *
+ * See https://docs.microsoft.com/en-us/typography/opentype/spec/gvar
+ */
+class gvar extends SimpleTable {
+    constructor(dict, dataview) {
+        const { p } = super(`gvar`, dict, dataview);
+    }
+}
+
+export { gvar };

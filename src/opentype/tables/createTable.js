@@ -1,7 +1,6 @@
 // opentype tables
 import { cmap } from "./simple/cmap.js";
-import { fvar } from "./simple/fvar.js";
-import { gasp } from "./simple/gasp.js";
+import { gasp } from "./simple/ttf/gasp.js";
 import { head } from "./simple/head.js";
 import { hhea } from "./simple/hhea.js";
 import { hmtx } from "./simple/hmtx.js";
@@ -11,9 +10,15 @@ import { OS2  } from "./simple/OS2.js";
 import { post } from "./simple/post.js";
 
 // opentype tables that rely on the "common layout tables" data structures
-import { BASE } from "./common/BASE.js";
-import { GSUB } from "./common/GSUB.js";
-import { GPOS } from "./common/GPOS.js";
+import { BASE } from "./advanced/BASE.js";
+import { GSUB } from "./advanced/GSUB.js";
+import { GPOS } from "./advanced/GPOS.js";
+
+// SVG tables... err... table
+import { SVG } from "./simple/SVG.js";
+
+// Variable fonts
+import { fvar } from "./simple/variation/fvar.js";
 
 /**
  * Table factory
@@ -35,6 +40,9 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `BASE`) return new BASE(dict, dataview);
     if (dict.tag === `GSUB`) return new GSUB(dict, dataview);
     if (dict.tag === `GPOS`) return new GPOS(dict, dataview);
+
+    if (dict.tag === `SVG `) return new SVG(dict, dataview);
+
     // further code goes here once more table parsers exist
     return {};
 };
