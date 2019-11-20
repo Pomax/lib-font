@@ -75,7 +75,7 @@ If you want to build this code for use in  the browser, you can use `rollup` (`n
 $ npx rollup --no-treeshaking --format=esm Font.js > Font.rolled.js
 ```
 
-Note that this still requires the `inflate` and `unbrotli` libraries from the `./lib` directory, which I'm intentionally leaving out: without them plain opentype parsing will still work fine, but woff and woff2 parsing obviously wont.
+Note that this does not include the `inflate` and `unbrotli` libraries from the `./lib` directory: as optional dependencies, they're intentionally left out when you roll up the code. Without them, plain opentype parsing will still work perfectly fine, but woff and woff2 parsing obviously won't.
 
 Also, if you wish to minify the rolled up version of Font.js, I would recommend using `babel-minify` (`npm install babel-minify` after which it's `npx minify font.rolled.js -d minified`). Again, this won't do antyhing to make the `inflate` or `unbrotli` libraries smaller, but it will reduce the size of Font.js to around 50% its original size.
 
