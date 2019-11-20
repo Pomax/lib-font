@@ -71,7 +71,7 @@ Barring that, you can of course use one of the many ways to fire up a quick http
 
 ## Building this code
 
-If you want to build this code for use in  the browser, you can use `rollup` (`npm install rollup`, after which it's `npx rollup`) to turn Font.js into a single file:
+While the whole point of ES modules is that you don't need to bundle anything, if you _want_ to turn Font.js into a single file, you can do so using `rollup` (`npm install rollup`, after which it's `npx rollup`):
 
 ```bash
 $ npx rollup --no-treeshaking --format=esm Font.js > Font.rolled.js
