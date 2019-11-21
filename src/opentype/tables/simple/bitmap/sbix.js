@@ -1,6 +1,6 @@
+import { ParsedData } from "../../../../parser.js";
 import { SimpleTable } from "../../simple-table.js";
 import lazy from "../../../../lazy.js";
-import { ParsedData } from "../../../../parser.js";
 
 /**
 * The OpenType `sbix` table.

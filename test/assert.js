@@ -12,10 +12,15 @@ function equal(a, b) {
     return (a === b);
 }
 
-function note(msg) {
+function note(msg, style) {
     let div = document.createElement('div')
     div.textContent = msg;
+    div.setAttribute(`style`, style);
     rollout.appendChild(div);
+}
+
+function heading(msg) {
+    note(msg, `font-weight: bold; font-size: 1.5em; padding: 0.5em 0`);
 }
 
 function pass(why) {
@@ -25,7 +30,6 @@ function pass(why) {
 function fail (a, b, why) {
     note(`${logPad.join('')}❌${why} is false: ${a} is not ${b}`);
 }
-
 
 function assertEqual(a, b, why) {
     if (equal(a,b)) {
@@ -49,4 +53,4 @@ function unindent(full) {
     if(full) logPad = [];
 }
 
-export { indent, unindent, assertEqual, assertNotEqual };
+export { heading, indent, unindent, assertEqual, assertNotEqual };

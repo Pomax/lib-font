@@ -25,6 +25,14 @@ import { CFF } from "./simple/cff/CFF.js";
 import { CFF2 } from "./simple/cff/CFF2.js";
 import { VORG } from "./simple/cff/VORG.js";
 
+// bitmap
+import { EBLC } from "./simple/bitmap/EBLC.js";
+import { EBDT } from "./simple/bitmap/EBDT.js";
+import { EBSC } from "./simple/bitmap/EBSC.js";
+import { CBLC } from "./simple/bitmap/CBLC.js";
+import { CBDT } from "./simple/bitmap/CBDT.js";
+import { sbix } from "./simple/bitmap/sbix.js";
+
 /**
  * Table factory
  * @param {*} dict an object of the form: { tag: "string", offset: <number>, [length: <number>]}
@@ -51,6 +59,13 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `CFF `) return new CFF(dict, dataview);
     if (dict.tag === `CFF2`) return new CFF2(dict, dataview);
     if (dict.tag === `VORG`) return new VORG(dict, dataview);
+
+    if (dict.tag === `EBLC`) return new EBLC(dict, dataview);
+    if (dict.tag === `EBDT`) return new EBDT(dict, dataview);
+    if (dict.tag === `EBSC`) return new EBSC(dict, dataview);
+    if (dict.tag === `CBLC`) return new CBLC(dict, dataview);
+    if (dict.tag === `CBDT`) return new CBDT(dict, dataview);
+    if (dict.tag === `sbix`) return new sbix(dict, dataview);
 
     // further code goes here once more table parsers exist
     return {};

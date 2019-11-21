@@ -8,6 +8,12 @@ import { SimpleTable } from "../../simple-table.js";
 class glyf extends SimpleTable {
     constructor(dict, dataview) {
         const { p } =  super(dict, dataview);
+        // This table is not really a table, but a pure data block.
+    }
+
+    getGlyphData(offset, length) {
+        this.parser.currentPosition = this.tableStart + offset;
+        return this.parser.readBytes(length);
     }
 }
 

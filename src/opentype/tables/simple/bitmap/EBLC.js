@@ -1,6 +1,6 @@
 import { BitmapSize } from "./shared.js";
 import { SimpleTable } from "../../simple-table.js";
-import { lazy } from "../../../../lazy.js";
+import lazy from "../../../../lazy.js";
 
 /**
 * The OpenType `EBLC` table.

@@ -1,6 +1,5 @@
 import { ParsedData } from "../../../parser.js";
 import { SimpleTable } from "../simple-table.js";
-import lazy from "../../../lazy.js";
 
 /**
  * The OpenType `SVG` table.
