@@ -1,4 +1,5 @@
 import { SimpleTable } from "../../simple-table.js";
+import lazy from "../../../../lazy.js";
 
 /**
 * The OpenType `CFF2` table.
@@ -8,6 +9,7 @@ import { SimpleTable } from "../../simple-table.js";
 class CFF2 extends SimpleTable {
     constructor(dict, dataview) {
         const { p } =  super(`CFF2`, dict, dataview);
+        lazy(this, `data`, () => p.readBytes());
     }
 }
 

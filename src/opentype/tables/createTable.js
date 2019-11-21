@@ -20,6 +20,11 @@ import { SVG } from "./simple/SVG.js";
 // Variable fonts
 import { fvar } from "./simple/variation/fvar.js";
 
+// CFF
+import { CFF } from "./simple/cff/CFF.js";
+import { CFF2 } from "./simple/cff/CFF2.js";
+import { VORG } from "./simple/cff/VORG.js";
+
 /**
  * Table factory
  * @param {*} dict an object of the form: { tag: "string", offset: <number>, [length: <number>]}
@@ -42,6 +47,10 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `GPOS`) return new GPOS(dict, dataview);
 
     if (dict.tag === `SVG `) return new SVG(dict, dataview);
+
+    if (dict.tag === `CFF `) return new CFF(dict, dataview);
+    if (dict.tag === `CFF2`) return new CFF2(dict, dataview);
+    if (dict.tag === `VORG`) return new VORG(dict, dataview);
 
     // further code goes here once more table parsers exist
     return {};
