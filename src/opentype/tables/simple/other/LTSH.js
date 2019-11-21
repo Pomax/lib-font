@@ -1,4 +1,4 @@
-import { SimpleTable } from "../simple-table.js";
+import { SimpleTable } from "../../simple-table.js";
 
 /**
 * The OpenType `LTSH` table.
@@ -6,7 +6,7 @@ import { SimpleTable } from "../simple-table.js";
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/LTSH
 */
 class LTSH extends SimpleTable {
-    constructor(dict, dataview, tables) {
+    constructor(dict, dataview) {
         const { p } =  super(`LTSH`, dict, dataview);
     }
 }

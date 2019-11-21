@@ -1,4 +1,4 @@
-import { SimpleTable } from "../simple-table.js";
+import { SimpleTable } from "../../simple-table.js";
 
 /**
 * The OpenType `EBLC` table.
@@ -6,7 +6,7 @@ import { SimpleTable } from "../simple-table.js";
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/EBLC
 */
 class EBLC extends SimpleTable {
-    constructor(dict, dataview, tables) {
+    constructor(dict, dataview) {
         const { p } =  super(`EBLC`, dict, dataview);
     }
 }

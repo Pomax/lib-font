@@ -1,5 +1,5 @@
-import { SimpleTable } from "../simple-table.js";
-import lazy from "../../../lazy.js";
+import { SimpleTable } from "../../simple-table.js";
+import lazy from "../../../../lazy.js";
 
 /**
  * The OpenType `fvar` table.

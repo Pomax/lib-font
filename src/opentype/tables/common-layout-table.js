@@ -1,7 +1,7 @@
 import { SimpleTable } from "./simple-table.js";
-import { ScriptList, ScriptTable, LangSysTable } from "./common/shared/script.js";
-import { FeatureList, FeatureTable } from "./common/shared/feature.js";
-import { LookupList, LookupTable } from "./common/shared/lookup.js";
+import { ScriptList, ScriptTable, LangSysTable } from "./advanced/shared/script.js";
+import { FeatureList, FeatureTable } from "./advanced/shared/feature.js";
+import { LookupList, LookupTable } from "./advanced/shared/lookup.js";
 import lazy from "../../lazy.js";
 
 
