@@ -8,7 +8,7 @@ import { SimpleTable } from "../simple-table.js";
 */
 class name extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`name`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.format = p.uint16;
         this.count = p.uint16;
@@ -35,7 +35,7 @@ class name extends SimpleTable {
         let record = this.nameRecords.find(record => record.nameID === nameID);
         if (record) {
             const dict = { offset: this.stringStart + record.offset };
-            const p = new Parser(`Name record ${nameID}`, dict, this.parser.data);
+            const p = new Parser(dict, this.parser.data, `Name record ${nameID}`);
             const bytes = new Uint8Array(p.readBytes(record.length));
             return [...bytes].map(v => String.fromCharCode(v)).join(``);
         }

@@ -13,8 +13,8 @@ function asText(data) {
  * A data parser for table data, with auto-advancing pointer.
  */
 class Parser {
-    constructor(name, dict, dataview) {
-        this.name = name;
+    constructor(dict, dataview, name) {
+        this.name = (name || dict.tag || ``).trim();
         this.length = dict.length;
         this.start = dict.offset;
         this.offset = 0;
@@ -118,14 +118,16 @@ class Parser {
         }
     }
 
-    readBytes(n=0) {
+    readBytes(n=0, Type=undefined) {
         // Get the entire datablock out.
         n = n || this.length;
         if (n === 0) return [];
 
         const start = this.start + this.offset;
         const end = start + n;
-        return this.data.buffer.slice(start, end);
+        let slice = this.data.buffer.slice(start, end);
+        if (Type)  slice = new Type(slice);
+        return slice;
     }
 }
 

@@ -7,7 +7,7 @@ import { SimpleTable } from "../simple-table.js";
 */
 class hhea extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`hhea`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;

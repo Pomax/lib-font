@@ -11,7 +11,7 @@ import createSubTable from "./cmap/createSubTable.js";
  */
 class cmap extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`cmap`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.version = p.uint16;
         this.numTables = p.uint16;
@@ -22,7 +22,7 @@ class cmap extends SimpleTable {
         let record = this.encodingRecords[tableID];
         if (record) {
             const dict = { offset: this.tableStart + record.offset };
-            const p = new Parser(`Cmap subtable record ${tableID}`, dict, this.parser.data);
+            const p = new Parser(dict, this.parser.data, `Cmap subtable record ${tableID}`);
             const format = p.uint16;
             return createSubTable(format, p);
         }

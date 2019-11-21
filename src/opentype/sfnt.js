@@ -9,7 +9,7 @@ import lazy from "../lazy.js";
  */
 class SFNT extends SimpleTable {
     constructor(dataview) {
-        const { p } = super("sfnt", { offset: 0, length: 12}, dataview);
+        const { p } = super({ offset: 0, length: 12}, dataview, `sfnt`);
 
         this.version = p.uint32;
         this.numTables = p.uint16;

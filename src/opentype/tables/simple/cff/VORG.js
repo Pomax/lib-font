@@ -8,7 +8,7 @@ import lazy from "../../../../lazy.js";
 */
 class VORG extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } =  super(`VORG`, dict, dataview);
+        const { p } =  super(dict, dataview);
 
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;

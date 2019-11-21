@@ -7,7 +7,7 @@ import { SimpleTable } from "../../simple-table.js";
  */
 class avar extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`avar`, dict, dataview);
+        const { p } = super(dict, dataview);
     }
 }
 

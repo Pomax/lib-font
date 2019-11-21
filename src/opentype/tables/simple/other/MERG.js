@@ -7,7 +7,7 @@ import { SimpleTable } from "../../simple-table.js";
 */
 class MERG extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } =  super(`MERG`, dict, dataview);
+        const { p } =  super(dict, dataview);
     }
 }
 

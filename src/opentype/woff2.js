@@ -13,7 +13,7 @@ const brotliDecode = window.unbrotli;
  */
 class WOFF2 extends SimpleTable {
     constructor(dataview) {
-        const { p } = super("woff2", { offset: 0, length: 48 }, dataview);
+        const { p } = super({ offset: 0, length: 48 }, dataview, `woff2`);
         this.signature = p.tag;
         this.flavor = p.uint32;
         this.length = p.uint32;

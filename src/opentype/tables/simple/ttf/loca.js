@@ -7,7 +7,7 @@ import { SimpleTable } from "../../simple-table.js";
 */
 class loca extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } =  super(`loca`, dict, dataview);
+        const { p } =  super(dict, dataview);
     }
 }
 

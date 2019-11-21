@@ -1,13 +1,13 @@
-import { SimpleTable } from "../../simple-table.js";
+import { EBLC } from "./EBLC.js";
 
 /**
 * The OpenType `CBLC` table.
 *
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/CBLC
 */
-class CBLC extends SimpleTable {
+class CBLC extends EBLC {
     constructor(dict, dataview) {
-        const { p } =  super(`CBLC`, dict, dataview);
+        super(dict, dataview, `CBLC`);
     }
 }
 

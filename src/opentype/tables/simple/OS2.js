@@ -7,7 +7,7 @@ import { SimpleTable } from "../simple-table.js";
  */
 class OS2 extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`OS/2`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.version = p.uint16;
         this.xAvgCharWidth = p.int16;

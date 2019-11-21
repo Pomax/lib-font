@@ -1,8 +1,8 @@
 import { Parser, ParsedData } from "../../parser.js";
 
 class SimpleTable extends ParsedData{
-    constructor(name, dict, dataview) {
-        const { parser, start } = super(new Parser(name, dict, dataview));
+    constructor(dict, dataview, name) {
+        const { parser, start } = super(new Parser(dict, dataview, name));
 
         // alias the parser as "p"
         const pGetter = { enumerable: false, get:() => parser };

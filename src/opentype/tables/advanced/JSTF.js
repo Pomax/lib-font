@@ -8,7 +8,7 @@ import { SimpleTable } from "../simple-table.js";
  */
 class JSTF extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`JSTF`, dict, dataview);
+        const { p } = super(dict, dataview);
     }
 }
 

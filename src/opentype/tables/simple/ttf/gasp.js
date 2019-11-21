@@ -8,7 +8,7 @@ import lazy from "../../../../lazy.js";
  */
 class gasp extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`gasp`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.version = p.uint16;
         this.numRanges = p.uint16;

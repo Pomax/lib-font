@@ -7,7 +7,7 @@ import { SimpleTable } from "../simple-table.js";
 */
 class post extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`post`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.version = p.legacyFixed;
         this.italicAngle = p.fixed;

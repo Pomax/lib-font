@@ -8,7 +8,7 @@ import lazy from "../../../../lazy.js";
 */
 class CFF2 extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } =  super(`CFF2`, dict, dataview);
+        const { p } =  super(dict, dataview);
         lazy(this, `data`, () => p.readBytes());
     }
 }

@@ -12,7 +12,7 @@ const gzipDecode = (window.pako ? window.pako.inflate : undefined);
  */
 class WOFF extends SimpleTable {
     constructor(dataview) {
-        const { p } = super("woff", { offset: 0, length: 44 }, dataview);
+        const { p } = super({ offset: 0, length: 44 }, dataview, `woff`);
 
         this.signature = p.tag;
         this.flavor = p.uint32;

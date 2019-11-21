@@ -7,7 +7,7 @@ import { SimpleTable } from "../../simple-table.js";
 */
 class PCLT extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } =  super(`PCLT`, dict, dataview);
+        const { p } =  super(dict, dataview);
     }
 }
 

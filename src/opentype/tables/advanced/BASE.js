@@ -8,7 +8,7 @@ import { SimpleTable } from "../simple-table.js";
  */
 class BASE extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`BASE`, dict, dataview);
+        const { p } = super(dict, dataview);
 
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
@@ -30,7 +30,7 @@ class BASE extends SimpleTable {
  */
 class AxisTable extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`AxisTable`, dict, dataview);
+        const { p } = super(dict, dataview, `AxisTable`);
 
         this.baseTagListOffset = p.offset16;    // from beginning of Axis table
         this.baseScriptListOffset = p.offset16; // from beginning of Axis table
@@ -42,7 +42,7 @@ class AxisTable extends SimpleTable {
 
 class BaseTagListTable extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`AxisTable`, dict, dataview);
+        const { p } = super(dict, dataview, `BaseTagListTable`);
         this.baseTagCount = p.uint16;
         // TODO: make lazy?
         this.baselineTags = [...new Array(this.baseTagCount)].map(_ => p.tag);
@@ -51,7 +51,7 @@ class BaseTagListTable extends SimpleTable {
 
 class BaseScriptListTable extends SimpleTable {
     constructor(dict, dataview) {
-        const { p } = super(`AxisTable`, dict, dataview);
+        const { p } = super(dict, dataview, `BaseScriptListTable`);
         this.baseScriptCount = p.uint16
 
         const recordStart = p.currentPosition;
