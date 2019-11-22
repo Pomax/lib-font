@@ -12,15 +12,15 @@ class Format12 {
         lazy(this, `groups`, getter);
     }
 
-    supports(char) {
-        const charcode = char.charCodeAt(0);
+    supports(charCode) {
+        if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
         const groups = this.groups;
-        let i = groups.findIndex(s => s.startCharCode > charcode);
+        let i = groups.findIndex(s => s.startcharCode > charCode);
         if (i===0) return false;
         if (i===-1) i = groups.length;
         let g = groups[i-1];
-        if (g.endCharCode < charcode) return false;
-        return charcode - g.startCharCode + g.startGlyphID;
+        if (g.endcharCode < charCode) return false;
+        return charCode - g.startcharCode + g.startGlyphID;
     }
 }
 

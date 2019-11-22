@@ -13,11 +13,11 @@ class Format10 {
         lazy(this, `glyphs`, getter);
     }
 
-    supports(char) {
-        const charcode = char.charCodeAt(0);
-        if (charcode < this.startCharCode) return false;
-        if (charcode > this.startCharCode + this.numChars) return false;
-        return charcode - this.startCharCode;
+    supports(charCode) {
+        if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+        if (charCode < this.startCharCode) return false;
+        if (charCode > this.startCharCode + this.numChars) return false;
+        return charCode - this.startCharCode;
     }
 }
 

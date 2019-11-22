@@ -118,19 +118,24 @@ class Parser {
         }
     }
 
-    readBytes(n=0, Type=undefined) {
-        // Get the entire datablock out.
+    /**
+     * Read an entire data block.
+     */
+    readBytes(n=0, offset=0, bits=8, signed=false) {
         n = n || this.length;
         if (n === 0) return [];
 
-        const start = this.start + this.offset;
-        const end = start + n;
-        let slice = this.data.buffer.slice(start, end);
-        if (Type)  slice = new Type(slice);
+        if (offset) this.currentPosition = offset;
+
+        const fn = `${signed ? ``:`u`}int${bits}`, slice = [];
+        while(n--) slice.push(this[fn]);
         return slice;
     }
 }
 
+/**
+ * ... docs go here ...
+ */
 class ParsedData {
     constructor(parser) {
         const pGetter = { enumerable: false, get:() => parser };

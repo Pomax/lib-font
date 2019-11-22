@@ -45,7 +45,7 @@ class GlyphData {
         // The actual embedded graphic data has a byte length that is inferred from sequential
         // entries in the strike.glyphDataOffsets array + the fixed size (8 bytes) of the preceding fields.
         const len = 0;
-        lazy(this, `data`, () => p.readBytes(len, Uint8Array));
+        lazy(this, `data`, () => p.readBytes(len));
 
         // TODO: make this.data load in the correct data
     }

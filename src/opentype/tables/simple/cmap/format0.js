@@ -7,9 +7,9 @@ class Format0 {
         this.glyphIdArray = [...new Array(256)].map(_ => p.uint8);
     }
 
-    supports(char) {
-        // FIXME: code goes here... later
-        return false;
+    supports(charCode) {
+        if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+        return 0 <= charCode && charCode <= 255;
     }
 }
 

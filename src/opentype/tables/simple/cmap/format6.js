@@ -12,11 +12,11 @@ class Format6 {
         lazy(this, `glyphIdArray`, getter);
     }
 
-    supports(char) {
-        const charcode = char.charCodeAt(0);
-        if (charcode < this.firstCode) return false;
-        if (charcode > this.firstCode + this.entryCount) return false;
-        return charcode - this.firstCode;
+    supports(charCode) {
+        if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+        if (charCode < this.firstCode) return false;
+        if (charCode > this.firstCode + this.entryCount) return false;
+        return charCode - this.firstCode;
     }
 }
 
