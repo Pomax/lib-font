@@ -23,11 +23,10 @@ font.onload = () => {
     assertEqual(SFNT.numTables, 20, `There are 20 tables in this font`);
 
     const expected = [
-        "BASE", "DSIG", "GDEF", "GPOS",
-        "GSUB", "OS/2", "SVG ", "cmap",
-        "cvt ", "fpgm", "gasp", "glyf",
-        "head", "hhea", "hmtx", "loca",
-        "maxp", "name", "post", "prep"
+        "BASE", "DSIG", "GDEF", "GPOS", "GSUB",
+        "OS/2", "SVG ", "cmap", "cvt ", "fpgm",
+        "gasp", "glyf", "head", "hhea", "hmtx",
+        "loca", "maxp", "name", "post", "prep"
     ];
     assertEqual(SFNT.directory.map(d => d.tag), expected, `tables: "${expected.join(`", "`)}"`);
 

@@ -27,6 +27,7 @@ font.onload = () => {
         "GSUB", "OS/2", "SVG ", "cmap", "head",
         "hhea", "hmtx", "maxp", "name", "post"
     ];
+    
     assertEqual(SFNT.directory.map(d => d.tag), expected, `tables: "${expected.join(`", "`)}"`);
 
     assertEqual(SFNT.searchRange, 128, `Correct searchRange`);
