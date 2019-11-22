@@ -20,7 +20,24 @@ class post extends SimpleTable {
         this.maxMemType1 = p.uint32;
 
         if (this.version === 1 || this.version === 3) return p.verifyLength();
-        console.warn(`A post table version 2.x is not currently supported, because they're just weird.`);
+
+        this.numGlyphs = p.uint16;
+
+        if (this.version === 2) {
+            this.glyphNameIndex = [...new Array(this.numGlyphs)].map(_ => p.uint16);
+            // And then we get:
+            //
+            //   names = int8[numberNewGlyphs]
+            //   Glyph names with length bytes [variable] (a Pascal string)
+            //
+            // and the full description is not worth my time trying to figure out right now.
+            //
+            // TODO: get someone to implement that >_>
+        }
+
+        if (this.version === 2.5) {
+            this.offset = [...new Array(this.numGlyphs)].map(_ => p.int8);
+        }
     }
 }
 

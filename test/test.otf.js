@@ -19,13 +19,19 @@ font.onload = () => {
     assertNotEqual(SFNT, undefined, `SFNT EXISTS`);
     indent();
 
-    {
-        assertEqual(SFNT.version, 1330926671, `Version is OTTO`);
-        assertEqual(SFNT.numTables, 15, `There are 15 tables in this font`);
-        assertEqual(SFNT.searchRange, 128, `Correct searchRange`);
-        assertEqual(SFNT.entrySelector, 3, `Correct entrySelector`);
-        assertEqual(SFNT.rangeShift, 112, `Correct rangeShift`);
-    }
+    assertEqual(SFNT.version, 1330926671, `Version is OTTO`);
+    assertEqual(SFNT.numTables, 15, `There are 15 tables in this font`);
+
+    const expected = [
+        "BASE", "CFF ", "DSIG", "GDEF", "GPOS",
+        "GSUB", "OS/2", "SVG ", "cmap", "head",
+        "hhea", "hmtx", "maxp", "name", "post"
+    ];
+    assertEqual(SFNT.directory.map(d => d.tag), expected, `tables: "${expected.join(`", "`)}"`);
+
+    assertEqual(SFNT.searchRange, 128, `Correct searchRange`);
+    assertEqual(SFNT.entrySelector, 3, `Correct entrySelector`);
+    assertEqual(SFNT.rangeShift, 112, `Correct rangeShift`);
 
     testSFNT(SFNT);
 }
