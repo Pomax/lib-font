@@ -112,6 +112,14 @@ class Parser {
     get offset16() { return this.uint16; }
     get offset32() { return this.uint32; }
 
+    // "that weird datatype"
+    get F2DOT14() {
+        const bits = p.uint16;
+        const integer = [0,1,-2,-1][bits >> 14];
+        const fraction = bits & 0x3fff;
+        return integer + (fraction / 16384);
+    }
+
     verifyLength() {
         if (this.offset != this.length) {
             console.error(`unexpected parsed table size (${this.offset}) for "${this.name}" (expected ${this.length})`);
