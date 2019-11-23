@@ -74,6 +74,14 @@ class SmallGlyphMetrics {
     }
 }
 
+class EBDTComponent {
+    constructor(p) {
+        this.glyphID = p.uint16;
+        this.xOffset = p.int8;
+        this.yOffset = p.int8;
+    }
+}
+
 class IndexSubTableArray {
     constructor(p) {
         this.firstGlyphIndex = p.uint16;
@@ -89,6 +97,7 @@ export {
     IndexSubHeader,
     BigGlyphMetrics,
     SmallGlyphMetrics,
+    EBDTComponent,
     IndexSubTableArray
 };
 
