@@ -32,12 +32,20 @@ class Format2 {
         const last = first + subheader.entryCount;
         return first <= low && low <= last;
     }
+
+    getSupportedCharCodes(preservePropNames=false) {
+        if (preservePropNames) {
+            return this.subHeaders.map(h => ({ firstCode: h.firstCode, lastCode: h.lastCode }));
+        }
+        return this.subHeaders.map(h => ({ start: h.firstCode, end: h.lastCode }));
+    }
 }
 
 class SubHeader {
     constructor(p) {
         this.firstCode = p.uint16;
         this.entryCount = p.uint16;
+        this.lastCode = this.first + this.entryCount;
         this.idDelta = p.int16 ;
         this.idRangeOffset = p.uint16;
     }

@@ -22,6 +22,11 @@ class Format12 {
         if (g.endcharCode < charCode) return false;
         return charCode - g.startcharCode + g.startGlyphID;
     }
+
+    getSupportedCharCodes(preservePropNames=false) {
+        if (preservePropNames) return this.groups;
+        return this.groups.map(v => ({ start: v.startCode, end: v.endCode}));
+    }
 }
 
 class SequentialMapGroup {

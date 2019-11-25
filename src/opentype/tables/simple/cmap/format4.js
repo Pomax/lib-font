@@ -36,8 +36,8 @@ class Format4 {
 
     buildSegments() {
         const build = (_,i) => ({
-            start: this.startCode[i],
-            end: this.endCode[i],
+            startCode: this.startCode[i],
+            endCode: this.endCode[i],
             idDelta: this.idDelta[i],
             idRangeOffset: this.idRangeOffset[i]
         });
@@ -53,6 +53,11 @@ class Format4 {
         let s = segments[i-1];
         if (s.end < charCode) return false;
         return charCode + s.idDelta;
+    }
+
+    getSupportedCharCodes(preservePropNames=false) {
+        if (preservePropNames) return this.segments;
+        return this.segments.map(v => ({ start: v.startCode, end: v.endCode}));
     }
 }
 

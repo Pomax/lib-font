@@ -45,14 +45,14 @@ function testSFNT(SFNT, isTTF) {
         ], [3,10], `6 = Windows: Unicode full repertoire`);
         unindent();
 
-        let subtable = cmap.get(0);
+        let subtable = cmap.getSubTable(0);
         assertEqual(subtable.format, 4, `First subtable is format 4`);
 
         function testFormat4(subtable) {
             assertEqual(subtable.segCountX2, 438, `Subtable encodes 219 segments`);
             let segment = subtable.segments[0];
-            assertEqual(segment.start, 32, `First segment starts on char 32`);
-            assertEqual(segment.end, 47, `First segment ends on char 47`);
+            assertEqual(segment.startCode, 32, `First segment starts on char 32`);
+            assertEqual(segment.endCode, 47, `First segment ends on char 47`);
             assertEqual(segment.idDelta, 0, `Segment has zero delta`);
             assertEqual(segment.idRangeOffset, 438, `Segment has a range offset of 438`);
         }
@@ -61,7 +61,7 @@ function testSFNT(SFNT, isTTF) {
         testFormat4(subtable);
         unindent();
 
-        subtable = cmap.get(1);
+        subtable = cmap.getSubTable(1);
         assertEqual(subtable.format, 12, `Second subtable is format 12`);
 
         function testFormat12() {
@@ -77,27 +77,27 @@ function testSFNT(SFNT, isTTF) {
         testFormat12(subtable);
         unindent();
 
-        subtable = cmap.get(2);
+        subtable = cmap.getSubTable(2);
         assertEqual(subtable.format, 14, `Third subtable is format 14`);
         indent();
         assertEqual(subtable.numVarSelectorRecords, 1, `Subtable has a single variation selector record`);
         assertEqual(subtable.varSelectors.length, 1, `Data indeed resolves to a single variation selector record`);
         unindent();
 
-        subtable = cmap.get(3);
+        subtable = cmap.getSubTable(3);
         assertEqual(subtable.format, 6, `Fourth subtable is format 6`);
         indent();
         assertEqual(subtable.entryCount, 247, `Subtable has 247 entries`);
         assertEqual(subtable.glyphIdArray.length, 247, `Data indeed resolves to 247 glyph IDs`);
         unindent();
 
-        subtable = cmap.get(4);
+        subtable = cmap.getSubTable(4);
         assertEqual(subtable.format, 4, `Fifth subtable is format 4, and should be the same as the first subtable`);
         indent();
         testFormat4(subtable);
         unindent();
 
-        subtable = cmap.get(5);
+        subtable = cmap.getSubTable(5);
         assertEqual(subtable.format, 12, `Sixth subtable is format 12, and should be the same as the second subtable`);
         indent();
         testFormat12(subtable);

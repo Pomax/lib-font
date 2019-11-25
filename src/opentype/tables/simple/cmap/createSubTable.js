@@ -15,7 +15,8 @@ import { Format14 } from "./format14.js";
  * @param {int} format the subtable format number (see https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-0-byte-encoding-table onward)
  * @param {parser} parser a parser already pointing at the subtable's data location, right after reading the `format` uint16.
  */
-export default function createSubTable(format, parser) {
+export default function createSubTable(parser) {
+    const format = parser.uint16;
     if (format === 0) return new Format0(parser);
     if (format === 2) return new Format2(parser);
     if (format === 4) return new Format4(parser);

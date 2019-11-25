@@ -1,6 +1,7 @@
 import { Parser } from "../../../parser.js";
 import { SimpleTable } from "../simple-table.js";
 import createSubTable from "./cmap/createSubTable.js";
+import lazy from "../../../lazy.js";
 
 /**
  * The OpenType `cmap` main table.
@@ -15,17 +16,25 @@ class cmap extends SimpleTable {
 
         this.version = p.uint16;
         this.numTables = p.uint16;
-        this.encodingRecords = [...new Array(this.numTables)].map(_ => new EncodingRecord(p));
+        this.encodingRecords = [...new Array(this.numTables)].map(_ => new EncodingRecord(p, this.tableStart));
     }
 
-    get(tableID) {
-        let record = this.encodingRecords[tableID];
-        if (record) {
-            const dict = { offset: this.tableStart + record.offset };
-            const p = new Parser(dict, this.parser.data, `Cmap subtable record ${tableID}`);
-            const format = p.uint16;
-            return createSubTable(format, p);
-        }
+    getSubTable(tableID) {
+        return this.encodingRecords[tableID].table;
+    }
+
+    getSupportedEncodings() {
+        return this.encodingRecords.map(r => ({
+            platformID: r.platformID,
+            encodingId: r.encodingID
+        }));
+    }
+
+    getSupportedCharCodes(platformID, encodingID) {
+        const recordID = this.encodingRecords.findIndex(r => r.platformID===platformID && r.encodingID===encodingID);
+        if (recordID === -1) return false;
+        const subtable = this.getSubTable(recordID);
+        return subtable.getSupportedCharCodes();
     }
 
     supports(char) {
@@ -47,10 +56,15 @@ class cmap extends SimpleTable {
  * ...docs go here...
  */
 class EncodingRecord {
-    constructor(p) {
+    constructor(p, tableStart) {
         this.platformID = p.uint16;
         this.encodingID = p.uint16;
-        this.offset = p.offset32;
+        this.offset = p.offset32; // from cmap table start
+
+        lazy(this, `table`, () => {
+            p.currentPosition = tableStart + this.offset;
+            return createSubTable(p);
+        });
     }
 }
 

@@ -7,6 +7,7 @@ class Format6 {
         this.language = p.uint16;
         this.firstCode = p.uint16;
         this.entryCount = p.uint16;
+        this.lastCode = this.firstCode + this.entryCount;
 
         const getter = () => [...new Array(this.entryCount)].map(_ => p.uint16);
         lazy(this, `glyphIdArray`, getter);
@@ -17,6 +18,13 @@ class Format6 {
         if (charCode < this.firstCode) return false;
         if (charCode > this.firstCode + this.entryCount) return false;
         return charCode - this.firstCode;
+    }
+
+    getSupportedCharCodes(preservePropNames=false) {
+        if (preservePropNames) {
+            return [{ firstCode: this.firstCode, lastCode: this.lastCode }];
+        }
+        return [{ start: this.firstCode, end: this.lastCode }];
     }
 }
 

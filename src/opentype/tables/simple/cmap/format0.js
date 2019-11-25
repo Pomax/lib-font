@@ -11,6 +11,10 @@ class Format0 {
         if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
         return 0 <= charCode && charCode <= 255;
     }
+
+    getSupportedCharCodes() {
+        return [{ start: 1, end: 256 }];
+    }
 }
 
 export { Format0 };

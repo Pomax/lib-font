@@ -21,6 +21,11 @@ class Format13 {
         if (g.endcharCode < charCode) return false;
         return g.glyphId;
     }
+
+    getSupportedCharCodes(preservePropNames=false) {
+        if (preservePropNames) return this.groups;
+        return this.groups.map(v => ({ start: v.startCharCode, end: v.endCharCode}));
+    }
 }
 
 class ConstantMapGroup {

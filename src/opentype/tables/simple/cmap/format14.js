@@ -10,9 +10,21 @@ class Format14 {
         lazy(this, `varSelectors`, getter);
     }
 
+    supports() {
+        return false;
+    }
+
+    getSupportedCharCodes() {
+        return false;
+    }
+
     supportsVariation(variation) {
         let v = this.varSelector.find(uvs => uvs.varSelector === variation);
         return v ? v : false;
+    }
+
+    getSupportedVariations() {
+        return []; // TODO: implement this function?
     }
 }
 

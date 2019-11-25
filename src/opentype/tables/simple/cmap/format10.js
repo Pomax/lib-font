@@ -9,6 +9,7 @@ class Format10 {
         this.language = p.uint32;
         this.startCharCode = p.uint32;
         this.numChars = p.uint32;
+        this.endCharCode = this.startCharCode + this.numChars;
         const getter = () => [...new Array(this.numChars)].map(_ => p.uint16);
         lazy(this, `glyphs`, getter);
     }
@@ -18,6 +19,13 @@ class Format10 {
         if (charCode < this.startCharCode) return false;
         if (charCode > this.startCharCode + this.numChars) return false;
         return charCode - this.startCharCode;
+    }
+
+    getSupportedCharCodes(preservePropNames=false) {
+        if (preservePropNames) {
+            return [{ startCharCode: this.startCharCode, endCharCode: this.endCharCode }];
+        }
+        return [{ start: this.startCharCode, end: this.endCharCode }];
     }
 }
 
