@@ -25,7 +25,7 @@ class fvar extends SimpleTable {
             return [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
         });
 
-        const instanceStart = axisStart + this.instanceCount * this.instanceSize;
+        const instanceStart = axisStart + this.axisCount * this.axisSize;
         lazy(this, `instances`, () => {
             p.currentPosition = instanceStart;
             return [... new Array(this.instanceCount)].map(_ =>  new InstanceRecord(p, this.axisCount));
