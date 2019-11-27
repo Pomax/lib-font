@@ -19,8 +19,17 @@ class fvar extends SimpleTable {
         this.instanceCount = p.uint16;
         this.instanceSize = p.uint16;
 
-        const getter = () => [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
-        lazy(this, `axes`, getter);
+        const axisStart = p.currentPosition;
+        lazy(this, `axes`, () => {
+            p.currentPosition = axisStart;
+            return [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
+        });
+
+        const instanceStart = axisStart + this.instanceCount * this.instanceSize;
+        lazy(this, `instances`, () => {
+            p.currentPosition = instanceStart;
+            return [... new Array(this.axisCount)].map(_ =>  new InstanceRecord(p, this.axisCount));
+        });        
     }
 
     getSupportedAxes() {
@@ -32,9 +41,6 @@ class fvar extends SimpleTable {
     }
 }
 
-/**
- * The fvar variation axis record class
- */
 class VariationAxisRecord {
     constructor(p) {
         this.tag = p.tag;
@@ -43,6 +49,15 @@ class VariationAxisRecord {
         this.maxValue = p.fixed;
         this.flags = p.flags(16);
         this.axisNameID = p.uint16;
+    }
+}
+
+class InstanceRecord {
+    constructor(p, axisCount) {
+        this.subfamilyNameID = p.uint16;
+        p.uint16;
+        this.coordinates = [...new Array(axisCount)].map(_ => p.fixed);
+        this.postScriptNameID = p.uint16;
     }
 }
 

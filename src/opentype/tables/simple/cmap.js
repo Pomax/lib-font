@@ -1,4 +1,3 @@
-import { Parser } from "../../../parser.js";
 import { SimpleTable } from "../simple-table.js";
 import createSubTable from "./cmap/createSubTable.js";
 import lazy from "../../../lazy.js";
