@@ -36,6 +36,7 @@ import { sbix } from "./simple/bitmap/sbix.js";
 // "other" tables
 import { DSIG } from "./simple/other/DSIG.js";
 import { hdmx } from "./simple/other/hdmx.js";
+import { kern } from "./simple/other/kern.js";
 import { LTSH } from "./simple/other/LTSH.js";
 
 /**
@@ -73,8 +74,9 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `sbix`) return new sbix(dict, dataview);
 
     if (dict.tag === `DSIG`) return new DSIG(dict, dataview);
-    if (dict.tag === `LTSH`) return new LTSH(dict, dataview);
     if (dict.tag === 'hdmx') return new hdmx(dict, dataview, tables.hmtx);
+    if (dict.tag === 'kern') return new kern(dict, dataview);
+    if (dict.tag === `LTSH`) return new LTSH(dict, dataview);
 
     // further code goes here once more table parsers exist
     return {};
