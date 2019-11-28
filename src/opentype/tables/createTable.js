@@ -38,6 +38,7 @@ import { DSIG } from "./simple/other/DSIG.js";
 import { hdmx } from "./simple/other/hdmx.js";
 import { kern } from "./simple/other/kern.js";
 import { LTSH } from "./simple/other/LTSH.js";
+import { MERG } from "./simple/other/MERG.js";
 
 /**
  * Table factory
@@ -77,6 +78,7 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === 'hdmx') return new hdmx(dict, dataview, tables.hmtx);
     if (dict.tag === 'kern') return new kern(dict, dataview);
     if (dict.tag === `LTSH`) return new LTSH(dict, dataview);
+    if (dict.tag === `MERG`) return new MERG(dict, dataview);
 
     // further code goes here once more table parsers exist
     return {};
