@@ -8,6 +8,9 @@ import { SimpleTable } from "../../simple-table.js";
 class LTSH extends SimpleTable {
     constructor(dict, dataview) {
         const { p } =  super(dict, dataview);
+        this.version = p.uint16;
+        this.numGlyphs = p.uint16;
+        this.yPels = p.readBytes(this.numGlyphs);
     }
 }
 
