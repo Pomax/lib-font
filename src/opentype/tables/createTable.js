@@ -33,6 +33,9 @@ import { CBLC } from "./simple/bitmap/CBLC.js";
 import { CBDT } from "./simple/bitmap/CBDT.js";
 import { sbix } from "./simple/bitmap/sbix.js";
 
+// "other" tables
+import { DSIG } from "./simple/other/DSIG.js";
+
 /**
  * Table factory
  * @param {*} dict an object of the form: { tag: "string", offset: <number>, [length: <number>]}
@@ -66,6 +69,8 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `CBLC`) return new CBLC(dict, dataview);
     if (dict.tag === `CBDT`) return new CBDT(dict, dataview);
     if (dict.tag === `sbix`) return new sbix(dict, dataview);
+
+    if (dict.tag === `DSIG`) return new DSIG(dict, dataview);
 
     // further code goes here once more table parsers exist
     return {};
