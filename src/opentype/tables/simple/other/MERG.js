@@ -18,9 +18,8 @@ class MERG extends SimpleTable {
         // This is a big 2D array
         lazy(this, `mergeEntryMatrix`, () => [...new Array(this.mergeClassCount)].map(_ => p.readBytes(this.mergeClassCount)));
 
-        // If you need this table parsed, please file an issue, or better yet, a PR.
- 
-        console.warn(`Full MERG parsing is currently not supported - `);
+        console.warn(`Full MERG parsing is currently not supported.`);
+        console.warn(`If you need this table parsed, please file an issue, or better yet, a PR.`);
     }
 }
 
