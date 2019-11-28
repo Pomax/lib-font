@@ -6,8 +6,20 @@ import { SimpleTable } from "../../simple-table.js";
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/hdmx
 */
 class hdmx extends SimpleTable {
-    constructor(dict, dataview) {
+    constructor(dict, dataview, hmtx) {
         const { p } =  super(dict, dataview);
+        this.version = p.uint16;
+        this.numRecords = p.int16;
+        this.sizeDeviceRecord = p.int32;
+        this.records = [...new Array(numRecords)].map(_ => new DeviceRecord(p, hmtx));
+    }
+}
+
+class DeviceRecord {
+    constructor(p, hmtx) {
+        this.pixelSize = p.uint8;
+        this.maxWidth = p.uint8;
+        this.widths = p.readBytes(hmtx.numGlyphs);
     }
 }
 
