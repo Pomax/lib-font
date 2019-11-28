@@ -13,12 +13,18 @@ class hmtx extends SimpleTable {
         const numberOfHMetrics = tables.hhea.numberOfHMetrics;
         const numGlyphs = tables.maxp.numGlyphs;
 
-        const hMetricGetter = () => [...new Array(numberOfHMetrics)].map(_ => new LongHorMetric(p.uint16, p.int16));
-        lazy(this, `hMetrics`, hMetricGetter);
+        const metricsStart = p.currentPosition;
+        lazy(this, `hMetrics`, () => {
+            p.currentPosition = metricsStart;
+            return [...new Array(numberOfHMetrics)].map(_ => new LongHorMetric(p.uint16, p.int16))
+        });
 
         if (numberOfHMetrics < numGlyphs) {
-            const lsbGetter = () => [...new Array(numGlyphs - numberOfHMetrics)].map(_ => p.int16);
-            lazy(this, `leftSideBearings`, lsbGetter);
+            const lsbStart = metricsStart + numberOfHMetrics * 4;
+            lazy(this, `leftSideBearings`, () => {
+                p.currentPosition = lsbStart;
+                return [...new Array(numGlyphs - numberOfHMetrics)].map(_ => p.int16);
+            });
         }
     }
 }

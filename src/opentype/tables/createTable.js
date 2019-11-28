@@ -42,6 +42,7 @@ import { MERG } from "./simple/other/MERG.js";
 import { PCLT } from "./simple/other/PCLT.js";
 import { VDMX } from "./simple/other/VDMX.js";
 import { vhea } from "./simple/other/vhea.js";
+import { vmtx } from "./simple/other/vmtx.js";
 
 /**
  * Table factory
@@ -85,6 +86,7 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `PCLT`) return new PCLT(dict, dataview);
     if (dict.tag === `VDMX`) return new VDMX(dict, dataview);
     if (dict.tag === `vhea`) return new vhea(dict, dataview);
+    if (dict.tag === `vmtx`) return new vmtx(dict, dataview, tables);
 
     // further code goes here once more table parsers exist
     return {};
