@@ -18,9 +18,9 @@ class MERG extends SimpleTable {
         // This is a big 2D array
         lazy(this, `mergeEntryMatrix`, () => [...new Array(this.mergeClassCount)].map(_ => p.readBytes(this.mergeClassCount)));
 
-        // Once you have this data, you're on your own. Please see 
-        // https://docs.microsoft.com/en-us/typography/opentype/spec/merg#processing
-        // for the details on what to do. But you probably already know that.
+        // If you need this table parsed, please file an issue, or better yet, a PR.
+ 
+        console.warn(`Full MERG parsing is currently not supported - `);
     }
 }
 
