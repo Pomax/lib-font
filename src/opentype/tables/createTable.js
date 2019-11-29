@@ -11,6 +11,7 @@ import { post } from "./simple/post.js";
 
 // opentype tables that rely on the "common layout tables" data structures
 import { BASE } from "./advanced/BASE.js";
+import { GDEF } from "./advanced/GDEF.js";
 import { GSUB } from "./advanced/GSUB.js";
 import { GPOS } from "./advanced/GPOS.js";
 
@@ -62,6 +63,7 @@ export default function createTable(tables, dict, dataview) {
     if (dict.tag === `post`) return new post(dict, dataview);
 
     if (dict.tag === `BASE`) return new BASE(dict, dataview);
+    if (dict.tag === `GDEF`) return new GDEF(dict, dataview);
     if (dict.tag === `GSUB`) return new GSUB(dict, dataview);
     if (dict.tag === `GPOS`) return new GPOS(dict, dataview);
 
