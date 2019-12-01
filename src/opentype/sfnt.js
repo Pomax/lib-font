@@ -1,5 +1,4 @@
 import { SimpleTable } from "./tables/simple-table.js";
-import createTable from "./tables/createTable.js";
 import lazy from "../lazy.js";
 
 /**
@@ -8,7 +7,7 @@ import lazy from "../lazy.js";
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for more information
  */
 class SFNT extends SimpleTable {
-    constructor(dataview) {
+    constructor(dataview, createTable) {
         const { p } = super({ offset: 0, length: 12}, dataview, `sfnt`);
 
         this.version = p.uint32;

@@ -32,15 +32,12 @@ function fail (a, b, why) {
 }
 
 function assertEqual(a, b, why) {
-    if (equal(a,b)) {
-        pass(why);
-    } else {
-        fail(a, b, why);
-    }
+    if (equal(a,b)) { pass(why); }
+    else { fail(a, b, why); }
 }
 
 function assertNotEqual(a, b, why) {
-    if (a === b) { fail(a, b, why); }
+    if (equal(a,b)) { fail(a, b, why); }
     else { pass(why); }
 }
 

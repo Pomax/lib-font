@@ -2,7 +2,7 @@
 import { manPage } from "./src/manpage.js";
 import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
-
+import { loadTableClasses } from "./src/opentype/tables/createTable.js";
 
 /**
  * either return the appropriate CSS format
@@ -127,15 +127,18 @@ class Font extends EventManager {
      * This is a non-blocking operation IF called from an async function
      */
     async parseBasicData(type) {
-        if (type === `truetype` || type === `opentype`) {
-            this.opentype = new SFNT(this.fontData);
-        }
-        if (type === `woff`) {
-            this.opentype = new WOFF(this.fontData);
-        }
-        if (type === `woff2`) {
-            this.opentype = new WOFF2(this.fontData);
-        }
+        return loadTableClasses().then(createTable => {
+            if (type === `truetype` || type === `opentype`) {
+                this.opentype = new SFNT(this.fontData, createTable);
+            }
+            if (type === `woff`) {
+                this.opentype = new WOFF(this.fontData, createTable);
+            }
+            if (type === `woff2`) {
+                this.opentype = new WOFF2(this.fontData, createTable);
+            }
+            return this.opentype;
+        });
     }
 
     /**

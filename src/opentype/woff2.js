@@ -1,9 +1,7 @@
 import { SimpleTable } from "./tables/simple-table.js";
-import createTable from "./tables/createTable.js";
 import lazy from "../lazy.js";
 
 const brotliDecode = window.unbrotli;
-
 
 /**
  * The WOFF2 header
@@ -12,7 +10,7 @@ const brotliDecode = window.unbrotli;
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for font information
  */
 class WOFF2 extends SimpleTable {
-    constructor(dataview) {
+    constructor(dataview, createTable) {
         const { p } = super({ offset: 0, length: 48 }, dataview, `woff2`);
         this.signature = p.tag;
         this.flavor = p.uint32;
@@ -47,7 +45,7 @@ class WOFF2 extends SimpleTable {
 
         // then decompress the original data and lazy-bind
         let decoded = brotliDecode(new Uint8Array(dataview.buffer.slice(dictOffset)));
-        buildWoff2LazyLookups(this, decoded);
+        buildWoff2LazyLookups(this, decoded, createTable);
     }
 }
 
@@ -84,7 +82,7 @@ class Woff2TableDirectoryEntry {
  * @param {DataView} dataview passed when dealing with woff
  * @param {buffer} decoded passed when dealing with woff2
  */
-function buildWoff2LazyLookups(woff2, decoded) {
+function buildWoff2LazyLookups(woff2, decoded, createTable) {
     woff2.tables = {};
     woff2.directory.forEach(entry => {
         lazy(woff2.tables, entry.tag.trim(), () => {

@@ -1,5 +1,4 @@
 import { SimpleTable } from "./tables/simple-table.js";
-import createTable from "./tables/createTable.js";
 import lazy from "../lazy.js";
 
 const gzipDecode = (window.pako ? window.pako.inflate : undefined);
@@ -11,7 +10,7 @@ const gzipDecode = (window.pako ? window.pako.inflate : undefined);
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for font information
  */
 class WOFF extends SimpleTable {
-    constructor(dataview) {
+    constructor(dataview, createTable) {
         const { p } = super({ offset: 0, length: 44 }, dataview, `woff`);
 
         this.signature = p.tag;
@@ -31,7 +30,7 @@ class WOFF extends SimpleTable {
         p.verifyLength();
 
         this.directory = [... new Array(this.numTables)].map(_ => new WoffTableDirectoryEntry(p));
-        buildWoffLazyLookups(this, dataview);
+        buildWoffLazyLookups(this, dataview, createTable);
     }
 }
 
@@ -58,7 +57,7 @@ class WoffTableDirectoryEntry {
  * @param {DataView} dataview passed when dealing with woff
  * @param {buffer} decoded passed when dealing with woff2
  */
-function buildWoffLazyLookups(woff, dataview) {
+function buildWoffLazyLookups(woff, dataview, createTable) {
     woff.tables = {};
     woff.directory.forEach(entry => {
         lazy(woff.tables, entry.tag.trim(), () => {

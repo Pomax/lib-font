@@ -153,6 +153,17 @@ class ParsedData {
         const startGetter = { enumerable: false, get:() => start }
         Object.defineProperty(this, `start`, startGetter);
     }
+
+    load(struct) {
+        Object.keys(struct).forEach(p => {
+            let props = Object.getOwnPropertyDescriptor(struct, p);
+            if (props.get) { this[p] = props.get.bind(this); }
+            else if (props.value) { this[p] = props.value; }
+        });
+        if (this.parser.length) {
+            this.parser.verifyLength();
+        }
+    }
 }
 
 export { Parser, ParsedData };

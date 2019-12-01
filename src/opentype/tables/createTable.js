@@ -1,97 +1,104 @@
-// opentype tables
-import { cmap } from "./simple/cmap.js";
-import { gasp } from "./simple/ttf/gasp.js";
-import { head } from "./simple/head.js";
-import { hhea } from "./simple/hhea.js";
-import { hmtx } from "./simple/hmtx.js";
-import { maxp } from "./simple/maxp.js";
-import { name } from "./simple/name.js";
-import { OS2  } from "./simple/OS2.js";
-import { post } from "./simple/post.js";
+// Step 1: set up a namespace for all our table classes.
+const tableClasses = {};
+let tableClassesLoaded = false;
 
-// opentype tables that rely on the "common layout tables" data structures
-import { BASE } from "./advanced/BASE.js";
-import { GDEF } from "./advanced/GDEF.js";
-import { GSUB } from "./advanced/GSUB.js";
-import { GPOS } from "./advanced/GPOS.js";
+// Step 2: load all the table classes. While the imports
+// all resolve asynchronously, Promise.all won't "exit"
+// until every class definition has been loaded.
+Promise.all([
+    // opentype tables
+    import("./simple/cmap.js"),
+    import("./simple/head.js"),
+    import("./simple/hhea.js"),
+    import("./simple/hmtx.js"),
+    import("./simple/maxp.js"),
+    import("./simple/name.js"),
+    import("./simple/OS2.js"),
+    import("./simple/post.js"),
 
-// SVG tables... err... table
-import { SVG } from "./simple/SVG.js";
+    // opentype tables that rely on the "common layout tables" data structures
+    import("./advanced/BASE.js"),
+    import("./advanced/GDEF.js"),
+    import("./advanced/GSUB.js"),
+    import("./advanced/GPOS.js"),
 
-// Variable fonts
-import { fvar } from "./simple/variation/fvar.js";
+    // SVG tables... err... table
+    import("./simple/SVG.js"),
 
-// CFF
-import { CFF } from "./simple/cff/CFF.js";
-import { CFF2 } from "./simple/cff/CFF2.js";
-import { VORG } from "./simple/cff/VORG.js";
+    // Variable fonts
+    import("./simple/variation/fvar.js"),
 
-// bitmap
-import { EBLC } from "./simple/bitmap/EBLC.js";
-import { EBDT } from "./simple/bitmap/EBDT.js";
-import { EBSC } from "./simple/bitmap/EBSC.js";
-import { CBLC } from "./simple/bitmap/CBLC.js";
-import { CBDT } from "./simple/bitmap/CBDT.js";
-import { sbix } from "./simple/bitmap/sbix.js";
+    // TTF tables
+    import("./simple/ttf/cvt.js"),
+    import("./simple/ttf/fpgm.js"),
+    import("./simple/ttf/gasp.js"),
+    import("./simple/ttf/glyf.js"),
+    import("./simple/ttf/loca.js"),
+    import("./simple/ttf/prep.js"),
 
-// "other" tables
-import { DSIG } from "./simple/other/DSIG.js";
-import { hdmx } from "./simple/other/hdmx.js";
-import { kern } from "./simple/other/kern.js";
-import { LTSH } from "./simple/other/LTSH.js";
-import { MERG } from "./simple/other/MERG.js";
-import { meta } from "./simple/other/meta.js";
-import { PCLT } from "./simple/other/PCLT.js";
-import { VDMX } from "./simple/other/VDMX.js";
-import { vhea } from "./simple/other/vhea.js";
-import { vmtx } from "./simple/other/vmtx.js";
+    // CFF
+    import("./simple/cff/CFF.js"),
+    import("./simple/cff/CFF2.js"),
+    import("./simple/cff/VORG.js"),
+
+    // bitmap
+    import("./simple/bitmap/EBLC.js"),
+    import("./simple/bitmap/EBDT.js"),
+    import("./simple/bitmap/EBSC.js"),
+    import("./simple/bitmap/CBLC.js"),
+    import("./simple/bitmap/CBDT.js"),
+    import("./simple/bitmap/sbix.js"),
+
+    // "other" tables
+    import("./simple/other/DSIG.js"),
+    import("./simple/other/hdmx.js"),
+    import("./simple/other/kern.js"),
+    import("./simple/other/LTSH.js"),
+    import("./simple/other/MERG.js"),
+    import("./simple/other/meta.js"),
+    import("./simple/other/PCLT.js"),
+    import("./simple/other/VDMX.js"),
+    import("./simple/other/vhea.js"),
+    import("./simple/other/vmtx.js"),
+])
+
+// Step 3: rebind all the class imports so that
+// we can fetch constructors given table names.
+.then(data => {
+    data.forEach(e => {
+        let name = Object.keys(e)[0];
+        tableClasses[name] = e[name];
+    });
+    tableClassesLoaded = true;
+});
 
 /**
- * Table factory
+ * Step 4: set up a table factory that can build tables given a name tag.
+ * @param {*} tables the object containing actual table instances.
  * @param {*} dict an object of the form: { tag: "string", offset: <number>, [length: <number>]}
  * @param {*} dataview a DataView object over an ArrayBuffer of Uint8Array
  */
-export default function createTable(tables, dict, dataview) {
-    if (dict.tag === `cmap`) return new cmap(dict, dataview);
-    if (dict.tag === `fvar`) return new fvar(dict, dataview);
-    if (dict.tag === `gasp`) return new gasp(dict, dataview);
-    if (dict.tag === `head`) return new head(dict, dataview);
-    if (dict.tag === `hhea`) return new hhea(dict, dataview);
-    if (dict.tag === `hmtx`) return new hmtx(dict, dataview, tables);
-    if (dict.tag === `maxp`) return new maxp(dict, dataview);
-    if (dict.tag === `name`) return new name(dict, dataview);
-    if (dict.tag === `OS/2`) return new OS2(dict, dataview);
-    if (dict.tag === `post`) return new post(dict, dataview);
-
-    if (dict.tag === `BASE`) return new BASE(dict, dataview);
-    if (dict.tag === `GDEF`) return new GDEF(dict, dataview);
-    if (dict.tag === `GSUB`) return new GSUB(dict, dataview);
-    if (dict.tag === `GPOS`) return new GPOS(dict, dataview);
-
-    if (dict.tag === `SVG `) return new SVG(dict, dataview);
-
-    if (dict.tag === `CFF `) return new CFF(dict, dataview);
-    if (dict.tag === `CFF2`) return new CFF2(dict, dataview);
-    if (dict.tag === `VORG`) return new VORG(dict, dataview);
-
-    if (dict.tag === `EBLC`) return new EBLC(dict, dataview);
-    if (dict.tag === `EBDT`) return new EBDT(dict, dataview);
-    if (dict.tag === `EBSC`) return new EBSC(dict, dataview);
-    if (dict.tag === `CBLC`) return new CBLC(dict, dataview);
-    if (dict.tag === `CBDT`) return new CBDT(dict, dataview);
-    if (dict.tag === `sbix`) return new sbix(dict, dataview);
-
-    if (dict.tag === `DSIG`) return new DSIG(dict, dataview);
-    if (dict.tag === 'hdmx') return new hdmx(dict, dataview, tables.hmtx);
-    if (dict.tag === 'kern') return new kern(dict, dataview);
-    if (dict.tag === `LTSH`) return new LTSH(dict, dataview);
-    if (dict.tag === `MERG`) return new MERG(dict, dataview);
-    if (dict.tag === `meta`) return new meta(dict, dataview);
-    if (dict.tag === `PCLT`) return new PCLT(dict, dataview);
-    if (dict.tag === `VDMX`) return new VDMX(dict, dataview);
-    if (dict.tag === `vhea`) return new vhea(dict, dataview);
-    if (dict.tag === `vmtx`) return new vmtx(dict, dataview, tables);
-
-    // further code goes here once more table parsers exist
+function createTable(tables, dict, dataview) {
+    let name = dict.tag.replace(/[^\w\d]/g,``);
+    let Type = tableClasses[name];
+    if (Type) return new Type(dict, dataview, tables);
+    console.warn(`Font.js has no definition for ${name}. The table was skipped.`);
     return {};
 };
+
+function loadTableClasses() {
+    let count = 0;
+    function checkLoaded(resolve) {
+        if (!tableClassesLoaded) {
+            if (count > 10) {
+                return reject(new Error(`loading took too long`));
+            }
+            count++;
+            return setTimeout(() => checkLoaded(resolve), 250);
+        }
+        resolve(createTable);
+    }
+    return new Promise((resolve, reject) => checkLoaded(resolve));
+}
+
+export { loadTableClasses };

@@ -12,7 +12,6 @@ import lazy from "../../../lazy.js";
 class cmap extends SimpleTable {
     constructor(dict, dataview) {
         const { p } = super(dict, dataview);
-
         this.version = p.uint16;
         this.numTables = p.uint16;
         this.encodingRecords = [...new Array(this.numTables)].map(_ => new EncodingRecord(p, this.tableStart));

@@ -8,27 +8,26 @@ import { SimpleTable } from "../simple-table.js";
 class head extends SimpleTable {
     constructor(dict, dataview) {
         const { p } = super(dict, dataview);
-
-        this.majorVersion = p.uint16;
-        this.minorVersion = p.uint16;
-        this.fontRevision = p.fixed;
-        this.checkSumAdjustment = p.uint32;
-        this.magicNumber = p.uint32;
-        this.flags = p.flags(16);
-        this.unitsPerEm = p.uint16;
-        this.created = p.longdatetime;
-        this.modified = p.longdatetime;
-        this.xMin = p.int16;
-        this.yMin = p.int16;
-        this.xMax = p.int16;
-        this.yMax = p.int16;
-        this.macStyle = p.flags(16);
-        this.lowestRecPPEM = p.uint16;
-        this.fontDirectionHint = p.uint16;
-        this.indexToLocFormat = p.uint16;
-        this.glyphDataFormat = p.uint16;
-
-        p.verifyLength();
+        this.load({
+            majorVersion: p.uint16,
+            minorVersion: p.uint16,
+            fontRevision: p.fixed,
+            checkSumAdjustment: p.uint32,
+            magicNumber: p.uint32,
+            flags: p.flags(16),
+            unitsPerEm: p.uint16,
+            created: p.longdatetime,
+            modified: p.longdatetime,
+            xMin: p.int16,
+            yMin: p.int16,
+            xMax: p.int16,
+            yMax: p.int16,
+            macStyle: p.flags(16),
+            lowestRecPPEM: p.uint16,
+            fontDirectionHint: p.uint16,
+            indexToLocFormat: p.uint16,
+            glyphDataFormat: p.uint16,
+        });
     }
 }
 
