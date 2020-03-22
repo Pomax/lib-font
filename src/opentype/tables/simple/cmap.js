@@ -37,14 +37,14 @@ class cmap extends SimpleTable {
 
     supports(char) {
         return this.encodingRecords.some((_,tableID) => {
-            const t = this.get(tableID);
+            const t = this.getSubTable(tableID);
             return t.supports && t.supports(char) !== false;
         });
     }
 
     supportsVariation(variation) {
         return this.encodingRecords.some((_,tableID) => {
-            const t = this.get(tableID);
+            const t = this.getSubTable(tableID);
             return t.supportsVariation && t.supportsVariation(variation) !== false;
         });
     }

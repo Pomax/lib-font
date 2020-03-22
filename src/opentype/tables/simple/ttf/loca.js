@@ -7,10 +7,12 @@ import lazy from "../../../../lazy.js";
 * See https://docs.microsoft.com/en-us/typography/opentype/spec/loca
 */
 class loca extends SimpleTable {
-    constructor(dict, dataview, hmtx, maxp) {
+    constructor(dict, dataview, tables) {
         const { p } =  super(dict, dataview);
-        const n = maxp.numGlyphs + 1; // "plus one" because the offset list needs one extra element to determine the block length for the last supported glyph.
-        if (hmtx.indexToLocFormat === 0) {
+
+        const n = tables.maxp.numGlyphs + 1; // "plus one" because the offset list needs one extra element to determine the block length for the last supported glyph.
+
+        if (tables.hmtx.indexToLocFormat === 0) {
             this.x2 = true;
             lazy(this, `offsets`, () => [...new Array(n)].map(_ => p.offset16));
         } else {

@@ -27,7 +27,7 @@ font.onload = () => {
         "GSUB", "OS/2", "SVG ", "cmap", "head",
         "hhea", "hmtx", "maxp", "name", "post"
     ];
-    
+
     assertEqual(SFNT.directory.map(d => d.tag), expected, `tables: "${expected.join(`", "`)}"`);
 
     assertEqual(SFNT.searchRange, 128, `Correct searchRange`);
@@ -35,6 +35,9 @@ font.onload = () => {
     assertEqual(SFNT.rangeShift, 112, `Correct rangeShift`);
 
     testSFNT(SFNT);
+
+    assertEqual(font.supports('a'), true, `font supports the Latin lowercase A`);
+    assertEqual(font.supports('〆'), true, `font does not support the Japanese EOL marker`);
 }
 
 font.src = `../fonts/SourceCodePro-Regular.otf`;

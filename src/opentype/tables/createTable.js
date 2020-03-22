@@ -88,7 +88,7 @@ function createTable(tables, dict, dataview) {
 
 function loadTableClasses() {
     let count = 0;
-    function checkLoaded(resolve) {
+    function checkLoaded(resolve, reject) {
         if (!tableClassesLoaded) {
             if (count > 10) {
                 return reject(new Error(`loading took too long`));

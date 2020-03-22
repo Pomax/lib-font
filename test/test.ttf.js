@@ -35,6 +35,9 @@ font.onload = () => {
     assertEqual(SFNT.rangeShift, 64, `Correct rangeShift`);
 
     testSFNT(SFNT, true);
+
+    assertEqual(font.supports('a'), true, `font supports the Latin lowercase A`);
+    assertEqual(font.supports('〆'), true, `font does not support the Japanese EOL marker`);
 }
 
 font.src = `../fonts/SourceCodePro-Regular.ttf`;

@@ -5,7 +5,7 @@ import {
     assertNotEqual,
 } from "./assert.js";
 
-function testSFNT(SFNT, isTTF) {
+function testSFNT(SFNT, isTTF) { try {
 
     // Table tests
     const tables = SFNT.tables;
@@ -268,6 +268,6 @@ function testSFNT(SFNT, isTTF) {
         assertNotEqual(CFF, undefined, `CFF EXISTS`);
         indent();
     }
-}
+} catch (e) { console.error(e); } }
 
 export { testSFNT };
