@@ -119,4 +119,4 @@ Tweet at me! [@TheRealPomax](http://twitter.com/TheRealPomax) or [@TheRealPomax@
 
 ## And if I just want to use this?
 
-This code is [MIT licensed](https://opensource.org/licenses/MIT), do whatever you want with it.
+This code is [MIT licensed](https://raw.githubusercontent.com/Pomax/Font.js/master/LICENSE), do whatever you want with it.
