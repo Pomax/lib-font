@@ -1,7 +1,9 @@
 import { SimpleTable } from "./tables/simple-table.js";
 import lazy from "../lazy.js";
 
-const brotliDecode = window.unbrotli;
+// Font.js expects this to be loaded seperately and made available
+// as a global object on `window`
+// const brotliDecode = window.unbrotli;
 
 /**
  * The WOFF2 header

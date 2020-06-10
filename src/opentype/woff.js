@@ -1,7 +1,9 @@
 import { SimpleTable } from "./tables/simple-table.js";
 import lazy from "../lazy.js";
 
-const gzipDecode = (window.pako ? window.pako.inflate : undefined);
+// Font.js expects this to be loaded seperately and made available
+// as a global object on `window`
+// const gzipDecode = (window.pako ? window.pako.inflate : undefined);
 
 /**
  * The WOFF header
