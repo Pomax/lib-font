@@ -4,6 +4,11 @@ import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
 
+import fs from "fs";
+
+// A simple hack to distinguish between browser and Node
+const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
 /**
  * either return the appropriate CSS format
  * for a specific font URL, or generate an
@@ -70,8 +75,17 @@ class Font extends EventManager {
      */
     set src(url) {
         this.__src = url;
-        this.defineFontFace(this.name, url, this.options);
-        this.loadFont(url);
+        if(isBrowser) {
+            this.defineFontFace(this.name, url, this.options);
+            this.loadFont(url);
+        }
+        else {
+            // Test, but probably not what we want. We can just
+            // directly call loadFont and not rely on events
+            // when in Node env?
+            const stream = fs.createReadStream(url)
+            console.log(stream);
+        }
     }
 
     /**
@@ -100,14 +114,31 @@ class Font extends EventManager {
      */
     async loadFont(url) {
         const type = getFontCSSFormat(url);
-        fetch(url)
-        .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
-        .then(buffer => this.fromDataBuffer(buffer, type))
-        .catch(err => {
-            const evt = new Event(`error`, err, `Failed to load font at ${url}`);
-            this.dispatch(evt);
-            if (this.onerror) this.onerror(evt);
-        });
+        if(isBrowser) {
+            fetch(url)
+            .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
+            .then(buffer => this.fromDataBuffer(buffer, type))
+            .catch(err => {
+                console.log(err);
+                const evt = new Event(`error`, err, `Failed to load font at ${url}`);
+                this.dispatch(evt);
+                if (this.onerror) this.onerror(evt);
+            });
+        } else {
+            // TODO: recreate the fetch stuff ↑ with Node's fs
+
+            // Load the font from filesytem -- so far, so good
+            let response = fs.readFileSync(url);
+
+            // Now, recreate the response/buffer stuff so Font.js can continue
+            // Once the font has been turned into a buffer/object/thingy that
+            // Font.js expects, I think it will work the same as in the browser
+            // from there on.
+
+            // response = response.arrayBuffer()
+            // this.fromDataBuffer(response, type);
+            // console.log(font.toString());
+        }
     }
 
     /**
@@ -212,5 +243,8 @@ class Font extends EventManager {
 
 // Font.manPage = manPage;
 
-// window.Font = Font;
-global.Font = Font;
+if(isBrowser) {
+    window.Font = Font;
+} else {
+    global.Font = Font;
+}

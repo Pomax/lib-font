@@ -1,6 +1,7 @@
 const f = new Font("Testy");
 // f.src = "Fit-Variable.woff2";
 // f.src = "Gimlet_Italics-VF.ttf";
+
 f.src = "Fraunces-VF.ttf";
 
 f.onload = e => parsy(e);
