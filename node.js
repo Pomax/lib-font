@@ -51,7 +51,6 @@ myApp.get('*', (req, resp) => {
 	const font = new FontNode(name);
 	font.src = `fonts/${requestUrl}`;
 	font.onload = e => {
-		console.log(e.detail.font);
 		const name = e.detail.font.opentype.tables.name;
 
 		// Get variable axes data
@@ -75,11 +74,12 @@ myApp.get('*', (req, resp) => {
 		let charset = "";
 		// const chars = e.detail.font.opentype.tables.cmap.get(1);
 		console.log(e.detail.font.opentype.tables.cmap.encodingRecords.map(r => r.table.getSupportedCharCodes()));
+		resp.end(JSON.stringify(e.detail.font));
 	};
 	font.onerror = e => {
 		console.error(e);
+		resp.end(e);
 	};
-	resp.end('Hi!');
 });
 
 const httpServer = http.createServer(myApp);
