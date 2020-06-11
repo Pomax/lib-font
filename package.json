@@ -8,7 +8,6 @@
 		"test": "test"
 	},
 	"scripts": {
-		"dev": "nodemon node.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
@@ -24,13 +23,6 @@
 	"homepage": "https://github.com/Pomax/Font.js#readme",
 	"type": "module",
 	"dependencies": {
-		"body-parser": "^1.19.0",
-		"express": "^4.17.1",
-		"fs": "0.0.1-security",
-		"http": "0.0.1-security",
-		"node-fetch": "^2.6.0"
-	},
-	"devDependencies": {
-		"nodemon": "^2.0.4"
+		"fs": "0.0.1-security"
 	}
 }
