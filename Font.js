@@ -75,15 +75,8 @@ class Font extends EventManager {
 		this.__src = url;
 		if (isBrowser()) {
 			this.defineFontFace(this.name, url, this.options);
-			this.loadFont(url);
 		}
-		else {
-			// Test, but probably not what we want. We can just
-			// directly call loadFont and not rely on events
-			// when in Node env?
-			const stream = fs.createReadStream(url)
-			console.log(stream);
-		}
+		this.loadFont(url);
 	}
 
 	/**

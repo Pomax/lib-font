@@ -1,7 +1,8 @@
-import './Font.js';
-const express = require('express');
-const fs = require('fs');
-const http = require('http');
+import './FontNode.js';
+import express from 'express';
+import fs from 'fs';
+import http from 'http';
+import bodyParser from 'body-parser';
 
 const myApp = express();
 const mimetype = {
@@ -24,8 +25,6 @@ const mimetype = {
 	'.mp3': 'audio/mpeg',
 	'.ogg': 'audio/ogg'
 };
-const out = process.stdout;
-
 myApp.use(bodyParser.urlencoded({
 	extended: true
 }));
@@ -33,34 +32,31 @@ myApp.use(bodyParser.json());
 
 process.env.TZ = 'Europe/Amsterdam';
 
-Font.loadFont = function (file) {
-	// TODO: recreate the fetch stuff ↑ with Node's fs
-
-	// Load the font from filesytem -- so far, so good
-	let response = fs.readFileSync(file);
-
-	// Now, recreate the response/buffer stuff so Font.js can continue
-	// Once the font has been turned into a buffer/object/thingy that
-	// Font.js expects, I think it will work the same as in the browser
-	// from there on.
-
-	// response = response.arrayBuffer()
-	// this.fromDataBuffer(response, type);
-	// console.log(font.toString());
-}
-
 myApp.get('/fonts/*', (req, resp) => {
 	const requestUrl = req.url.substring(1);
 	const ext = requestUrl.replace(/^.*(?=\.)/, '');
-	const name = requestUrl.replace(/^.*\/(.*?)\..*??$/, '$1');
-	const font = new Font(name);
 	const mime = mimetype[ext] || 'text/html';
-	fetch(requestUrl, (error, data) => {
+	fs.readFile(`${requestUrl}`, (error, data) => {
+		console.log(data);
 		resp.writeHead(200, {
 			'Content-Type': mime
 		});
-		font.loadFont(data)
+		resp.end(data);
 	});
+});
+
+myApp.get('*', (req, resp) => {
+	const requestUrl = req.url.substring(1);
+	const name = requestUrl.replace(/^.*\/(.*?)(?:\..*?)?$/, '$1');
+	const font = new FontNode(name);
+	font.src = `fonts/${requestUrl}`;
+	font.onload = e => {
+		console.log(e.detail.font);
+	};
+	font.onerror = e => {
+		console.error(e);
+	};
+	resp.end('Hi!');
 });
 
 const httpServer = http.createServer(myApp);
