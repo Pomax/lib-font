@@ -1,7 +1,6 @@
 import './Font.js';
-import fetch from 'node-fetch'
 import fs from 'fs';
-import fileFetch from 'file-fetch';
+import fetch from 'node-fetch';
 
 function checkFetchResponseStatus(response) {
 	if (!response.ok) {
@@ -33,6 +32,17 @@ function getFontCSSFormat(pth) {
 	this.dispatch(new Event(`error`, {}, msg));
 }
 
+fs.readFileAsync = function (filename) {
+	return new Promise(function (resolve, reject) {
+		fs.readFile(filename, function (err, data) {
+			if (err)
+				reject(err);
+			else
+				resolve(data);
+		});
+	});
+};
+
 class FontNode extends Font {
 	constructor(name, options = {}) {
 		super(name, options);
@@ -41,10 +51,8 @@ class FontNode extends Font {
 	loadFont = (url) => {
 		const fsp = fs.promises;
 		const type = getFontCSSFormat(url);
-		console.log(`file://${process.cwd()}/${url}`);
-		fileFetch(`file://${process.cwd()}/${url}`)
-			.then(response => checkFetchResponseStatus(response) && response.body) //BUFFER?
-			.then(response => { console.log(response); return response })
+		fetch(`http://localhost:8080/${url}`)
+			.then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
 			.then(buffer => this.fromDataBuffer(buffer, type))
 			.catch(err => { console.log(err); return `error ${err} Failed to load font at ${url}` });
 	}

@@ -52,6 +52,29 @@ myApp.get('*', (req, resp) => {
 	font.src = `fonts/${requestUrl}`;
 	font.onload = e => {
 		console.log(e.detail.font);
+		const name = e.detail.font.opentype.tables.name;
+
+		// Get variable axes data
+		let axes = "";
+		const fvar = e.detail.font.opentype.tables.fvar;
+		console.log(name);
+		// 	for (const axis of fvar.axes) {
+		// 		axes += `
+		// - axis: ${axis.tag}
+		//   name: ${name.get(axis.axisNameID)}
+		//   min: ${axis.minValue}
+		//   max: ${axis.maxValue}
+		//   default: ${axis.defaultValue}`;
+		// 	}
+		// 	document.querySelector(".axes").innerHTML = axes;
+
+		// Get variable named instances
+		// NOT POSSIBLE WITH FONT.JS YET
+
+		// Get character set
+		let charset = "";
+		// const chars = e.detail.font.opentype.tables.cmap.get(1);
+		console.log(e.detail.font.opentype.tables.cmap.encodingRecords.map(r => r.table.getSupportedCharCodes()));
 	};
 	font.onerror = e => {
 		console.error(e);
