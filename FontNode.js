@@ -1,5 +1,6 @@
 import './Font.js';
 import fs from 'fs';
+import { LC } from './lib/log-color.js';
 
 function getFontCSSFormat(pth) {
 	let pos = pth.lastIndexOf(`.`);
@@ -42,12 +43,15 @@ class FontNode extends Font {
 	}
 
 	loadFont = (url) => {
-		const fsp = fs.promises;
 		const type = getFontCSSFormat(url);
-		fs.readFileAsync(`${process.cwd()}/${url}`)
+		fs.readFileAsync(url)
 			.then(buffer => new Uint8Array(buffer).buffer)
 			.then(arrayBuffer => this.fromDataBuffer(arrayBuffer, type))
-			.catch(err => { console.log(err); return `error ${err} Failed to load font at ${url}` });
+			.catch(err => {
+				const error = `${LC.red}Failed to load font at ${url}${LC.reset}\n${err}\n`;
+				console.error(error);
+				return error
+			});
 	}
 }
 

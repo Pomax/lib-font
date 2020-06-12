@@ -4,7 +4,6 @@ import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
 
-import fs from "fs";
 import isBrowser from "./lib/is-browser.js";
 
 /**

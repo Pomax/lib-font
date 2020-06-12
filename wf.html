@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<title>Generate specimen boilerplate data</title>
-		<script src="./lib/inflate.js" defer></script>
-		<script src="./lib/unbrotli.js" defer></script>
-		<script src="./Font.js" type="module" defer></script>
-		<script src="./wf.js" defer></script>
-	</head>
-	<body>
-        <p>This utility uses Font.js to analyse the font</p>
-		<p>Serve this page with <code>python -m SimpleHTTPServer</code>, file system doesn't work!</p>
-		<p>Point to the proper font file by editing <code>generate-data.js</code></p>
 
-		<hr />
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Generate specimen boilerplate data</title>
+	<script src="./lib/inflate.js" defer></script>
+	<script src="./lib/unbrotli.js" defer></script>
+	<script src="./Font.js" type="module" defer></script>
+	<script src="./wf.js" defer></script>
+</head>
 
-		<h1>axes.yml</h1>
-		<pre class="axes"></pre>
+<body>
+	<p>This utility uses Font.js to analyse the font</p>
+	<p>Serve this page with <code>python -m SimpleHTTPServer</code>, file system doesn't work!</p>
+	<p>Point to the proper font file by editing <code>generate-data.js</code></p>
 
-		<hr />
+	<hr />
 
-		<h1>charset.yml</h1>
-		<pre class="charset"></pre>
-	</body>
+	<h1>axes.yml</h1>
+	<pre class="axes"></pre>
+
+	<hr />
+
+	<h1>charset.yml</h1>
+	<pre class="charset"></pre>
+</body>
+
 </html>
