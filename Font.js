@@ -3,6 +3,7 @@ import { manPage } from "./src/manpage.js";
 import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
+import { _window } from "./lib/window.js";
 
 /**
  * either return the appropriate CSS format
@@ -212,4 +213,4 @@ class Font extends EventManager {
 
 Font.manPage = manPage;
 
-window.Font = Font;
+_window.Font = Font;

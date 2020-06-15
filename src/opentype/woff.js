@@ -1,7 +1,8 @@
 import { SimpleTable } from "./tables/simple-table.js";
 import lazy from "../lazy.js";
+import { _window } from "../../lib/window.js";
 
-const gzipDecode = (window.pako ? window.pako.inflate : undefined);
+const gzipDecode = (_window.pako ? _window.pako.inflate : undefined);
 
 /**
  * The WOFF header

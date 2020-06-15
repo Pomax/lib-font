@@ -1,3 +1,4 @@
+import { _window } from "../lib/window.js";
 // Shim for "man" template tag
 
 (function(scope) {
@@ -9,7 +10,7 @@
             else console.log(data.text, ...data.styles);
         }
     };
-})(window);
+})(_window);
 
 // data containers
 
