@@ -119,7 +119,7 @@ This code is [MIT licensed](https://raw.githubusercontent.com/Pomax/Font.js/mast
 
 ## Node.js
 
-New to Font.js is the possibility to load the information of a font file located on your server, via Node.js. Be sure to have the latest [Node.js](https://nodejs.org/en/download/current/) installed, and run:
+To use Font.js in Node.js to load the information of a font file located on the server, make sure to have the latest [Node.js](https://nodejs.org/en/download/current/) installed, and run:
 ```bash
 $ npm install
 ```
