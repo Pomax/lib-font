@@ -97,15 +97,15 @@ class Font extends EventManager {
      * This is a non-blocking operation.
      *
      * @param {String} url The URL for the font in question
-     * @param {String} ext Force extension, e.g. if URL is a base64 string
+     * @param {String} filename The filename when URL is a base64 string
      */
-    async loadFont(url, ext) {
-        const type = ext ? getFontCSSFormat(ext) : getFontCSSFormat(url);
+    async loadFont(url, filename) {
+        const type = getFontCSSFormat(filename || url);
         fetch(url)
         .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
         .then(buffer => this.fromDataBuffer(buffer, type))
         .catch(err => {
-            const evt = new Event(`error`, err, `Failed to load font at ${url}`);
+            const evt = new Event(`error`, err, `Failed to load font at ${filename || url}`);
             this.dispatch(evt);
             if (this.onerror) this.onerror(evt);
         });
