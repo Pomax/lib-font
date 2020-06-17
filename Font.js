@@ -97,9 +97,10 @@ class Font extends EventManager {
      * This is a non-blocking operation.
      *
      * @param {String} url The URL for the font in question
+     * @param {String} ext Force extension, e.g. if URL is a base64 string
      */
-    async loadFont(url) {
-        const type = getFontCSSFormat(url);
+    async loadFont(url, ext) {
+        const type = ext ? getFontCSSFormat(ext) : getFontCSSFormat(url);
         fetch(url)
         .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
         .then(buffer => this.fromDataBuffer(buffer, type))
