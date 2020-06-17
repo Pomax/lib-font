@@ -57,6 +57,27 @@ myFont.onload = evt => doSomeFontThings(evt);
 myFont.src = `./fonts/SourceCodeVariable-Roman.otf.woff2`;
 ```
 
+You can also pass a base64 string. In that case, you'll have to pass the filename as well, so the font type can de deducted from the extension:
+
+```js
+const myFont = new Font(`Adobe Source Code Pro`);
+
+// Grab file frop drop event or file upload
+const file = e.target.files[0];
+
+// Use FileReader to convert the file it to base64
+const reader = new FileReader();
+reader.readAsDataURL(file);
+
+reader.onload = function() {
+    // Pass the base64 string, and the original filename
+    myFont.loadFont(reader.result, file.name);
+    myFont.onload = e => {
+        // ...
+    };
+};
+```
+
 ## Running this code
 
 I'd recommend using the Node.js `live-server` package (`npm install live-server` after which it's `npx live-server`), which will start up a server _and_ open your browser to the server's index.html page, live-reloading whenever you change things in the code.
