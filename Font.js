@@ -3,7 +3,7 @@ import { manPage } from "./src/manpage.js";
 import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
-import { _window } from "./lib/window.js";
+import { context, isBrowser } from "./lib/context.js";
 
 /**
  * either return the appropriate CSS format
@@ -25,17 +25,18 @@ export function getFontCSSFormat(path) {
     
     if (format) return format;
 
-    if(_window) {
-        let msg = {
-            eot: `The .eot format is not supported: it died in January 12, 2016, when Microsoft retired all versions of IE that didn't already support WOFF.`,
-            svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again.`,
-            fon: `The .fon format is not supported: this is an ancient Windows bitmap font format.`,
-            ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`
-        }[ext];
+    let msg = {
+        eot: `The .eot format is not supported: it died in January 12, 2016, when Microsoft retired all versions of IE that didn't already support WOFF.`,
+        svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again.`,
+        fon: `The .fon format is not supported: this is an ancient Windows bitmap font format.`,
+        ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`
+    }[ext];
+    if (!msg) msg = `${path} is not a font.`;
 
-        if (!msg) msg = `${url} is not a font.`;
-
+    if(isBrowser) {
         this.dispatch(new Event(`error`, {}, msg));
+    } else {
+       throw new Error(msg); // Error handling for NodeJS
     }
 }
 
@@ -55,7 +56,7 @@ function checkFetchResponseStatus(response) {
 /**
  * The Font object, which the WebAPIs are still sorely missing.
  */
-class Font extends EventManager {
+export class Font extends EventManager {
     constructor(name, options={}) {
         super();
         this.name = name;
@@ -215,4 +216,6 @@ class Font extends EventManager {
 
 Font.manPage = manPage;
 
-_window.Font = Font;
+if(isBrowser) {
+    context.Font = Font;
+}

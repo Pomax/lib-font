@@ -1,4 +1,4 @@
-import { _window } from "../lib/window.js";
+import { context } from "../lib/context.js";
 // Shim for "man" template tag
 
 (function(scope) {
@@ -10,7 +10,7 @@ import { _window } from "../lib/window.js";
             else console.log(data.text, ...data.styles);
         }
     };
-})(_window);
+})(context);
 
 // data containers
 

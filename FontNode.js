@@ -1,50 +1,55 @@
 import path from 'path';
 import './lib/inflate.js';
 import './lib/unbrotli.js';
-import './Font.js';
-import fs from 'fs';
-import { getFontCSSFormat } from './Font.js';
+import fs from 'fs'
+const fsp = fs.promises;
+import { Font as FontMain, getFontCSSFormat } from './Font.js';
 
-fs.readFileAsync = (filename) => {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filename, (err, data) => {
-            if (err) reject(err);
-            else resolve(data);
-        });
-    });
-};
-
-export default class FontNode extends Font {
-    constructor(fileRaw, options = {}) {
-        if (fileRaw) {
-            const file = path.normalize(path.resolve(fileRaw)) || '';
-            const name = file.replace(/^.*\/(.*?)(?:\..*?)$/, '$1');
-            const font = super(name, options);
-            font.src = file;
-            return new Promise(function (resolve, reject) {
-                font.onload = data => {
-                    resolve(data.detail.font);
-                };
-                font.onerror = error => {
-                    reject(error);
-                };
-            });
-        }
+class Font extends FontMain {
+    constructor(name, options) {
+      super(name, options);
     }
-
+  
     set src(url) {
-        this.__src = url;
-        this.loadFont(url);
+      this.__src = url;
+      this.loadFile(url)
+      .catch(error => {
+        if (!this.onerror) throw error;
+        this.onerror(error);
+    })
     }
+  
+    async loadFile(url) {
+      this.__src = url;
+  
+      const file = path.normalize(path.resolve(url));
+  
+      if (!file) {
+        const err = new Error('FontNode error. File not found.')
+        if (this.onerror) this.onerror(err);
+        throw err;
+      }
+  
+      const ext = path.extname(file);
+  
+      if (!ext) {
+        const err = new Error('FontNode error. File extension is missing.')
+        if (this.onerror) this.onerror(err);
+        throw err;
+      }
+  
+      const type = getFontCSSFormat(ext);
+  
+      if (!type) {
+        const err = new Error('FontNode error. Unknown file type.')
+        if (this.onerror) this.onerror(err);
+        throw err;
+      } 
+  
+      return fsp.readFile(url)
+        .then(buffer => new Uint8Array(buffer).buffer)
+        .then(arrayBuffer => this.fromDataBuffer(arrayBuffer, type));
+    }
+  }
 
-    loadFont = (url) => {
-        fs.readFileAsync(url)
-            .then(buffer => new Uint8Array(buffer).buffer)
-            .then(arrayBuffer => ({ arrayBuffer, type: getFontCSSFormat(url) }))
-            .then(({ arrayBuffer, type }) => this.fromDataBuffer(arrayBuffer, type))
-            .catch(error => {
-                this.dispatch(error);
-                if (this.onerror) this.onerror(error);
-            });
-    }
-}
+export default Font;
