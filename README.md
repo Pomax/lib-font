@@ -139,7 +139,7 @@ Create an example `font-node.js` file:
 ```js
 import Font from 'font-js';
 
-const file = './fonts/SourceCodePro-Regular.ttf';
+const filePath = './fonts/SourceCodePro-Regular.ttf';
 const font = new Font('SourceCodePro-Regular');
 
 font.onload = () => {
@@ -171,7 +171,7 @@ font.onerror = () => {
     console.log('ERROR!', error, '\n');
 };
 
-font.src = file;
+font.src = filePath;
 ```
 Then run it:
 ```bash
