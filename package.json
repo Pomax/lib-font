@@ -1,8 +1,8 @@
 {
   "name": "font.js",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "What if you could actually inspect your web fonts? In the same context that you actually use those web fonts? That's what this is for.",
-  "main": "index.js",
+  "main": "./FontNode.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -17,7 +17,6 @@
     "woff",
     "woff2",
     "otf",
-    "fontkit",
     "opentype"
   ],
   "author": "Pomax",
@@ -26,8 +25,5 @@
     "url": "https://github.com/Pomax/Font.js/issues"
   },
   "homepage": "https://github.com/Pomax/Font.js#readme",
-  "type": "module",
-  "dependencies": {
-    "fs": "0.0.1-security"
-  }
+  "type": "module"
 }
