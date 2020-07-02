@@ -167,7 +167,7 @@ font.onload = () => {
     );
 };
 
-font.onerror = () => {
+font.onerror = (error) => {
     console.log('ERROR!', error, '\n');
 };
 
