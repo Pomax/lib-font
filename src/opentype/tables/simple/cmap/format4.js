@@ -46,13 +46,7 @@ class Format4 {
 
     supports(charCode) {
         if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
-        const segments = this.segments;
-        let i = segments.findIndex(s => s.start > charCode);
-        if (i===0) return false;
-        if (i===-1) i = segments.length;
-        let s = segments[i-1];
-        if (s.end < charCode) return false;
-        return charCode + s.idDelta;
+        return this.segments.findIndex(s => s.startCode <= charCode && charCode <= s.endCode) !== -1
     }
 
     getSupportedCharCodes(preservePropNames=false) {
