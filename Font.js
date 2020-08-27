@@ -100,10 +100,9 @@ class Font extends EventManager {
      * @param {String} filename The filename when URL is a base64 string
      */
     async loadFont(url, filename) {
-        const type = getFontCSSFormat(filename || url);
         fetch(url)
         .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
-        .then(buffer => this.fromDataBuffer(buffer, type))
+        .then(buffer => this.fromDataBuffer(buffer, filename || url))
         .catch(err => {
             const evt = new Event(`error`, err, `Failed to load font at ${filename || url}`);
             this.dispatch(evt);
@@ -116,7 +115,8 @@ class Font extends EventManager {
      *
      * @param {Buffer} buffer The binary data associated with this font.
      */
-    async fromDataBuffer(buffer, type) {
+    async fromDataBuffer(buffer, filenameOrUrl) {
+        const type = getFontCSSFormat(filenameOrUrl);
         this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
         await this.parseBasicData(type);
         const evt = new Event("load", { font: this });
