@@ -72,7 +72,7 @@ class Parser {
     }
 
     get fixed() {
-        let major = this.uint16;
+        let major = this.int16;
         let minor = Math.round(1000 * this.uint16/65356);
         return major + minor/1000;
     }
