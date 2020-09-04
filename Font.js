@@ -4,6 +4,20 @@ import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
 
+const PERMITTED_TYPES = [
+    `ttf`,
+    `otf`,
+    `woff`,
+    `woff2`,
+];
+const ILLEGAL_TYPES = [
+    `eot`,
+    `svg`,
+    `fon`,
+    `ttc`,
+];
+const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
+
 /**
  * either return the appropriate CSS format
  * for a specific font URL, or generate an
@@ -115,8 +129,11 @@ class Font extends EventManager {
      *
      * @param {Buffer} buffer The binary data associated with this font.
      */
-    async fromDataBuffer(buffer, filenameOrUrl) {
-        const type = getFontCSSFormat(filenameOrUrl);
+    async fromDataBuffer(buffer, typeOrPath) {
+        let type = typeOrPath;
+        if (!ALL_TYPES.includes(typeOrPath)) {
+            type = getFontCSSFormat(typeOrPath);
+        }
         this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
         await this.parseBasicData(type);
         const evt = new Event("load", { font: this });
