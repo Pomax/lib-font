@@ -104,11 +104,31 @@ Also, if you wish to minify the rolled up version of Font.js, I would recommend 
 
 ## Compatibility
 
-This library was designed specifically for use in the browser.
+This library was designed specifically for use in the browser, but will also run in any version of Node.js that has [esmodule]() support(v12 with feature flags, v14+ natively). Font.js can be imported using the `import` keyword, after which the rest of the code is effectively identical:
 
-It won't work in Node right now, because Node doesn't have its own `window`, `document`, and Fetch API implementation, but most important: Node.js is absolutely stupid when it comes to loading es modules, and for some idiotic reason demands you call module files `.mjs` instead of just looking for ES import/export statements in `.js` files. And I'm not renaming every file to an `.mjs` extension...
+```js
+import { Font } from "./Font.js";
 
-Of course, you can always run the code through whatever babel+webpack solution you probably already have set up, but you'll have to do that yourself. I'm having too much fun writing nice, clean, pure browser code.
+const myfont = new Font("My Test Font");
+
+myfont.onerror = evt => console.error(evt);
+
+myfont.onload = function inspectThisFont(evt) {
+    const font = e.detail.font;
+    const tables = font.opentype.tables;
+    const name = tables.name;
+    const fvar = tables.fvar;
+
+    console.log(`fvar has ${fvar.axisCount} axes, at size ${fvar.axisSize}`)
+    console.log(`fvar has ${fvar.instanceCount} instances:`)
+
+    fvar.instances.forEach(i =>
+        console.log(`subfamily: ${name.get(i.subfamilyNameID)}, postscriptname: ${name.get(i.postScriptNameID)}`)
+    );
+}
+
+myfont.src = "./fonts/MySuperGreatFont-Regular-but-great.ttf";
+```
 
 ## API
 
