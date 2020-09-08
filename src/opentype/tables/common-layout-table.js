@@ -73,10 +73,26 @@ class CommonLayoutTable extends SimpleTable {
 
     getSupportedLangSys(scriptTable) {
         scriptTable = this.ensureScriptTable(scriptTable);
-        return scriptTable.langSysRecords.map(l => l.langSysTag);
+        const hasDefault = scriptTable.defaultLangSys !== 0;
+        const supported = scriptTable.langSysRecords.map(l => l.langSysTag);
+        if (hasDefault) supported.unshift(`dflt`);
+        return supported;
     }
 
-    getLangSysTable(scriptTable, langSysTag) {
+    getDefaultLangSysTable(scriptTable) {
+        scriptTable = this.ensureScriptTable(scriptTable);
+        let offset = scriptTable.defaultLangSys;
+        if (offset !== 0) {
+            this.parser.currentPosition = scriptTable.start + offset;
+            let table = new LangSysTable(this.parser);
+            table.langSysTag = ``;
+            table.defaultForScript = scriptTable.scriptTag;
+            return table;
+        }
+    }
+
+    getLangSysTable(scriptTable, langSysTag=`dflt`) {
+        if (langSysTag === `dflt`) return this.getDefaultLangSysTable(scriptTable);
         scriptTable = this.ensureScriptTable(scriptTable);
         let record = (scriptTable.langSysRecords).find(l => l.langSysTag === langSysTag);
         this.parser.currentPosition = scriptTable.start + record.langSysOffset;
