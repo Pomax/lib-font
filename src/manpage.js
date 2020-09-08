@@ -9,7 +9,7 @@
             else console.log(data.text, ...data.styles);
         }
     };
-})(window);
+})(globalThis);
 
 // data containers
 

@@ -10,8 +10,8 @@ class COLR extends SimpleTable {
         const { p } =  super(dict, dataview);
         this.version = p.uint16;
         this.numBaseGlyphRecords = p.uint16;
-        this.baseGlyphRecordsOffset = p.Offset32; 	// from beginning of COLR table) to Base Glyph records.
-        this.layerRecordsOffset = p.Offset32; // from beginning of COLR table) to Layer Records.
+        this.baseGlyphRecordsOffset = p.offset32; 	// from beginning of COLR table) to Base Glyph records.
+        this.layerRecordsOffset = p.offset32; // from beginning of COLR table) to Layer Records.
         this.numLayerRecords = p.uint16;
     }
 
@@ -39,7 +39,7 @@ class COLR extends SimpleTable {
             this.parser.currentPosition = mid;
             let middle = new BaseGlyphRecord(this.parser);
             let midID = middle.gID;
-            
+
             if (midID === glyphID) return middle;
 
             // curses!

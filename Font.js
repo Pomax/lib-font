@@ -10,13 +10,45 @@ const PERMITTED_TYPES = [
     `woff`,
     `woff2`,
 ];
+
 const ILLEGAL_TYPES = [
     `eot`,
     `svg`,
     `fon`,
     `ttc`,
 ];
+
 const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
+
+if(typeof fetch === "undefined") {
+    let backlog = [];
+
+    var fetch = (...args) => {
+        return new Promise((resolve, reject) => {
+            backlog.push({ args, resolve, reject});
+        });
+    };
+
+    import('fs').then(fs => {
+        fetch = async function(path) {
+            return new Promise((resolve, reject) => {
+                fs.readFile(path, (err, data) => {
+                    if (err) return reject(err);
+                    resolve({
+                        ok: true,
+                        arrayBuffer: () => data.buffer
+                    });
+                });
+            });
+        };
+
+        while(backlog.length) {
+            let instruction = backlog.shift();
+            fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
+        }
+    });
+}
+
 
 /**
  * either return the appropriate CSS format
@@ -92,19 +124,21 @@ class Font extends EventManager {
      * This is a blocking operation.
      */
     defineFontFace(name, url, options) {
-        let format = getFontCSSFormat(url);
-        if (!format) return;
-        let style = document.createElement(`style`);
-        style.className = `injected by Font.js`;
-        let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
-        style.textContent = `
-@font-face {
-    font-family: "${name}";
-    ${rules}
-    src: url("${url}") format("${format}");
-}`;
-        this.styleElement = style;
-        document.head.appendChild(style);
+        if (typeof document !== "undefined") {
+            let format = getFontCSSFormat(url);
+            if (!format) return;
+            let style = document.createElement(`style`);
+            style.className = `injected by Font.js`;
+            let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
+            style.textContent = `
+    @font-face {
+        font-family: "${name}";
+        ${rules}
+        src: url("${url}") format("${format}");
+    }`;
+            this.styleElement = style;
+            document.head.appendChild(style);
+        }
     }
 
     /**
@@ -217,7 +251,7 @@ class Font extends EventManager {
     /**
      * load this font back into the DOM context after being unload()'d earlier.
      */
-    unload() {
+    load() {
         if (this.__unloaded) {
             delete this.__unloaded;
             document.head.appendChild(this.styleElement);
@@ -230,4 +264,6 @@ class Font extends EventManager {
 
 Font.manPage = manPage;
 
-window.Font = Font;
+globalThis.Font = Font;
+
+export { Font };

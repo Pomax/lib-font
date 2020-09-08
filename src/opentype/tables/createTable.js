@@ -49,6 +49,10 @@ Promise.all([
     import("./simple/bitmap/CBDT.js"),
     import("./simple/bitmap/sbix.js"),
 
+    // color
+    import("./simple/color/COLR.js"),
+    import("./simple/color/CPAL.js"),
+
     // "other" tables
     import("./simple/other/DSIG.js"),
     import("./simple/other/hdmx.js"),

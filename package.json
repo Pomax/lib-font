@@ -1,0 +1,30 @@
+{
+  "name": "font.js",
+  "version": "0.78.0",
+  "description": "A JS based OpenType font inspector",
+  "main": "Font.js",
+  "type": "module",
+  "directories": {
+    "lib": "lib",
+    "src": "src"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pomax/font.js.git"
+  },
+  "keywords": [
+    "opentype",
+    "font",
+    "webfont",
+    "parse",
+    "inspect",
+    "debug"
+  ],
+  "author": "Pomax",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Pomax/font.js/issues"
+  },
+  "homepage": "https://github.com/Pomax/font.js#readme"
+}
