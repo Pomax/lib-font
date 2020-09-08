@@ -18,7 +18,7 @@ class CPAL extends SimpleTable {
         this.colorRecordIndices = [... new Array(this.numPalettes)].map(_ => p.uint16);
 
         lazy(this, `colorRecords`, () => {
-            p.currentPosition = this.startTable + this.offsetFirstColorRecord;
+            p.currentPosition = this.tableStart + this.offsetFirstColorRecord;
             return [...new Array(this.numColorRecords)].map(_ => new ColorRecord(p));
         });
 
@@ -30,17 +30,17 @@ class CPAL extends SimpleTable {
             this.offsetPaletteEntryLabelArray = p.offset32; // from the beginning of CPAL table to the Palette Entry Label Array.
 
             lazy(this, `paletteTypeArray`, () => {
-                p.currentPosition = this.startTable + this.offsetPaletteTypeArray;
+                p.currentPosition = this.tableStart + this.offsetPaletteTypeArray;
                 return new PaletteTypeArray(p, numPalettes);
             });
 
             lazy(this, `paletteLabelArray`, () => {
-                p.currentPosition = this.startTable + this.offsetPaletteLabelArray;
+                p.currentPosition = this.tableStart + this.offsetPaletteLabelArray;
                 return new PaletteLabelsArray(p, numPalettes);
             });
 
             lazy(this, `paletteEntryLabelArray`, () => {
-                p.currentPosition = this.startTable + this.offsetPaletteEntryLabelArray;
+                p.currentPosition = this.tableStart + this.offsetPaletteEntryLabelArray;
                 return new PaletteEntryLabelArray(p, numPalettes);
             });
         }
