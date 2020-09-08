@@ -85,7 +85,7 @@ function checkFetchResponseStatus(response) {
 /**
  * The Font object, which the WebAPIs are still sorely missing.
  */
-export class Font extends EventManager {
+class Font extends EventManager {
     constructor(name, options={}) {
         super();
         this.name = name;
