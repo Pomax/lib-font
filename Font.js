@@ -4,6 +4,22 @@ import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
 
+const PERMITTED_TYPES = [
+    `ttf`,
+    `otf`,
+    `woff`,
+    `woff2`,
+];
+
+const ILLEGAL_TYPES = [
+    `eot`,
+    `svg`,
+    `fon`,
+    `ttc`,
+];
+
+const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
+
 if(typeof fetch === "undefined") {
     let backlog = [];
 
@@ -32,6 +48,7 @@ if(typeof fetch === "undefined") {
         }
     });
 }
+
 
 /**
  * either return the appropriate CSS format
@@ -128,14 +145,14 @@ class Font extends EventManager {
      * This is a non-blocking operation.
      *
      * @param {String} url The URL for the font in question
+     * @param {String} filename The filename when URL is a base64 string
      */
-    async loadFont(url) {
-        const type = getFontCSSFormat(url);
+    async loadFont(url, filename) {
         fetch(url)
         .then(response => checkFetchResponseStatus(response) && response.arrayBuffer())
-        .then(buffer => this.fromDataBuffer(buffer, type))
+        .then(buffer => this.fromDataBuffer(buffer, filename || url))
         .catch(err => {
-            const evt = new Event(`error`, err, `Failed to load font at ${url}`);
+            const evt = new Event(`error`, err, `Failed to load font at ${filename || url}`);
             this.dispatch(evt);
             if (this.onerror) this.onerror(evt);
         });
@@ -146,7 +163,11 @@ class Font extends EventManager {
      *
      * @param {Buffer} buffer The binary data associated with this font.
      */
-    async fromDataBuffer(buffer, type) {
+    async fromDataBuffer(buffer, typeOrPath) {
+        let type = typeOrPath;
+        if (!ALL_TYPES.includes(typeOrPath)) {
+            type = getFontCSSFormat(typeOrPath);
+        }
         this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
         await this.parseBasicData(type);
         const evt = new Event("load", { font: this });

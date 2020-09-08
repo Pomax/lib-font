@@ -57,13 +57,34 @@ myFont.onload = evt => doSomeFontThings(evt);
 myFont.src = `./fonts/SourceCodeVariable-Roman.otf.woff2`;
 ```
 
+You can also pass in a file directly, e.g. using the [HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). In that case, you'll need to use `fromDataBuffer` instead of `loadFont`, and pass the original filename explicity so that the type of font can be determined from the extension:
+
+```js
+const myFont = new Font(`Adobe Source Code Pro`);
+
+// Grab file frop drop event or file upload
+const file = e.target.files[0];
+
+// Use FileReader to, well, read the file
+const reader = new FileReader();
+reader.readAsArrayBuffer(file);
+
+reader.onload = function() {
+    // Pass the buffer, and the original filename
+    myFont.fromDataBuffer(reader.result, file.name);
+    myFont.onload = e => {
+        // ...
+    };
+};
+```
+
 ## Running this code
 
 I'd recommend using the Node.js `live-server` package (`npm install live-server` after which it's `npx live-server`), which will start up a server _and_ open your browser to the server's index.html page, live-reloading whenever you change things in the code.
 
 Barring that, you can of course use one of the many ways to fire up a quick http server:
 - `http-server` (Node.js package)
-- `python -m SimpleHTTPServer` (when still using python 2.7 - please stop using that btw) 
+- `python -m SimpleHTTPServer` (when still using python 2.7 - please stop using that btw)
 - `python -m http.server` (when using Python 3)
 - `php -S localhost:8000` (if you happen to still have PHP installed)
 - `ruby -run -e httpd . -p 8000` (ruby, obviously)
