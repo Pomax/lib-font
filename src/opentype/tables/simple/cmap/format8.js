@@ -14,18 +14,12 @@ class Format8 {
 
     supports(charCode) {
         if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
-        const groups = this.groups;
-        let i = groups.findIndex(s => s.startcharCode > charCode);
-        if (i===0) return false;
-        if (i===-1) i = groups.length;
-        let g = groups[i-1];
-        if (g.endcharCode < charCode) return false;
-        return charCode - g.startcharCode + g.startGlyphID;
+        return this.groups.findIndex(s => s.startcharCode <= charCode && charCode <= s.endcharCode) !== -1
     }
 
     getSupportedCharCodes(preservePropNames=false) {
         if (preservePropNames) return this.groups;
-        return this.groups.map(v => ({ start: v.startCode, end: v.endCode}));
+        return this.groups.map(v => ({ start: v.startcharCode, end: v.endcharCode}));
     }
 }
 

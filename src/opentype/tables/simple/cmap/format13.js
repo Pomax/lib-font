@@ -13,13 +13,7 @@ class Format13 {
 
     supports(charCode) {
         if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
-        const groups = this.groups;
-        let i = groups.findIndex(s => s.startCharCode > charCode);
-        if (i===0) return false;
-        if (i===-1) i = groups.length;
-        let g = groups[i-1];
-        if (g.endcharCode < charCode) return false;
-        return g.glyphId;
+        return this.groups.findIndex(s => s.startCharCode <= charCode && charCode <= s.endCharCode) !== -1
     }
 
     getSupportedCharCodes(preservePropNames=false) {
