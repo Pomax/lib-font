@@ -199,7 +199,7 @@ class Font extends EventManager {
     /**
      * load this font back into the DOM context after being unload()'d earlier.
      */
-    unload() {
+    load() {
         if (this.__unloaded) {
             delete this.__unloaded;
             document.head.appendChild(this.styleElement);
