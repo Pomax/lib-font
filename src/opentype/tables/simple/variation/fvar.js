@@ -12,14 +12,14 @@ class fvar extends SimpleTable {
 
         this.majorVersion = p.uint16;
         this.minorVersion = p.uint16;
-        this.axesArrayOffset = p.uint16;
+        this.axesArrayOffset = p.offset16;
         p.uint16;
         this.axisCount = p.uint16;
         this.axisSize = p.uint16;
         this.instanceCount = p.uint16;
         this.instanceSize = p.uint16;
 
-        const axisStart = p.currentPosition;
+        const axisStart = this.tableStart + this.axesArrayOffset;
         lazy(this, `axes`, () => {
             p.currentPosition = axisStart;
             return [... new Array(this.axisCount)].map(_ =>  new VariationAxisRecord(p));
@@ -27,9 +27,13 @@ class fvar extends SimpleTable {
 
         const instanceStart = axisStart + this.axisCount * this.axisSize;
         lazy(this, `instances`, () => {
-            p.currentPosition = instanceStart;
-            return [... new Array(this.instanceCount)].map(_ =>  new InstanceRecord(p, this.axisCount));
-        });        
+            let instances = [];
+            for(let i = 0; i<this.instanceCount; i++) {
+                p.currentPosition = instanceStart + i * this.instanceSize;
+                instances.push(new InstanceRecord(p, this.axisCount));
+            }
+            return instances;
+        });
     }
 
     getSupportedAxes() {
