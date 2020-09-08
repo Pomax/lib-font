@@ -1,29 +1,30 @@
 {
   "name": "font.js",
-  "version": "2.0.0",
-  "description": "What if you could actually inspect your web fonts? In the same context that you actually use those web fonts? That's what this is for.",
-  "main": "./FontNode.js",
+  "version": "0.78.0",
+  "description": "A JS based OpenType font inspector",
+  "main": "FontNode.js",
+  "type": "module",
   "directories": {
     "lib": "lib",
-    "test": "test"
+    "src": "src"
   },
+  "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pomax/Font.js.git"
+    "url": "git+https://github.com/Pomax/font.js.git"
   },
   "keywords": [
+    "opentype",
     "font",
-    "ttf",
-    "woff",
-    "woff2",
-    "otf",
-    "opentype"
+    "webfont",
+    "parse",
+    "inspect",
+    "debug"
   ],
   "author": "Pomax",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/Pomax/Font.js/issues"
+    "url": "https://github.com/Pomax/font.js/issues"
   },
-  "homepage": "https://github.com/Pomax/Font.js#readme",
-  "type": "module"
+  "homepage": "https://github.com/Pomax/font.js#readme"
 }
