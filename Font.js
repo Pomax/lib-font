@@ -20,10 +20,12 @@ const ILLEGAL_TYPES = [
 
 const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
 
-if(typeof globalThis.fetch === "undefined") {
+let fetch = globalThis.fetch;
+
+if(!fetch) {
     let backlog = [];
 
-    var fetch = (...args) => {
+    fetch = (...args) => {
         return new Promise((resolve, reject) => {
             backlog.push({ args, resolve, reject});
         });
@@ -47,8 +49,6 @@ if(typeof globalThis.fetch === "undefined") {
             fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
         }
     });
-} else {
-    fetch = globalThis.fetch;
 }
 
 
