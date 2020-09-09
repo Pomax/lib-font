@@ -8,7 +8,9 @@
     "lib": "lib",
     "src": "src"
   },
-  "scripts": {},
+  "scripts": {
+    "clean": "prettier --write \"src/**/*.js\""
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Pomax/font.js.git"
@@ -26,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/Pomax/font.js/issues"
   },
-  "homepage": "https://github.com/Pomax/font.js#readme"
+  "homepage": "https://github.com/Pomax/font.js#readme",
+  "devDependencies": {
+    "prettier": "^2.1.1"
+  }
 }

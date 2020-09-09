@@ -1,2 +1,4 @@
 .DS_Store
 protected
+node_modules
+package-lock.json

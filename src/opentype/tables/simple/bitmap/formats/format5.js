@@ -4,9 +4,9 @@
  * 5, which will contain the metrics information for all glyphs.
  */
 class Format5 {
-    constructor(p, h, w) {
-        this.imageData = p.readBytes(Math.ceil(h * w / 8));
-    }
+  constructor(p, h, w) {
+    this.imageData = p.readBytes(Math.ceil((h * w) / 8));
+  }
 }
 
 export { Format5 };

@@ -7,9 +7,9 @@ import { SimpleTable } from "../simple-table.js";
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/MATH
  */
 class MATH extends SimpleTable {
-    constructor(dict, dataview) {
-        const { p } = super(dict, dataview);
-    }
+  constructor(dict, dataview) {
+    const { p } = super(dict, dataview);
+  }
 }
 
 export { MATH };
