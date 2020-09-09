@@ -61,8 +61,7 @@ class NameRecord {
         this.offset = p.offset16;
 
         lazy(this, `string`, () => {
-            const dict = { offset: nameTable.tableStart + nameTable.stringOffset + this.offset };
-            const p = new Parser(dict, nameTable.parser.data, `Name record ${this.nameID}`);
+            p.currentPosition =  nameTable.stringStart + this.offset
             return decodeString(p, this);
         });
     }
