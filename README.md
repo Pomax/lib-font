@@ -114,7 +114,7 @@ const myfont = new Font("My Test Font");
 myfont.onerror = evt => console.error(evt);
 
 myfont.onload = function inspectThisFont(evt) {
-    const font = e.detail.font;
+    const font = evt.detail.font;
     const tables = font.opentype.tables;
     const name = tables.name;
     const fvar = tables.fvar;
