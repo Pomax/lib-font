@@ -1,5 +1,6 @@
 import { Parser } from "../../../parser.js";
 import { SimpleTable } from "../simple-table.js";
+import lazy from "../../../lazy.js";
 
 /**
 * The OpenType `name` table.
@@ -15,7 +16,7 @@ class name extends SimpleTable {
         this.stringOffset = p.offset16; // relative to start of table
 
         // name records
-        this.nameRecords = [...new Array(this.count)].map((_,i) => new NameRecord(p));
+        this.nameRecords = [...new Array(this.count)].map(_ => new NameRecord(p, this));
 
         // lang-tag records, if applicable
         if (this.format === 1) {
@@ -33,12 +34,7 @@ class name extends SimpleTable {
      */
     get(nameID) {
         let record = this.nameRecords.find(record => record.nameID === nameID);
-        if (record) {
-            const dict = { offset: this.stringStart + record.offset };
-            const p = new Parser(dict, this.parser.data, `Name record ${nameID}`);
-            const bytes = new Uint8Array(p.readBytes(record.length));
-            return [...bytes].map(v => String.fromCharCode(v)).join(``);
-        }
+        if (record) return record.string;
     }
 }
 
@@ -56,14 +52,44 @@ class LangTagRecord {
  * ...docs go here...
  */
 class NameRecord {
-    constructor(p) {
+    constructor(p, nameTable) {
         this.platformID = p.uint16;
         this.encodingID = p.uint16;
         this.languageID = p.uint16;
         this.nameID = p.uint16;
         this.length = p.uint16;
         this.offset = p.offset16;
+
+        lazy(this, `string`, () => {
+            const dict = { offset: nameTable.tableStart + nameTable.stringOffset + this.offset };
+            const p = new Parser(dict, nameTable.parser.data, `Name record ${this.nameID}`);
+            return decodeString(p, this);
+        });
     }
+}
+
+
+/**
+ * Specific platforms and platform/encoding combinations encode strings in
+ * different ways.
+ */
+function decodeString(p, record) {
+    const { nameID, platformID, encodingID, length } = record;
+
+    // We decode strings for the Unicode/Microsoft platforms as UTF-16
+    if (platformID === 0 || platformID === 3) {
+        const str = [];
+        for(let i=0, e=length/2; i<e; i++) str[i] = String.fromCharCode(p.uint16);
+        return str.join(``);
+    }
+
+    // Everything else, we treat as plain bytes.
+    const bytes = p.readBytes(length);
+    const str = [];
+    bytes.forEach(function(b,i) { str[i] = String.fromCharCode(b); });
+    return str.join(``);
+
+    // TODO: if someone wants to finesse this/implement all the other string encodings, have at it!
 }
 
 export { name };
