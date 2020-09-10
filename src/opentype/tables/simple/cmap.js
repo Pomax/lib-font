@@ -39,6 +39,24 @@ class cmap extends SimpleTable {
     return subtable.getSupportedCharCodes();
   }
 
+  reverse(glyphid) {
+    for(let i=0; i<this.numTables; i++) {
+      let code = this.getSubTable(i).reverse(glyphid);
+      if (code) return code;
+    }
+  }
+
+  getGlyphId(char) {
+    let last = 0;
+    this.encodingRecords.some((_, tableID) => {
+      let t = this.getSubTable(tableID);
+      if (!t.getGlyphId) return false;
+      last = t.getGlyphId(char);
+      return last !== 0;
+    });
+    return last;
+  }
+
   supports(char) {
     return this.encodingRecords.some((_, tableID) => {
       const t = this.getSubTable(tableID);

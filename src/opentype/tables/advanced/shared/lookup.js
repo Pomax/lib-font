@@ -1,7 +1,13 @@
 import { ParsedData } from "../../../../parser.js";
-import { CoverageTable } from "./coverage.js";
+import GSUBtables from "./subtables/gsub.js";
+import GPOStables from "./subtables/gpos.js";
 
 class LookupList extends ParsedData {
+  static EMPTY = {
+    lookupCount: 0,
+    lookups: [],
+  };
+
   constructor(p) {
     super(p);
     this.lookupCount = p.uint16;
@@ -10,8 +16,9 @@ class LookupList extends ParsedData {
 }
 
 class LookupTable extends ParsedData {
-  constructor(p) {
+  constructor(p, type) {
     super(p);
+    this.ctType = type;
     this.lookupType = p.uint16;
     this.lookupFlag = p.uint16;
     this.subTableCount = p.uint16;
@@ -39,11 +46,11 @@ class LookupTable extends ParsedData {
     return this.lookupFlag & (0xff00 === 0xff00);
   }
 
-  getSubTables() {
-    return this.subtableOffsets.map((offset) => {
-      this.parser.currentPosition = this.start + offset;
-      return new CoverageTable(this.parser);
-    });
+  // FIXME: make this a lazy .subtables array instead?
+  getSubTable(index) {
+    const builder = (this.ctType === `GSUB`) ? GSUBtables : GPOStables;
+    this.parser.currentPosition = this.start + this.subtableOffsets[index];
+    return builder.buildSubtable(this.lookupType, this.parser);
   }
 }
 

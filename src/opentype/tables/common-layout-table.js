@@ -28,23 +28,31 @@ class CommonLayoutTable extends SimpleTable {
       this.featureVariationsOffset = p.offset32;
     }
 
+    const no_content = !(this.scriptListOffset || this.featureListOffset || this.lookupListOffset);
+
     lazy(this, `scriptList`, () => {
+      if (no_content) return ScriptList.EMPTY;
       p.currentPosition = tableStart + this.scriptListOffset;
       return new ScriptList(p);
     });
 
     lazy(this, `featureList`, () => {
+      if (no_content) return FeatureList.EMPTY;
       p.currentPosition = tableStart + this.featureListOffset;
       return new FeatureList(p);
     });
 
     lazy(this, `lookupList`, () => {
+      if (no_content) return LookupList.EMPTY;
       p.currentPosition = tableStart + this.lookupListOffset;
       return new LookupList(p);
     });
 
+    // FIXME: This class doesn't actually exist anywhere in the code...
+
     if (this.featureVariationsOffset) {
       lazy(this, `featureVariations`, () => {
+        if (no_content) return FeatureVariations.EMPTY;
         p.currentPosition = tableStart + this.featureVariationsOffset;
         return new FeatureVariations(p);
       });
@@ -114,8 +122,14 @@ class CommonLayoutTable extends SimpleTable {
     return langSysTable.featureIndices.map((index) => this.getFeature(index));
   }
 
-  getFeature(featureIndex) {
-    let record = this.featureList.featureRecords[featureIndex];
+  getFeature(indexOrTag) {
+    let record;
+    if (parseInt(indexOrTag) == indexOrTag) {
+      record = this.featureList.featureRecords[indexOrTag];
+    } else {
+      record = this.featureList.featureRecords.find(f => f.featureTag === indexOrTag);
+    }
+    if (!record) return;
     this.parser.currentPosition = this.featureList.start + record.featureOffset;
     let table = new FeatureTable(this.parser);
     table.featureTag = record.featureTag;
@@ -128,10 +142,10 @@ class CommonLayoutTable extends SimpleTable {
     return featureTable.lookupListIndices.map((index) => this.getLookup(index));
   }
 
-  getLookup(lookupIndex) {
+  getLookup(lookupIndex, type) {
     let lookupOffset = this.lookupList.lookups[lookupIndex];
     this.parser.currentPosition = this.lookupList.start + lookupOffset;
-    return new LookupTable(this.parser);
+    return new LookupTable(this.parser, type);
   }
 }
 

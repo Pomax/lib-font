@@ -148,11 +148,11 @@ class Parser {
   /**
    * Read an entire data block.
    */
-  readBytes(n = 0, offset = 0, bits = 8, signed = false) {
+  readBytes(n = 0, position = 0, bits = 8, signed = false) {
     n = n || this.length;
     if (n === 0) return [];
 
-    if (offset) this.currentPosition = offset;
+    if (position) this.currentPosition = position;
 
     const fn = `${signed ? `` : `u`}int${bits}`,
       slice = [];

@@ -14,54 +14,76 @@ class Format4 {
     // This cmap subformat basically lazy-loads everything. It would be better to
     // not even lazy load but the code is not ready for selective extraction.
 
-    const endCodeOffset = p.currentPosition;
+    const endCodePosition = p.currentPosition;
     lazy(this, `endCode`, () =>
-      p.readBytes(this.segCountX2, endCodeOffset, 16)
+      p.readBytes(this.segCountX2, endCodePosition, 16)
     );
 
-    const startCodeOffset = endCodeOffset + 2 + this.segCountX2;
+    const startCodePosition = endCodePosition + this.segCountX2 + 2;
     lazy(this, `startCode`, () =>
-      p.readBytes(this.segCountX2, startCodeOffset, 16)
+      p.readBytes(this.segCountX2, startCodePosition, 16)
     );
 
-    const idDeltaOffset = startCodeOffset + this.segCountX2;
+    const idDeltaPosition = startCodePosition + this.segCountX2;
     lazy(this, `idDelta`, () =>
-      p.readBytes(this.segCountX2, idDeltaOffset, 16)
+      p.readBytes(this.segCountX2, idDeltaPosition, 16)
     );
 
-    const idRangeOffset = idDeltaOffset + this.segCountX2;
+    const idRangePosition = idDeltaPosition + this.segCountX2;
     lazy(this, `idRangeOffset`, () =>
-      p.readBytes(this.segCountX2, idRangeOffset, 16)
+      p.readBytes(this.segCountX2, idRangePosition, 16)
     );
 
-    const glyphIdArrayOffset = idRangeOffset + this.segCountX2;
+    const glyphIdArrayPosition = idRangePosition + this.segCountX2;
     const glyphIdArrayLength =
-      this.length - (glyphIdArrayOffset - this.tableStart);
+      this.length - (glyphIdArrayPosition - this.tableStart);
     lazy(this, `glyphIdArray`, () =>
-      p.readBytes(glyphIdArrayLength, glyphIdArrayOffset, 16)
+      p.readBytes(glyphIdArrayLength, glyphIdArrayPosition, 16)
     );
 
     // also, while not in the spec, we really want to organise all that data into convenient segments
-    lazy(this, `segments`, () => this.buildSegments());
+    lazy(this, `segments`, () => this.buildSegments(idRangePosition, glyphIdArrayPosition, p));
   }
 
-  buildSegments() {
-    const build = (_, i) => ({
-      startCode: this.startCode[i],
-      endCode: this.endCode[i],
-      idDelta: this.idDelta[i],
-      idRangeOffset: this.idRangeOffset[i],
-    });
+  buildSegments(idRangePosition, glyphIdArrayPosition, p) {
+    const build = (_, i) => {
+      let startCode = this.startCode[i],
+          endCode = this.endCode[i],
+          idDelta = this.idDelta[i],
+          idRangeOffset = this.idRangeOffset[i],
+          idRangeOffsetPointer = idRangePosition + 2*i,
+          glyphIDs = [];
+
+      // Glyph mappings one way, so if we want a reverse lookup, we'll
+      // have to build one here, so we can consult it later...
+      for(let i=0, e=endCode-startCode; i<e; i++) {
+        p.currentPosition = idRangeOffsetPointer + idRangeOffset + i*2;
+        glyphIDs.push(p.uint16);
+      }
+
+      return { startCode, endCode, idDelta, idRangeOffset, glyphIDs };
+    };
+
     return [...new Array(this.segCountX2 / 2)].map(build);
   }
 
-  supports(charCode) {
+  reverse(glyphID) {
+    let s = this.segments.find(v => v.glyphIDs.includes(glyphID));
+    if (!s) return;
+    return s.startCode + s.glyphIDs.indexOf(glyphID);
+  }
+
+  getGlyphId(charCode) {
     if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
-    return (
-      this.segments.findIndex(
-        (s) => s.startCode <= charCode && charCode <= s.endCode
-      ) !== -1
+    let segment = this.segments.find(s =>
+      s.startCode <= charCode && charCode <= s.endCode
     );
+    if (!segment) return 0;
+    return segment.glyphIDs[charCode - segment.startCode];
+  }
+
+  supports(charCode) {
+    return this.getGlyphId(charCode) !== 0;
   }
 
   getSupportedCharCodes(preservePropNames = false) {
