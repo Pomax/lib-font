@@ -65,13 +65,6 @@ class InstanceRecord {
     p.uint16;
     this.coordinates = [...new Array(axisCount)].map((_) => p.fixed);
     if (p.currentPosition - start < size) {
-      // Can we all agree that this is not text that should be in a spec?
-      //
-      // "The postScriptNameID field is optional, but should be included
-      // in all variable fonts, and may be required in some platforms"
-      //
-      // If it's optional, it's optional, the end. Don't then go "but it's
-      // also requied, idk, good luck lol".
       this.postScriptNameID = p.uint16;
     }
   }
