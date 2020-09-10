@@ -17,7 +17,7 @@ class LookupType extends ParsedData {
 class LookupType1 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 1`);
+    // console.log(`lookup type 1`);
     this.deltaGlyphID = p.int16;
   }
 }
@@ -25,7 +25,7 @@ class LookupType1 extends LookupType {
 class LookupType2 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 2`);
+    // console.log(`lookup type 2`);
     this.sequenceCount = p.uint16;
     this.sequenceOffsets = [...new Array(this.sequenceCount)].map(
       (_) => p.offset16
@@ -51,7 +51,7 @@ class SequenceTable {
 class LookupType3 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 3`);
+    // console.log(`lookup type 3`);
     this.alternateSetCount = p.uint16;
     this.alternateSetOffsets = [...new Array(this.alternateSetCount)].map(
       (_) => p.offset16
@@ -77,6 +77,8 @@ class AlternateSetTable {
 class LookupType4 extends LookupType {
   constructor(p) {
     super(p);
+    // console.log(`lookup type 4`);
+
     this.ligatureSetCount = p.uint16;
     this.ligatureSetOffsets = [...new Array(this.ligatureSetCount)].map(
       (_) => p.offset16
@@ -127,7 +129,7 @@ class SubstLookupRecord {
 class LookupType5 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 5`);
+    // console.log(`lookup type 5`);
 
     if (this.substFormat === 1) {
       this.subRuleSetCount = p.uint16;
