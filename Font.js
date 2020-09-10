@@ -216,7 +216,7 @@ class Font extends EventManager {
      * @param {*} char
      */
     supports(char) {
-        return this.opentype.tables.cmap.supports(char);
+        return this.getGlyphId(char) !== 0
     }
 
     /**
