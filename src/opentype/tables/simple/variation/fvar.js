@@ -32,7 +32,7 @@ class fvar extends SimpleTable {
       let instances = [];
       for (let i = 0; i < this.instanceCount; i++) {
         p.currentPosition = instanceStart + i * this.instanceSize;
-        instances.push(new InstanceRecord(p, this.axisCount));
+        instances.push(new InstanceRecord(p, this.axisCount, this.instanceSize));
       }
       return instances;
     });
@@ -59,11 +59,21 @@ class VariationAxisRecord {
 }
 
 class InstanceRecord {
-  constructor(p, axisCount) {
+  constructor(p, axisCount, size) {
+    let start = p.currentPosition;
     this.subfamilyNameID = p.uint16;
     p.uint16;
     this.coordinates = [...new Array(axisCount)].map((_) => p.fixed);
-    this.postScriptNameID = p.uint16;
+    if (p.currentPosition - start < size) {
+      // Can we all agree that this is not text that should be in a spec?
+      //
+      // "The postScriptNameID field is optional, but should be included
+      // in all variable fonts, and may be required in some platforms"
+      //
+      // If it's optional, it's optional, the end. Don't then go "but it's
+      // also requied, idk, good luck lol".
+      this.postScriptNameID = p.uint16;
+    }
   }
 }
 
