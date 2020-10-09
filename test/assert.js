@@ -1,4 +1,4 @@
-let rollout = document.body;
+let rollout = typeof document === "undefined" ? false : document.body;
 let logPad = [];
 
 function arrayEqual(a,b) {
@@ -13,6 +13,9 @@ function equal(a, b) {
 }
 
 function note(msg, style) {
+    if (!rollout) {
+        return console.log(msg);
+    }
     let div = document.createElement('div')
     div.textContent = msg;
     div.setAttribute(`style`, style);

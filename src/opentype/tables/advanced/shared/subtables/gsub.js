@@ -14,25 +14,26 @@ class LookupType extends ParsedData {
   }
 }
 
+// ===================================================================================
+
 class LookupType1 extends LookupType {
   constructor(p) {
     super(p);
-    // console.log(`lookup type 1`);
     this.deltaGlyphID = p.int16;
   }
 }
 
+// ===================================================================================
+
 class LookupType2 extends LookupType {
   constructor(p) {
     super(p);
-    // console.log(`lookup type 2`);
     this.sequenceCount = p.uint16;
     this.sequenceOffsets = [...new Array(this.sequenceCount)].map(
       (_) => p.offset16
     );
   }
   getSequence(index) {
-    // FIXME: make this a lazy .sequences array instead?
     let p = this.parser;
     p.currentPosition = this.start + this.sequenceOffsets[index];
     return new SequenceTable(p);
@@ -48,17 +49,17 @@ class SequenceTable {
   }
 }
 
+// ===================================================================================
+
 class LookupType3 extends LookupType {
   constructor(p) {
     super(p);
-    // console.log(`lookup type 3`);
     this.alternateSetCount = p.uint16;
     this.alternateSetOffsets = [...new Array(this.alternateSetCount)].map(
       (_) => p.offset16
     );
   }
   getAlternateSet(index) {
-    // FIXME: make this a lazy .alternateSets array instead?
     let p = this.parser;
     p.currentPosition = this.start + this.alternateSetOffsets[index];
     return new AlternateSetTable(p);
@@ -74,18 +75,17 @@ class AlternateSetTable {
   }
 }
 
+// ===================================================================================
+
 class LookupType4 extends LookupType {
   constructor(p) {
     super(p);
-    // console.log(`lookup type 4`);
-
     this.ligatureSetCount = p.uint16;
     this.ligatureSetOffsets = [...new Array(this.ligatureSetCount)].map(
       (_) => p.offset16
     ); // from beginning of subtable
   }
   getLigatureSet(index) {
-    // FIXME: make this a lazy .ligatureSets array instead?
     let p = this.parser;
     p.currentPosition = this.start + this.ligatureSetOffsets[index];
     return new LigatureSetTable(p);
@@ -101,7 +101,6 @@ class LigatureSetTable extends ParsedData {
     ); // from beginning of LigatureSetTable
   }
   getLigature(index) {
-    // FIXME: make this a lazy .ligatures array instead?
     let p = this.parser;
     p.currentPosition = this.start + this.ligatureOffsets[index];
     return new LigatureTable(p);
@@ -118,6 +117,8 @@ class LigatureTable {
   }
 }
 
+// ===================================================================================
+
 // used by types 5 through 8
 class SubstLookupRecord {
   constructor(p) {
@@ -126,16 +127,19 @@ class SubstLookupRecord {
   }
 }
 
+// ===================================================================================
+
 class LookupType5 extends LookupType {
   constructor(p) {
     super(p);
-    // console.log(`lookup type 5`);
+
+    // There are three possible subtable formats
 
     if (this.substFormat === 1) {
       this.subRuleSetCount = p.uint16;
       this.subRuleSetOffsets = [...new Array(this.subRuleSetCount)].map(
         (_) => p.offset16
-      ); //
+      );
     }
 
     if (this.substFormat === 2) {
@@ -148,7 +152,7 @@ class LookupType5 extends LookupType {
 
     if (this.substFormat === 3) {
       // undo the coverageOffset parsing, because this format uses an
-      // entire *array* of coverage offsets O_O
+      // entire *array* of coverage offsets instead.
       p.currentPosition -= 2;
       delete this.coverageOffset;
 
@@ -162,8 +166,6 @@ class LookupType5 extends LookupType {
       );
     }
   }
-
-  // FIXME: make these lazy props instead?
 
   getSubRuleSet(index) {
     if (this.substFormat !== 1)
@@ -180,7 +182,7 @@ class LookupType5 extends LookupType {
       );
     let p = this.parser;
     p.currentPosition = this.start + this.subClassSetOffsets[index];
-    return new SubRuleSetTable(p);
+    return new SubClassSetTable(p);
   }
 
   getCoverageTable(index) {
@@ -197,6 +199,8 @@ class LookupType5 extends LookupType {
   }
 }
 
+// 5.1
+
 class SubRuleSetTable extends ParsedData {
   constructor(p) {
     this.subRuleCount = p.uint16;
@@ -205,7 +209,6 @@ class SubRuleSetTable extends ParsedData {
     );
   }
   getSubRule(index) {
-    // FIXME: make this a lazy .subrules array instead?
     let p = this.parser;
     p.currentPosition = this.start + this.subRuleOffsets[index];
     return new SubRuleTable(p);
@@ -225,6 +228,8 @@ class SubRuleTable {
   }
 }
 
+// 5.2
+
 class SubClassSetTable extends ParsedData {
   constructor(p) {
     this.subClassRuleCount = p.uint16;
@@ -233,7 +238,6 @@ class SubClassSetTable extends ParsedData {
     );
   }
   getSubClass(index) {
-    // FIXME: make this a lazy .subclasses array instead?
     let p = this.parser;
     p.currentPosition = this.start + this.subClassRuleOffsets[index];
     return new SubClassRuleTable(p);
@@ -246,29 +250,93 @@ class SubClassRuleTable extends SubRuleTable {
   }
 }
 
+// ===================================================================================
+
 class LookupType6 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 6`);
-    // TODO: implement
+
+    // There are three possible subtable formats
+
+    if (this.substFormat === 1) {
+      this.chainSubRuleSetCount = p.uint16;
+      this.chainSubRuleSetOffsets = [...new Array(this.chainSubRuleSetCount)].map(
+        (_) => p.offset16
+      );
+    }
+
+    if (this.substFormat === 2) {
+      // TODO: implement
+      console.warn(`GSUB Lookup Type 6 Subformat 2 has not yet been implemented`);
+    }
+
+    if (this.substFormat === 3) {
+      // TODO: implement
+      console.warn(`GSUB Lookup Type 6 Subformat 3 has not yet been implemented`);
+    }
+  }
+
+  getChainSubRuleSet(index) {
+    if (this.substFormat !== 1)
+      throw new Error(`lookup type 6.${this.substFormat} has no chainsubrule sets.`);
+    let p = this.parser;
+    p.currentPosition = this.start + this.chainSubRuleSetOffsets[index];
+    return new ChainSubRuleSetTable(p);
   }
 }
+
+// 6.1
+
+class ChainSubRuleSetTable extends ParsedData {
+  constructor(p) {
+    this.chainSubRuleCount = p.uint16;
+    this.chainSubRuleOffsets = [...new Array(this.chainSubRuleCount)].map(
+      (_) => p.offset16
+    );
+  }
+  getSubRule(index) {
+    let p = this.parser;
+    p.currentPosition = this.start + this.chainSubRuleOffsets[index];
+    return new ChainSubRuleTable(p);
+  }
+}
+
+class ChainSubRuleTable {
+  constructor(p) {
+    this.backtrackGlyphCount = p.uint16;
+    this.backtrackSequence = [...new Array(this.backtrackGlyphCount)].map(_ => p.uint16);
+    this.inputGlyphCount = p.uint16;
+    this.inputSequence = [...new Array(this.inputGlyphCount - 1)].map(_ => p.uint16);
+    this.lookaheadGlyphCount = p.uint16;
+    this.lookAheadSequence = [...new Array(this.lookAheadGlyphCount)].map(_ => p.uint16);
+    this.substitutionCount = p.uint16;
+    this.substLookupRecords = [...new Array(this.SubstCount)].map(_ => new SubstLookupRecord(p));
+  }
+}
+
+// ===================================================================================
 
 class LookupType7 extends LookupType {
   constructor(p) {
     super(p);
     console.log(`lookup type 7`);
     // TODO: implement
+    console.warn(`GSUB Lookup Type 7 has not yet been implemented`);
   }
 }
+
+// ===================================================================================
 
 class LookupType8 extends LookupType {
   constructor(p) {
     super(p);
     console.log(`lookup type 8`);
     // TODO: implement
+    console.warn(`GSUB Lookup Type 8 has not yet been implemented`);
   }
 }
+
+// ===================================================================================
 
 export default {
   buildSubtable: function (type, p) {

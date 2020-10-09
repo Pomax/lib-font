@@ -7,6 +7,7 @@ class Format4 {
     this.length = p.uint16;
     this.language = p.uint16;
     this.segCountX2 = p.uint16;
+    this.segCount = this.segCountX2 / 2;
     this.searchRange = p.uint16;
     this.entrySelector = p.uint16;
     this.rangeShift = p.uint16;
@@ -16,27 +17,26 @@ class Format4 {
 
     const endCodePosition = p.currentPosition;
     lazy(this, `endCode`, () =>
-      p.readBytes(this.segCountX2, endCodePosition, 16)
+      p.readBytes(this.segCount, endCodePosition, 16)
     );
 
-    const startCodePosition = endCodePosition + this.segCountX2 + 2;
+    const startCodePosition = endCodePosition + 2 + this.segCountX2;
     lazy(this, `startCode`, () =>
-      p.readBytes(this.segCountX2, startCodePosition, 16)
+      p.readBytes(this.segCount, startCodePosition, 16)
     );
 
     const idDeltaPosition = startCodePosition + this.segCountX2;
     lazy(this, `idDelta`, () =>
-      p.readBytes(this.segCountX2, idDeltaPosition, 16)
+      p.readBytes(this.segCount, idDeltaPosition, 16, true) // Note that idDelta values are signed
     );
 
     const idRangePosition = idDeltaPosition + this.segCountX2;
     lazy(this, `idRangeOffset`, () =>
-      p.readBytes(this.segCountX2, idRangePosition, 16)
+      p.readBytes(this.segCount, idRangePosition, 16)
     );
 
     const glyphIdArrayPosition = idRangePosition + this.segCountX2;
-    const glyphIdArrayLength =
-      this.length - (glyphIdArrayPosition - this.tableStart);
+    const glyphIdArrayLength = this.length - (glyphIdArrayPosition - this.tableStart);
     lazy(this, `glyphIdArray`, () =>
       p.readBytes(glyphIdArrayLength, glyphIdArrayPosition, 16)
     );
@@ -54,17 +54,25 @@ class Format4 {
           idRangeOffsetPointer = idRangePosition + 2*i,
           glyphIDs = [];
 
-      // Glyph mappings one way, so if we want a reverse lookup, we'll
-      // have to build one here, so we can consult it later...
-      for(let i=0, e=endCode-startCode; i<e; i++) {
-        p.currentPosition = idRangeOffsetPointer + idRangeOffset + i*2;
-        glyphIDs.push(p.uint16);
+      // simple case
+      if (idRangeOffset === 0) {
+        for(let i=startCode + idDelta, e=endCode + idDelta; i<=e; i++) {
+          glyphIDs.push(i);
+        }
+      }
+
+      // not so simple case
+      else {
+        for(let i=0, e=endCode-startCode; i<=e; i++) {
+          p.currentPosition = idRangeOffsetPointer + idRangeOffset + i*2;
+          glyphIDs.push(p.uint16);
+        }
       }
 
       return { startCode, endCode, idDelta, idRangeOffset, glyphIDs };
     };
 
-    return [...new Array(this.segCountX2 / 2)].map(build);
+    return [...new Array(this.segCount)].map(build);
   }
 
   reverse(glyphID) {
