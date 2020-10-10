@@ -1,4 +1,4 @@
-import { Font } from "./Font.js";
+import { Font } from "../../Font.js";
 
 const f = new Font("gsub testing");
 
@@ -10,7 +10,7 @@ f.onload = function (e) {
 
   function letterFor(glyphid) {
     let code = cmap.reverse(glyphid);
-    let letter = code ? String.fromCharCode(code) : "??";
+    let letter = code ? String.fromCharCode(code) : `[${glyphid}:??]`;
     return letter;
   }
 
@@ -118,4 +118,5 @@ f.onload = function (e) {
   });
 };
 
-f.src = "./fonts/Recursive_VF_1.064.ttf";
+// f.src = "./fonts/Recursive_VF_1.064.ttf";
+f.src = "./fonts/OpenSans/OpenSans-Regular.ttf";
