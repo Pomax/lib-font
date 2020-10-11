@@ -32,7 +32,7 @@
   "homepage": "https://github.com/Pomax/font.js#readme",
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "prettier": "^2.1.1",
-    "jest": "^26.5.2"
+    "jest": "^26.5.3",
+    "prettier": "^2.1.1"
   }
 }

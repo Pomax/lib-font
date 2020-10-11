@@ -4,9 +4,6 @@ import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
 
-// temporarily node-only
-import fs from "fs";
-
 const PERMITTED_TYPES = [
     `ttf`,
     `otf`,
@@ -26,15 +23,15 @@ const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
 let fetch = globalThis.fetch;
 
 if(!fetch) {
-    // let backlog = [];
+    let backlog = [];
 
-    // fetch = (...args) => {
-    //     return new Promise((resolve, reject) => {
-    //         backlog.push({ args, resolve, reject});
-    //     });
-    // };
+    fetch = (...args) => {
+        return new Promise((resolve, reject) => {
+            backlog.push({ args, resolve, reject});
+        });
+    };
 
-    // import('fs').then(fs => {
+    import('fs').then(fs => {
         fetch = async function(path) {
             return new Promise((resolve, reject) => {
                 fs.readFile(path, (err, data) => {
@@ -47,11 +44,11 @@ if(!fetch) {
             });
         };
 
-    //     while(backlog.length) {
-    //         let instruction = backlog.shift();
-    //         fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
-    //     }
-    // });
+        while(backlog.length) {
+            let instruction = backlog.shift();
+            fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
+        }
+    });
 }
 
 
