@@ -18,14 +18,14 @@ class FeatureList extends ParsedData {
 class FeatureRecord {
   constructor(p) {
     this.featureTag = p.tag;
-    this.featureOffset = p.offset16; // Offset to Feature table, from beginning of FeatureList
+    this.featureOffset = p.Offset16; // Offset to Feature table, from beginning of FeatureList
   }
 }
 
 class FeatureTable extends ParsedData {
   constructor(p) {
     super(p);
-    this.featureParams = p.offset16;
+    this.featureParams = p.Offset16;
     this.lookupIndexCount = p.uint16;
     this.lookupListIndices = [...new Array(this.lookupIndexCount)].map(
       (_) => p.uint16

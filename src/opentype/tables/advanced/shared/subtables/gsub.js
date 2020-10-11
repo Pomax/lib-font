@@ -5,7 +5,7 @@ class LookupType extends ParsedData {
   constructor(p) {
     super(p);
     this.substFormat = p.uint16;
-    this.coverageOffset = p.offset16;
+    this.coverageOffset = p.Offset16;
   }
   getCoverageTable() {
     let p = this.parser;
@@ -30,7 +30,7 @@ class LookupType2 extends LookupType {
     super(p);
     this.sequenceCount = p.uint16;
     this.sequenceOffsets = [...new Array(this.sequenceCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     );
   }
   getSequence(index) {
@@ -56,7 +56,7 @@ class LookupType3 extends LookupType {
     super(p);
     this.alternateSetCount = p.uint16;
     this.alternateSetOffsets = [...new Array(this.alternateSetCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     );
   }
   getAlternateSet(index) {
@@ -82,7 +82,7 @@ class LookupType4 extends LookupType {
     super(p);
     this.ligatureSetCount = p.uint16;
     this.ligatureSetOffsets = [...new Array(this.ligatureSetCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     ); // from beginning of subtable
   }
   getLigatureSet(index) {
@@ -97,7 +97,7 @@ class LigatureSetTable extends ParsedData {
     super(p);
     this.ligatureCount = p.uint16;
     this.ligatureOffsets = [...new Array(this.ligatureCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     ); // from beginning of LigatureSetTable
   }
   getLigature(index) {
@@ -138,15 +138,15 @@ class LookupType5 extends LookupType {
     if (this.substFormat === 1) {
       this.subRuleSetCount = p.uint16;
       this.subRuleSetOffsets = [...new Array(this.subRuleSetCount)].map(
-        (_) => p.offset16
+        (_) => p.Offset16
       );
     }
 
     if (this.substFormat === 2) {
-      this.classDefOffset = p.offset16;
+      this.classDefOffset = p.Offset16;
       this.subClassSetCount = p.uint16;
       this.subClassSetOffsets = [...new Array(this.subClassSetCount)].map(
-        (_) => p.offset16
+        (_) => p.Offset16
       );
     }
 
@@ -159,7 +159,7 @@ class LookupType5 extends LookupType {
       this.glyphCount = p.uint16;
       this.substitutionCount = p.uint16;
       this.coverageOffsets = [...new Array(this.glyphCount)].map(
-        (_) => p.offset16
+        (_) => p.Offset16
       );
       this.substLookupRecords = [...new Array(this.substitutionCount)].map(
         (_) => new SubstLookupRecord(p)
@@ -203,9 +203,10 @@ class LookupType5 extends LookupType {
 
 class SubRuleSetTable extends ParsedData {
   constructor(p) {
+    super(p);
     this.subRuleCount = p.uint16;
     this.subRuleOffsets = [...new Array(this.subRuleCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     );
   }
   getSubRule(index) {
@@ -232,9 +233,10 @@ class SubRuleTable {
 
 class SubClassSetTable extends ParsedData {
   constructor(p) {
+    super(p);
     this.subClassRuleCount = p.uint16;
     this.subClassRuleOffsets = [...new Array(this.subClassRuleCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     );
   }
   getSubClass(index) {
@@ -260,28 +262,60 @@ class LookupType6 extends LookupType {
 
     if (this.substFormat === 1) {
       this.chainSubRuleSetCount = p.uint16;
-      this.chainSubRuleSetOffsets = [...new Array(this.chainSubRuleSetCount)].map(
-        (_) => p.offset16
-      );
+      this.chainSubRuleSetOffsets = [
+        ...new Array(this.chainSubRuleSetCount),
+      ].map((_) => p.Offset16);
     }
 
     if (this.substFormat === 2) {
-      // TODO: implement
-      console.warn(`GSUB Lookup Type 6 Subformat 2 has not yet been implemented`);
+      this.coverageOffset = p.Offset16;
+      this.backtrackClassDefOffset = p.Offset16;
+      this.inputClassDefOffset = p.Offset16;
+      this.lookaheadClassDefOffset = p.Offset16;
+      this.chainSubClassSetCount = p.uint16;
+      this.chainSubClassSetOffsets = [
+        ...new Array(this.chainSubClassSetCount),
+      ].map((_) => p.Offset16);
     }
 
     if (this.substFormat === 3) {
-      // TODO: implement
-      console.warn(`GSUB Lookup Type 6 Subformat 3 has not yet been implemented`);
+      this.backtrackGlyphCount = p.uint16;
+      this.backtrackCoverageOffsets = [
+        ...new Array(this.backtrackGlyphCount),
+      ].map((_) => p.Offset16);
+      this.inputGlyphCount = p.uint16;
+      this.inputCoverageOffsets = [...new Array(this.inputGlyphCount)].map(
+        (_) => p.Offset16
+      );
+      this.lookaheadGlyphCount = p.uint16;
+      this.lookaheadCoverageOffsets = [
+        ...new Array(this.lookaheadGlyphCount),
+      ].map((_) => p.Offset16);
+      this.substitutionCount = p.uint16;
+      this.substLookupRecords = [...new Array(this.substitutionCount)].map(
+        (_) => new SubstLookupRecord(p)
+      );
     }
   }
 
   getChainSubRuleSet(index) {
     if (this.substFormat !== 1)
-      throw new Error(`lookup type 6.${this.substFormat} has no chainsubrule sets.`);
+      throw new Error(
+        `lookup type 6.${this.substFormat} has no chainsubrule sets.`
+      );
     let p = this.parser;
     p.currentPosition = this.start + this.chainSubRuleSetOffsets[index];
     return new ChainSubRuleSetTable(p);
+  }
+
+  getChainSubClassSet(index) {
+    if (this.substFormat !== 2)
+      throw new Error(
+        `lookup type 6.${this.substFormat} has no chainsubclass sets.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + this.chainSubClassSetOffsets[index];
+    return new ChainSubClassSetTable(p);
   }
 }
 
@@ -289,9 +323,10 @@ class LookupType6 extends LookupType {
 
 class ChainSubRuleSetTable extends ParsedData {
   constructor(p) {
+    super(p);
     this.chainSubRuleCount = p.uint16;
     this.chainSubRuleOffsets = [...new Array(this.chainSubRuleCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     );
   }
   getSubRule(index) {
@@ -304,24 +339,72 @@ class ChainSubRuleSetTable extends ParsedData {
 class ChainSubRuleTable {
   constructor(p) {
     this.backtrackGlyphCount = p.uint16;
-    this.backtrackSequence = [...new Array(this.backtrackGlyphCount)].map(_ => p.uint16);
+    this.backtrackSequence = [...new Array(this.backtrackGlyphCount)].map(
+      (_) => p.uint16
+    );
     this.inputGlyphCount = p.uint16;
-    this.inputSequence = [...new Array(this.inputGlyphCount - 1)].map(_ => p.uint16);
+    this.inputSequence = [...new Array(this.inputGlyphCount - 1)].map(
+      (_) => p.uint16
+    );
     this.lookaheadGlyphCount = p.uint16;
-    this.lookAheadSequence = [...new Array(this.lookAheadGlyphCount)].map(_ => p.uint16);
+    this.lookAheadSequence = [...new Array(this.lookAheadGlyphCount)].map(
+      (_) => p.uint16
+    );
     this.substitutionCount = p.uint16;
-    this.substLookupRecords = [...new Array(this.SubstCount)].map(_ => new SubstLookupRecord(p));
+    this.substLookupRecords = [...new Array(this.SubstCount)].map(
+      (_) => new SubstLookupRecord(p)
+    );
   }
 }
+
+// 6.2
+
+class ChainSubClassSetTable extends ParsedData {
+  constructor(p) {
+    super(p);
+    this.chainSubClassRuleCount = p.uint16;
+    this.chainSubClassRuleOffsets = [
+      ...new Array(this.chainSubClassRuleCount),
+    ].map((_) => p.Offset16);
+  }
+  getSubClass(index) {
+    let p = this.parser;
+    p.currentPosition = this.start + this.chainSubRuleOffsets[index];
+    return new ChainSubClassRuleTable(p);
+  }
+}
+
+class ChainSubClassRuleTable {
+  constructor(p) {
+    this.backtrackGlyphCount = p.uint16;
+    this.backtrackSequence = [...new Array(this.backtrackGlyphCount)].map(
+      (_) => p.uint16
+    );
+    this.inputGlyphCount = p.uint16;
+    this.inputSequence = [...new Array(this.inputGlyphCount - 1)].map(
+      (_) => p.uint16
+    );
+    this.lookaheadGlyphCount = p.uint16;
+    this.lookAheadSequence = [...new Array(this.lookAheadGlyphCount)].map(
+      (_) => p.uint16
+    );
+    this.substitutionCount = p.uint16;
+    this.substLookupRecords = [...new Array(this.substitutionCount)].map(
+      (_) => new SubstLookupRecord(p)
+    );
+  }
+}
+
+// 6.3 does not rely on additional classes
 
 // ===================================================================================
 
 class LookupType7 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 7`);
-    // TODO: implement
-    console.warn(`GSUB Lookup Type 7 has not yet been implemented`);
+    this.substFormat = p.uint16;
+    this.extensionLookupType = p.uint16;
+    this.extensionOffset = p.Offset32;
   }
 }
 
@@ -330,9 +413,14 @@ class LookupType7 extends LookupType {
 class LookupType8 extends LookupType {
   constructor(p) {
     super(p);
-    console.log(`lookup type 8`);
-    // TODO: implement
-    console.warn(`GSUB Lookup Type 8 has not yet been implemented`);
+    this.substFormat = p.uint16;
+    this.coverageOffset = p.Offset16;
+    this.backtrackGlyphCount = p.uint16;
+    this.backtrackCoverageOffsets = [...new Array(this.backtrackGlyphCount)].map(_ => p.Offset16);
+    this.lookaheadGlyphCount = p.uint16;
+    this.lookaheadCoverageOffsets = [new Array(this.lookaheadGlyphCount)].map(_ => p.Offset16);
+    this.glyphCount = p.uint16;
+    this.substituteGlyphIDs = [...new Array(this.glyphCount)].map(_ => p.uint16);
   }
 }
 

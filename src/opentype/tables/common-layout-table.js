@@ -20,12 +20,12 @@ class CommonLayoutTable extends SimpleTable {
 
     this.majorVersion = p.uint16;
     this.minorVersion = p.uint16;
-    this.scriptListOffset = p.offset16;
-    this.featureListOffset = p.offset16;
-    this.lookupListOffset = p.offset16;
+    this.scriptListOffset = p.Offset16;
+    this.featureListOffset = p.Offset16;
+    this.lookupListOffset = p.Offset16;
 
     if (this.majorVersion === 1 && this.minorVersion === 1) {
-      this.featureVariationsOffset = p.offset32;
+      this.featureVariationsOffset = p.Offset32;
     }
 
     const no_content = !(this.scriptListOffset || this.featureListOffset || this.lookupListOffset);

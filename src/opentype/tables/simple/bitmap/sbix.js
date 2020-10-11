@@ -21,7 +21,7 @@ class sbix extends SimpleTable {
     this.flags = p.flags(16);
     this.numStrikes = p.uint32;
     lazy(this, `strikeOffsets`, () =>
-      [...new Array(this.numStrikes)].map((_) => p.offset32)
+      [...new Array(this.numStrikes)].map((_) => p.Offset32)
     ); // from the beginning of the 'sbix' table
   }
 
@@ -33,7 +33,7 @@ class Strike extends ParsedData {
     this.ppem = p.uint16;
     this.ppi = p.uint16;
     lazy(this, `glyphDataOffsets`, () =>
-      [...new Array(numGlyphs + 1)].map((_) => p.offset32)
+      [...new Array(numGlyphs + 1)].map((_) => p.Offset32)
     ); // from the beginning of the strike data header
   }
 

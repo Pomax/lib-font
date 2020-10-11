@@ -13,7 +13,7 @@ class name extends SimpleTable {
 
     this.format = p.uint16;
     this.count = p.uint16;
-    this.stringOffset = p.offset16; // relative to start of table
+    this.stringOffset = p.Offset16; // relative to start of table
 
     // name records
     this.nameRecords = [...new Array(this.count)].map(
@@ -24,7 +24,7 @@ class name extends SimpleTable {
     if (this.format === 1) {
       this.langTagCount = p.uint16;
       this.langTagRecords = [...new Array(this.langTagCount)].map(
-        (_) => new LangTagRecord(p.uint16, p.offset16)
+        (_) => new LangTagRecord(p.uint16, p.Offset16)
       );
     }
 
@@ -62,7 +62,7 @@ class NameRecord {
     this.languageID = p.uint16;
     this.nameID = p.uint16;
     this.length = p.uint16;
-    this.offset = p.offset16;
+    this.offset = p.Offset16;
 
     lazy(this, `string`, () => {
       p.currentPosition = nameTable.stringStart + this.offset;

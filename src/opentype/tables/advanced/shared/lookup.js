@@ -11,7 +11,7 @@ class LookupList extends ParsedData {
   constructor(p) {
     super(p);
     this.lookupCount = p.uint16;
-    this.lookups = [...new Array(this.lookupCount)].map((_) => p.offset16); // Array of offsets to Lookup tables, from beginning of LookupList
+    this.lookups = [...new Array(this.lookupCount)].map((_) => p.Offset16); // Array of offsets to Lookup tables, from beginning of LookupList
   }
 }
 
@@ -23,7 +23,7 @@ class LookupTable extends ParsedData {
     this.lookupFlag = p.uint16;
     this.subTableCount = p.uint16;
     this.subtableOffsets = [...new Array(this.subTableCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     ); // Array of offsets to lookup subtables, from beginning of Lookup table
     this.markFilteringSet = p.uint16;
   }

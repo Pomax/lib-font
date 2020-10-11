@@ -122,10 +122,10 @@ class Parser {
   get ufword() {
     return this.uint16;
   }
-  get offset16() {
+  get Offset16() {
     return this.uint16;
   }
-  get offset32() {
+  get Offset32() {
     return this.uint32;
   }
 

@@ -18,7 +18,7 @@ class Subtable3 {
           TODO: figure out how to size this array
         */
     const len = 0;
-    this.offsetArray = [...new Array(len)].map((_) => p.offset16);
+    this.offsetArray = [...new Array(len)].map((_) => p.Offset16);
   }
 }
 

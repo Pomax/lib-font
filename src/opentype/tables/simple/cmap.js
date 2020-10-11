@@ -79,7 +79,7 @@ class EncodingRecord {
   constructor(p, tableStart) {
     this.platformID = p.uint16;
     this.encodingID = p.uint16;
-    this.offset = p.offset32; // from cmap table start
+    this.offset = p.Offset32; // from cmap table start
 
     lazy(this, `table`, () => {
       p.currentPosition = tableStart + this.offset;

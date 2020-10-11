@@ -12,7 +12,7 @@ class fvar extends SimpleTable {
 
     this.majorVersion = p.uint16;
     this.minorVersion = p.uint16;
-    this.axesArrayOffset = p.offset16;
+    this.axesArrayOffset = p.Offset16;
     p.uint16;
     this.axisCount = p.uint16;
     this.axisSize = p.uint16;

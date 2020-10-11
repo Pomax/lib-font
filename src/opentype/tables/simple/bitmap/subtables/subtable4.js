@@ -20,7 +20,7 @@ class Subtable4 {
 class GlyphIdOffsetPair {
   constructor(p) {
     this.glyphID = p.uint16;
-    this.offset = p.offset16; // Location in EBDT (TODO: figure out what "in" means)
+    this.offset = p.Offset16; // Location in EBDT (TODO: figure out what "in" means)
   }
 }
 

@@ -18,28 +18,28 @@ class GDEF extends SimpleTable {
     this.majorVersion = p.uint16;
     this.minorVersion = p.uint16;
 
-    this.glyphClassDefOffset = p.offset16;
+    this.glyphClassDefOffset = p.Offset16;
     lazy(this, `glyphClassDefs`, () => {
       if (this.glyphClassDefOffset === 0) return undefined;
       p.currentPosition = this.tableStart + this.glyphClassDefOffset;
       return new ClassDefinition(p);
     });
 
-    this.attachListOffset = p.offset16;
+    this.attachListOffset = p.Offset16;
     lazy(this, `attachList`, () => {
       if (this.attachListOffset === 0) return undefined;
       p.currentPosition = this.tableStart + this.attachListOffset;
       return new AttachList(p);
     });
 
-    this.ligCaretListOffset = p.offset16;
+    this.ligCaretListOffset = p.Offset16;
     lazy(this, `ligCaretList`, () => {
       if (this.ligCaretListOffset === 0) return undefined;
       p.currentPosition = this.tableStart + this.ligCaretListOffset;
       return new LigCaretList(p);
     });
 
-    this.markAttachClassDefOffset = p.offset16;
+    this.markAttachClassDefOffset = p.Offset16;
     lazy(this, `markAttachClassDef`, () => {
       if (this.markAttachClassDefOffset === 0) return undefined;
       p.currentPosition = this.tableStart + this.markAttachClassDefOffset;
@@ -47,7 +47,7 @@ class GDEF extends SimpleTable {
     });
 
     if (this.minorVersion >= 2) {
-      this.markGlyphSetsDefOffset = p.offset16;
+      this.markGlyphSetsDefOffset = p.Offset16;
       lazy(this, `markGlyphSetsDef`, () => {
         if (this.markGlyphSetsDefOffset === 0) return undefined;
         p.currentPosition = this.tableStart + this.markGlyphSetsDefOffset;
@@ -56,7 +56,7 @@ class GDEF extends SimpleTable {
     }
 
     if (this.minorVersion === 3) {
-      this.itemVarStoreOffset = p.offset32;
+      this.itemVarStoreOffset = p.Offset32;
       lazy(this, `itemVarStore`, () => {
         if (this.itemVarStoreOffset === 0) return undefined;
         p.currentPosition = this.tableStart + this.itemVarStoreOffset;
@@ -69,10 +69,10 @@ class GDEF extends SimpleTable {
 class AttachList extends ParsedData {
   constructor(p) {
     super(p);
-    this.coverageOffset = p.offset16; // Offset to Coverage table - from beginning of AttachList table
+    this.coverageOffset = p.Offset16; // Offset to Coverage table - from beginning of AttachList table
     this.glyphCount = p.uint16;
     this.attachPointOffsets = [...new Array(this.glyphCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     ); // From beginning of AttachList table (in Coverage Index order)
   }
   getPoint(pointID) {
@@ -92,7 +92,7 @@ class LigCaretList extends ParsedData {
   constructor(p) {
     super(p);
 
-    this.coverageOffset = p.offset16;
+    this.coverageOffset = p.Offset16;
 
     lazy(this, `coverage`, () => {
       p.currentPosition = this.start + this.coverageOffset;
@@ -101,7 +101,7 @@ class LigCaretList extends ParsedData {
 
     this.ligGlyphCount = p.uint16;
     this.ligGlyphOffsets = [...new Array(this.ligGlyphCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     ); // From beginning of LigCaretList table
   }
 
@@ -116,7 +116,7 @@ class LigGlyph extends ParsedData {
     super(p);
     this.caretCount = p.uint16;
     this.caretValueOffsets = [...new Array(this.caretCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     ); // From beginning of LigGlyph table
   }
 
@@ -140,7 +140,7 @@ class CaretValue {
 
     if (this.caretValueFormat === 3) {
       this.coordinate = p.int16;
-      this.deviceOffset = p.offset16; // Offset to Device table (non-variable font) / Variation Index table (variable font) for X or Y value-from beginning of CaretValue table
+      this.deviceOffset = p.Offset16; // Offset to Device table (non-variable font) / Variation Index table (variable font) for X or Y value-from beginning of CaretValue table
     }
   }
 }
@@ -152,7 +152,7 @@ class MarkGlyphSetsTable extends ParsedData {
     this.markGlyphSetTableFormat = p.uint16;
     this.markGlyphSetCount = p.uint16;
     this.coverageOffsets = [...new Array(this.markGlyphSetCount)].map(
-      (_) => p.offset32
+      (_) => p.Offset32
     );
   }
 

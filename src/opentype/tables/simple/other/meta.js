@@ -26,7 +26,7 @@ class DataMap {
     this.parser = p;
 
     this.tag = p.tag;
-    this.dataOffset = p.offset32; // from the beginning of the metadata table to the data for this tag.
+    this.dataOffset = p.Offset32; // from the beginning of the metadata table to the data for this tag.
     this.dataLength = p.uint32;
   }
 
