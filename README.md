@@ -57,13 +57,34 @@ myFont.onload = evt => doSomeFontThings(evt);
 myFont.src = `./fonts/SourceCodeVariable-Roman.otf.woff2`;
 ```
 
+You can also pass in a file directly, e.g. using the [HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). In that case, you'll need to use `fromDataBuffer` instead of `loadFont`, and pass the original filename explicity so that the type of font can be determined from the extension:
+
+```js
+const myFont = new Font(`Adobe Source Code Pro`);
+
+// Grab file frop drop event or file upload
+const file = e.target.files[0];
+
+// Use FileReader to, well, read the file
+const reader = new FileReader();
+reader.readAsArrayBuffer(file);
+
+reader.onload = function() {
+    // Pass the buffer, and the original filename
+    myFont.fromDataBuffer(reader.result, file.name);
+    myFont.onload = e => {
+        // ...
+    };
+};
+```
+
 ## Running this code
 
 I'd recommend using the Node.js `live-server` package (`npm install live-server` after which it's `npx live-server`), which will start up a server _and_ open your browser to the server's index.html page, live-reloading whenever you change things in the code.
 
 Barring that, you can of course use one of the many ways to fire up a quick http server:
 - `http-server` (Node.js package)
-- `python -m SimpleHTTPServer` (when still using python 2.7 - please stop using that btw) 
+- `python -m SimpleHTTPServer` (when still using python 2.7 - please stop using that btw)
 - `python -m http.server` (when using Python 3)
 - `php -S localhost:8000` (if you happen to still have PHP installed)
 - `ruby -run -e httpd . -p 8000` (ruby, obviously)
@@ -83,7 +104,31 @@ Also, if you wish to minify the rolled up version of Font.js, I would recommend 
 
 ## Compatibility
 
-This library works in both the browser as well as [Node.js](##Node.js) v11 or higher.
+This library was designed specifically for use in the browser, but will also run in any version of Node.js that has [esmodule]() support(v12 with feature flags, v14+ natively). Font.js can be imported using the `import` keyword, after which the rest of the code is effectively identical:
+
+```js
+import { Font } from "./Font.js";
+
+const myfont = new Font("My Test Font");
+
+myfont.onerror = evt => console.error(evt);
+
+myfont.onload = function inspectThisFont(evt) {
+    const font = evt.detail.font;
+    const tables = font.opentype.tables;
+    const name = tables.name;
+    const fvar = tables.fvar;
+
+    console.log(`fvar has ${fvar.axisCount} axes, at size ${fvar.axisSize}`)
+    console.log(`fvar has ${fvar.instanceCount} instances:`)
+
+    fvar.instances.forEach(i =>
+        console.log(`subfamily: ${name.get(i.subfamilyNameID)}, postscriptname: ${name.get(i.postScriptNameID)}`)
+    );
+}
+
+myfont.src = "./fonts/MySuperGreatFont-Regular-but-great.ttf";
+```
 
 ## API
 

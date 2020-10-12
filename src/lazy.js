@@ -8,12 +8,12 @@
  * @param {*} getter
  */
 export default function lazy(object, property, getter) {
-    let val;
-    Object.defineProperty(object, property, {
-        get: () => {
-            if (val) return val;
-            val = getter();
-            return val;
-        }
-    })
-};
+  let val;
+  Object.defineProperty(object, property, {
+    get: () => {
+      if (val) return val;
+      val = getter();
+      return val;
+    },
+  });
+}
