@@ -16,7 +16,7 @@ function testGSUB(tables) {
   }
 
   let scripts = GSUB.getSupportedScripts();
-  expect(scripts).toEqual([`DFLT`, `cyrl`, `grek`, `latn`]);
+  expect(scripts).toEqual(Object.keys(expectations));
 
   scripts.forEach((script) => {
     let langsys = GSUB.getSupportedLangSys(script);

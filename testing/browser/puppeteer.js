@@ -20,11 +20,11 @@ let failed = false;
 
     if (failures.length) {
       failed = true;
-      console.error(`${failures.length} tests failed.\n`);
+      console.error(`${failures.length} browser tests failed.\n`);
       failures.forEach((f) => console.error(f));
       console.log(``);
     } else {
-      console.log(`All tests passed.\n`);
+      console.log(`All browser tests passed.\n`);
     }
   } catch (err) {
     console.error(err);
