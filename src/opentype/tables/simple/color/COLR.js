@@ -10,8 +10,8 @@ class COLR extends SimpleTable {
     const { p } = super(dict, dataview);
     this.version = p.uint16;
     this.numBaseGlyphRecords = p.uint16;
-    this.baseGlyphRecordsOffset = p.offset32; // from beginning of COLR table) to Base Glyph records.
-    this.layerRecordsOffset = p.offset32; // from beginning of COLR table) to Layer Records.
+    this.baseGlyphRecordsOffset = p.Offset32; // from beginning of COLR table) to Base Glyph records.
+    this.layerRecordsOffset = p.Offset32; // from beginning of COLR table) to Layer Records.
     this.numLayerRecords = p.uint16;
   }
 

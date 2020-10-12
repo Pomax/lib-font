@@ -5,11 +5,11 @@ class ItemVariationStoreTable {
     this.start = p.currentPosition;
 
     this.format = p.uint16;
-    this.variationRegionListOffset = p.offset32;
+    this.variationRegionListOffset = p.Offset32;
     this.itemVariationDataCount = p.uint16;
     this.itemVariationDataOffsets = [
       ...new Array(this.itemVariationDataCount),
-    ].map((_) => p.offset32);
+    ].map((_) => p.Offset32);
   }
 }
 

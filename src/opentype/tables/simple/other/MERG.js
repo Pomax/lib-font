@@ -11,9 +11,9 @@ class MERG extends SimpleTable {
     const { p } = super(dict, dataview);
     this.version = p.uint16;
     this.mergeClassCount = p.uint16;
-    this.mergeDataOffset = p.offset16; // from... where?
+    this.mergeDataOffset = p.Offset16; // from... where?
     this.classDefCount = p.uint16;
-    this.offsetToClassDefOffsets = p.offset16; // from the start of the MERG table.
+    this.offsetToClassDefOffsets = p.Offset16; // from the start of the MERG table.
 
     // This is a big 2D array
     lazy(this, `mergeEntryMatrix`, () =>

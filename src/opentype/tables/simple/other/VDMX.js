@@ -14,7 +14,7 @@ class VDMX extends SimpleTable {
     this.ratRanges = [...new Array(this.numRatios)].map(
       (_) => new RatioRange(p)
     );
-    this.offsets = [...new Array(this.numRatios)].map((_) => p.offset16); // start of this table to the VDMXGroup table for a corresponding RatioRange record.
+    this.offsets = [...new Array(this.numRatios)].map((_) => p.Offset16); // start of this table to the VDMXGroup table for a corresponding RatioRange record.
     this.VDMXGroups = [...new Array(this.numRecs)].map((_) => new VDMXGroup(p));
   }
 }

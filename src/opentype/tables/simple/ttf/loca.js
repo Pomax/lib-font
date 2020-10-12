@@ -14,9 +14,9 @@ class loca extends SimpleTable {
 
     if (tables.hmtx.indexToLocFormat === 0) {
       this.x2 = true;
-      lazy(this, `offsets`, () => [...new Array(n)].map((_) => p.offset16));
+      lazy(this, `offsets`, () => [...new Array(n)].map((_) => p.Offset16));
     } else {
-      lazy(this, `offsets`, () => [...new Array(n)].map((_) => p.offset32));
+      lazy(this, `offsets`, () => [...new Array(n)].map((_) => p.Offset32));
     }
   }
 

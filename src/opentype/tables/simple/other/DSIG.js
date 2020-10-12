@@ -27,7 +27,7 @@ class SignatureRecord {
   constructor(p) {
     this.format = p.uint32;
     this.length = p.uint32;
-    this.offset = p.offset32; // from the beginning of the DSIG table
+    this.offset = p.Offset32; // from the beginning of the DSIG table
   }
 }
 

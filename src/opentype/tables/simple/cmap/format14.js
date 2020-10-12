@@ -34,8 +34,8 @@ class Format14 {
 class VariationSelector {
   constructor(p) {
     this.varSelector = p.uint24;
-    this.defaultUVSOffset = p.offset32;
-    this.nonDefaultUVSOffset = p.offset32;
+    this.defaultUVSOffset = p.Offset32;
+    this.nonDefaultUVSOffset = p.Offset32;
   }
 }
 

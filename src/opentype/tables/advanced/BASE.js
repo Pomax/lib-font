@@ -12,8 +12,8 @@ class BASE extends SimpleTable {
 
     this.majorVersion = p.uint16;
     this.minorVersion = p.uint16;
-    this.horizAxisOffset = p.offset16; // from beginning of BASE table
-    this.vertAxisOffset = p.offset16; // from beginning of BASE table
+    this.horizAxisOffset = p.Offset16; // from beginning of BASE table
+    this.vertAxisOffset = p.Offset16; // from beginning of BASE table
 
     lazy(
       this,
@@ -29,7 +29,7 @@ class BASE extends SimpleTable {
     );
 
     if (this.majorVersion === 1 && this.minorVersion === 1) {
-      this.itemVarStoreOffset = p.offset32; // from beginning of BASE table
+      this.itemVarStoreOffset = p.Offset32; // from beginning of BASE table
       lazy(
         this,
         `itemVarStore`,
@@ -50,8 +50,8 @@ class AxisTable extends SimpleTable {
   constructor(dict, dataview) {
     const { p } = super(dict, dataview, `AxisTable`);
 
-    this.baseTagListOffset = p.offset16; // from beginning of Axis table
-    this.baseScriptListOffset = p.offset16; // from beginning of Axis table
+    this.baseTagListOffset = p.Offset16; // from beginning of Axis table
+    this.baseScriptListOffset = p.Offset16; // from beginning of Axis table
 
     lazy(
       this,
@@ -101,7 +101,7 @@ class BaseScriptListTable extends SimpleTable {
 class BaseScriptRecord {
   constructor(baseScriptListTableStart, p) {
     this.baseScriptTag = p.tag;
-    this.baseScriptOffset = p.offset16; // from beginning of BaseScriptList
+    this.baseScriptOffset = p.Offset16; // from beginning of BaseScriptList
     lazy(this, `baseScriptTable`, () => {
       p.currentPosition = baseScriptListTableStart + this.baseScriptOffset;
       return new BaseScriptTable(p);
@@ -112,8 +112,8 @@ class BaseScriptRecord {
 class BaseScriptTable {
   constructor(p) {
     this.start = p.currentPosition;
-    this.baseValuesOffset = p.offset16; // from beginning of BaseScript table
-    this.defaultMinMaxOffset = p.offset16; // from beginning of BaseScript table
+    this.baseValuesOffset = p.Offset16; // from beginning of BaseScript table
+    this.defaultMinMaxOffset = p.Offset16; // from beginning of BaseScript table
     this.baseLangSysCount = p.uint16;
     this.baseLangSysRecords = [...new Array(this.baseLangSysCount)].map(
       (_) => new BaseLangSysRecord(this.start, p)
@@ -134,7 +134,7 @@ class BaseScriptTable {
 class BaseLangSysRecord {
   constructor(baseScriptTableStart, p) {
     this.baseLangSysTag = p.tag;
-    this.minMaxOffset = p.offset16; // from beginning of BaseScript table
+    this.minMaxOffset = p.Offset16; // from beginning of BaseScript table
     lazy(this, `minMax`, () => {
       p.currentPosition = baseScriptTableStart + this.minMaxOffset;
       return new MinMaxTable(p);
@@ -150,7 +150,7 @@ class BaseValuesTable {
     this.defaultBaselineIndex = p.uint16;
     this.baseCoordCount = p.uint16;
     this.baseCoords = [...new Array(this.baseCoordCount)].map(
-      (_) => p.offset16
+      (_) => p.Offset16
     );
   }
   getTable(id) {
@@ -161,8 +161,8 @@ class BaseValuesTable {
 
 class MinMaxTable {
   constructor(p) {
-    this.minCoord = p.offset16;
-    this.maxCoord = p.offset16;
+    this.minCoord = p.Offset16;
+    this.maxCoord = p.Offset16;
     this.featMinMaxCount = p.uint16;
 
     const recordStart = p.currentPosition;
@@ -178,8 +178,8 @@ class MinMaxTable {
 class FeatMinMaxRecord {
   constructor(p) {
     this.featureTableTag = p.tag;
-    this.minCoord = p.offset16;
-    this.maxCoord = p.offset16;
+    this.minCoord = p.Offset16;
+    this.maxCoord = p.Offset16;
   }
 }
 
@@ -192,7 +192,7 @@ class BaseCoordTable {
       this.baseCoordPoint = p.uint16;
     }
     if (this.baseCoordFormat === 3) {
-      this.deviceTable = p.offset16;
+      this.deviceTable = p.Offset16;
     }
   }
 }

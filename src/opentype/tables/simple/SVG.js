@@ -11,7 +11,7 @@ class SVG extends SimpleTable {
     const { p } = super(dict, dataview);
 
     this.version = uint16;
-    this.offsetToSVGDocumentList = p.offset32; // from the start of the SVG table
+    this.offsetToSVGDocumentList = p.Offset32; // from the start of the SVG table
 
     p.currentPosition = this.tableStart + this.offsetToSVGDocumentList;
     this.documentList = new SVGDocumentList(p);
@@ -63,7 +63,7 @@ class SVGDocumentRecord {
   constructor(p) {
     this.startGlyphID = p.uint16;
     this.endGlyphID = p.uint16;
-    this.svgDocOffset = p.offset32; // from the beginning of the SVGDocumentList
+    this.svgDocOffset = p.Offset32; // from the beginning of the SVGDocumentList
     this.svgDocLength = p.uint32;
   }
 }

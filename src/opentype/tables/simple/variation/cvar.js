@@ -12,7 +12,7 @@ class cvar extends SimpleTable {
     this.majorVersion = uint16;
     this.minorVersion = uint16;
     this.tupleVariationCount = uint16;
-    this.dataOffset = p.offset32; // from the start of the table
+    this.dataOffset = p.Offset32; // from the start of the table
 
     // FIXME: this is only correct if we can properly read full Tuple Variation Header...
     lazy(this`tupleVariationHeaders`, () =>

@@ -4,6 +4,11 @@ import { ParsedData } from "../../../../parser.js";
  * ...
  */
 class ScriptList extends ParsedData {
+  static EMPTY = {
+    scriptCount: 0,
+    scriptRecords: []
+  }
+
   constructor(p) {
     super(p);
     this.scriptCount = p.uint16;
@@ -19,7 +24,7 @@ class ScriptList extends ParsedData {
 class ScriptRecord {
   constructor(p) {
     this.scriptTag = p.tag;
-    this.scriptOffset = p.offset16; // Offset to Script table, from beginning of ScriptList
+    this.scriptOffset = p.Offset16; // Offset to Script table, from beginning of ScriptList
   }
 }
 
@@ -29,7 +34,7 @@ class ScriptRecord {
 class ScriptTable extends ParsedData {
   constructor(p) {
     super(p);
-    this.defaultLangSys = p.offset16; // Offset to default LangSys table, from beginning of Script table — may be NULL
+    this.defaultLangSys = p.Offset16; // Offset to default LangSys table, from beginning of Script table — may be NULL
     this.langSysCount = p.uint16;
     this.langSysRecords = [...new Array(this.langSysCount)].map(
       (_) => new LangSysRecord(p)
@@ -43,7 +48,7 @@ class ScriptTable extends ParsedData {
 class LangSysRecord {
   constructor(p) {
     this.langSysTag = p.tag;
-    this.langSysOffset = p.offset16; // Offset to LangSys table, from beginning of Script table
+    this.langSysOffset = p.Offset16; // Offset to LangSys table, from beginning of Script table
   }
 }
 
@@ -52,7 +57,7 @@ class LangSysRecord {
  */
 class LangSysTable {
   constructor(p) {
-    this.lookupOrder = p.offset16;
+    this.lookupOrder = p.Offset16;
     this.requiredFeatureIndex = p.uint16;
     this.featureIndexCount = p.uint16;
     this.featureIndices = [...new Array(this.featureIndexCount)].map(

@@ -1,6 +1,6 @@
 class BitmapSize {
   constructor(p) {
-    this.indexSubTableArrayOffset = p.offset32; // from beginning of CBLC
+    this.indexSubTableArrayOffset = p.Offset32; // from beginning of CBLC
     this.indexTablesSize = p.uint32;
     this.numberofIndexSubTables = p.uint32;
     this.colorRef = p.uint32;
@@ -47,7 +47,7 @@ class IndexSubHeader {
   constructor(p) {
     this.indexFormat = p.uint16;
     this.imageFormat = p.uint16;
-    this.imageDataOffset = p.offset32; // Offset to image data in EBDT table.
+    this.imageDataOffset = p.Offset32; // Offset to image data in EBDT table.
   }
 }
 
@@ -86,7 +86,7 @@ class IndexSubTableArray {
   constructor(p) {
     this.firstGlyphIndex = p.uint16;
     this.lastGlyphIndex = p.uint16;
-    this.additionalOffsetToIndexSubtable = p.offset32; // from beginning of EBLC.
+    this.additionalOffsetToIndexSubtable = p.Offset32; // from beginning of EBLC.
   }
 }
 

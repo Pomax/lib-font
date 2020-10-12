@@ -199,8 +199,24 @@ class Font extends EventManager {
      * Does this font support the specified character?
      * @param {*} char
      */
+    getGlyphId(char) {
+        return this.opentype.tables.cmap.getGlyphId(char);
+    }
+
+    /**
+     * find the actual "letter" for a given glyphid
+     * @param {*} glyphid
+     */
+    reverse(glyphid) {
+        return this.opentype.tables.cmap.reverse(glyphid);
+    }
+
+    /**
+     * Does this font support the specified character?
+     * @param {*} char
+     */
     supports(char) {
-        return this.opentype.tables.cmap.supports(char) !== false;
+        return this.getGlyphId(char) !== 0
     }
 
     /**
