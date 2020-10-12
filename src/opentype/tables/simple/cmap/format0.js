@@ -12,6 +12,10 @@ class Format0 {
     return 0 <= charCode && charCode <= 255;
   }
 
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 0`);
+  }
+
   getSupportedCharCodes() {
     return [{ start: 1, end: 256 }];
   }

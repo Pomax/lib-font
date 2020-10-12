@@ -12,13 +12,14 @@ function equal(a, b) {
     return (a === b);
 }
 
-function note(msg, style) {
+function note(msg, style, classes) {
     if (!rollout) {
         return console.log(msg);
     }
     let div = document.createElement('div')
     div.textContent = msg;
-    div.setAttribute(`style`, style);
+    if (style) div.setAttribute(`style`, style);
+    if (classes) div.setAttribute(`class`, classes);
     rollout.appendChild(div);
 }
 
@@ -27,11 +28,11 @@ function heading(msg) {
 }
 
 function pass(why) {
-    note(`${logPad.join('')}✔️${why}`);
+    note(`${logPad.join('')}${why}`, false, `pass`);
 }
 
 function fail (a, b, why) {
-    note(`${logPad.join('')}❌${why} is false: ${a} is not ${b}`);
+    note(`${logPad.join('')}${why} is false: ${a} is not ${b}`, false, `fail`);
 }
 
 function assertEqual(a, b, why) {

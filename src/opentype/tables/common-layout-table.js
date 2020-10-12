@@ -28,7 +28,11 @@ class CommonLayoutTable extends SimpleTable {
       this.featureVariationsOffset = p.Offset32;
     }
 
-    const no_content = !(this.scriptListOffset || this.featureListOffset || this.lookupListOffset);
+    const no_content = !(
+      this.scriptListOffset ||
+      this.featureListOffset ||
+      this.lookupListOffset
+    );
 
     lazy(this, `scriptList`, () => {
       if (no_content) return ScriptList.EMPTY;
@@ -127,7 +131,9 @@ class CommonLayoutTable extends SimpleTable {
     if (parseInt(indexOrTag) == indexOrTag) {
       record = this.featureList.featureRecords[indexOrTag];
     } else {
-      record = this.featureList.featureRecords.find(f => f.featureTag === indexOrTag);
+      record = this.featureList.featureRecords.find(
+        (f) => f.featureTag === indexOrTag
+      );
     }
     if (!record) return;
     this.parser.currentPosition = this.featureList.start + record.featureOffset;

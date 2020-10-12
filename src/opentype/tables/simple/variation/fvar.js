@@ -32,7 +32,9 @@ class fvar extends SimpleTable {
       let instances = [];
       for (let i = 0; i < this.instanceCount; i++) {
         p.currentPosition = instanceStart + i * this.instanceSize;
-        instances.push(new InstanceRecord(p, this.axisCount, this.instanceSize));
+        instances.push(
+          new InstanceRecord(p, this.axisCount, this.instanceSize)
+        );
       }
       return instances;
     });

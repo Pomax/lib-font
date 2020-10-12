@@ -217,7 +217,7 @@ function testSFNT(SFNT, isTTF) { try {
         assertEqual(scripts, [`DFLT`, `cyrl`, `grek`, `latn`], `Four supported scripts`);
         const latn = GPOS.getScriptTable(`latn`);
         const ls = GPOS.getSupportedLangSys(latn);
-        assertEqual(ls, [`ATH `,`NSM `,`SKS `], `Script 'latn' has three lang sys entries`);
+        assertEqual(ls, [`dflt`, `ATH `,`NSM `,`SKS `], `Script 'latn' has four lang sys entries`);
         const langsys = GPOS.getLangSysTable(latn, `NSM `);
         const features = GPOS.getFeatures(langsys);
         assertEqual(features.length, 5, `Northern Sami supports 5 OpenType features`)
@@ -237,7 +237,7 @@ function testSFNT(SFNT, isTTF) { try {
         assertEqual(scripts, [`DFLT`, `cyrl`, `grek`, `latn`], `Four supported scripts`);
         const latn = GSUB.getScriptTable(`latn`);
         const ls = GSUB.getSupportedLangSys(latn);
-        assertEqual(ls, [`ATH `,`NSM `,`SKS `], `Script 'latn' has three lang sys entries`);
+        assertEqual(ls, [`dflt`, `ATH `,`NSM `,`SKS `], `Script 'latn' has four lang sys entries`);
         const langsys = GSUB.getLangSysTable(latn, `NSM `);
         const features = GSUB.getFeatures(langsys);
         assertEqual(features.length, 34, `Northern Sami supports 34 OpenType features`);

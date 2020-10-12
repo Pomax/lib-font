@@ -48,7 +48,7 @@ class LookupTable extends ParsedData {
 
   // FIXME: make this a lazy .subtables array instead?
   getSubTable(index) {
-    const builder = (this.ctType === `GSUB`) ? GSUBtables : GPOStables;
+    const builder = this.ctType === `GSUB` ? GSUBtables : GPOStables;
     this.parser.currentPosition = this.start + this.subtableOffsets[index];
     return builder.buildSubtable(this.lookupType, this.parser);
   }

@@ -22,6 +22,10 @@ class Format13 {
     );
   }
 
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 13`);
+  }
+
   getSupportedCharCodes(preservePropNames = false) {
     if (preservePropNames) return this.groups;
     return this.groups.map((v) => ({

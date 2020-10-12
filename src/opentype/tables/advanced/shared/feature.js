@@ -3,8 +3,8 @@ import { ParsedData } from "../../../../parser.js";
 class FeatureList extends ParsedData {
   static EMPTY = {
     featureCount: 0,
-    featureRecords: []
-  }
+    featureRecords: [],
+  };
 
   constructor(p) {
     super(p);

@@ -21,6 +21,10 @@ class Format10 {
     return charCode - this.startCharCode;
   }
 
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 10`);
+  }
+
   getSupportedCharCodes(preservePropNames = false) {
     if (preservePropNames) {
       return [

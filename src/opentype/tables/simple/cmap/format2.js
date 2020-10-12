@@ -33,6 +33,10 @@ class Format2 {
     return first <= low && low <= last;
   }
 
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 2`);
+  }
+
   getSupportedCharCodes(preservePropNames = false) {
     if (preservePropNames) {
       return this.subHeaders.map((h) => ({

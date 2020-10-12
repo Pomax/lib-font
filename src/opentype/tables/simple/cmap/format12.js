@@ -22,6 +22,17 @@ class Format12 {
     );
   }
 
+  reverse(glyphID) {
+    for(let group of this.groups) {
+      let start = group.startGlyphID;
+      if (start > glyphID) continue;
+      if (start === glyphID) return group.startCharCode;
+      let end = start + (group.endCharCode - group.startCharCode);
+      if (end < glyphID) continue;
+      return group.startCharCode + (glyphID - start);
+    }
+  }
+
   getSupportedCharCodes(preservePropNames = false) {
     if (preservePropNames) return this.groups;
     return this.groups.map((v) => ({

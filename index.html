@@ -2,22 +2,35 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Font.js testing page</title>
+        <title>Font.js unit tests</title>
         <script src="./lib/inflate.js" defer></script>
         <script src="./lib/unbrotli.js" defer></script>
         <script src="./Font.js" type="module" defer></script>
-        <script src="./index.js" defer></script>
+        <script src="./testing/browser/test.js" type="module" defer></script>
         <style>
-            span {
-                font-family: "Adobe Source Code Pro";
+            div {
+                white-space: pre-wrap;
+                border: 1px solid black;
+                border-bottom: none;
             }
+            div:first-child { border-bottom: none; }
+            div:last-child { border-bottom: 1px solid black; }
+            div:nth-child(2n-1) { background-color: #EEE; }
+            div.pass:before { content: "✔️"; }
+            div.fail:before { content: "❌"; }
         </style>
     </head>
     <body>
-        <p>Loading all fonts, and applying them as CSS webfont. <a href="./test/index.html">Click here</a> to run tests. <a href="https://github.com/Pomax/Font.js">Click here</a> to go to the repo.</p>
-
-        <section id='matrix'>
-            <h2>matrix</h2>
-        </section>
+        <h1>Test Results</h1>
+        <h3>Back to <a href="../index.html">index.html</a></h3>
     </body>
+    <script>
+        const tests = [];
+        document.addEventListener(`testend`, e => {
+            tests.push(e.detail.test);
+            if (tests.length === 2) {
+                document.body.id = "finished";
+            }
+        });
+        </script>
 </html>

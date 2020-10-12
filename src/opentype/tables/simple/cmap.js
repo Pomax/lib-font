@@ -40,7 +40,7 @@ class cmap extends SimpleTable {
   }
 
   reverse(glyphid) {
-    for(let i=0; i<this.numTables; i++) {
+    for (let i = 0; i < this.numTables; i++) {
       let code = this.getSubTable(i).reverse(glyphid);
       if (code) return code;
     }
