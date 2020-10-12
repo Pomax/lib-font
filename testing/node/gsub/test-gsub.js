@@ -1,7 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { expectations } from "./expectations.js";
 
-
 function testGSUB(tables) {
   const { cmap, name, GSUB } = tables;
 
@@ -33,7 +32,9 @@ function testGSUB(tables) {
       features.forEach((feature) => {
         const lookupIDs = feature.lookupListIndices;
 
-        expect(lookupIDs).toEqual(expectations[script].features[lang].lookups[feature.featureTag]);
+        expect(lookupIDs).toEqual(
+          expectations[script].features[lang].lookups[feature.featureTag]
+        );
 
         lookupIDs.forEach((id) => {
           const lookup = GSUB.getLookup(id);
@@ -68,7 +69,13 @@ function testGSUB(tables) {
                     ...ligatureTable.componentGlyphIDs,
                   ];
 
-                  console.log(sequence.map(letterFor), ` -> `, letterFor(ligatureTable.ligatureGlyph));
+                  console.log(
+                    `${script}[${lang}].${feature.featureTag}[${id}]: ligature [ ${
+                      sequence.map(letterFor).join(` + `)
+                    } ] -> ${
+                      letterFor(ligatureTable.ligatureGlyph)
+                    }`
+                  );
                 });
               });
             });

@@ -11,7 +11,7 @@
   "scripts": {
     "start": "",
     "clean": "prettier --write \"src/**/*.js\"",
-    "test": "run-s test:jest test:browser",
+    "test": "run-s clean test:jest test:browser",
     "test:browser": "run-p test:server test:puppeteer",
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",

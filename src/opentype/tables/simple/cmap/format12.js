@@ -23,7 +23,7 @@ class Format12 {
   }
 
   reverse(glyphID) {
-    for(let group of this.groups) {
+    for (let group of this.groups) {
       let start = group.startGlyphID;
       if (start > glyphID) continue;
       if (start === glyphID) return group.startCharCode;
