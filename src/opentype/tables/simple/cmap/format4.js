@@ -1,8 +1,9 @@
 import lazy from "../../../../lazy.js";
-import { ParsedData } from "../../../../parser.js";
+import { Subtable } from "./subtable.js";
 
-class Format4 {
-  constructor(p) {
+class Format4 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 4;
     this.length = p.uint16;
     this.language = p.uint16;

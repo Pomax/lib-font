@@ -1,8 +1,10 @@
 import lazy from "../../../../lazy.js";
+import { Subtable } from "./subtable.js";
 
 // basically Format 6, but for 32 bit characters
-class Format10 {
-  constructor(p) {
+class Format10 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 10;
     p.uint16;
     this.length = p.uint32;
