@@ -15,9 +15,10 @@ class Format6 {
 
   supports(charCode) {
     if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
-    if (charCode < this.firstCode) return false;
-    if (charCode > this.firstCode + this.entryCount) return false;
-    return charCode - this.firstCode;
+    if (charCode < this.firstCode) return {};
+    if (charCode > this.firstCode + this.entryCount) return {};
+    const code = charCode - this.firstCode;
+    return { code, unicode: String.fromCodePoint(code) };
   }
 
   reverse(glyphID) {

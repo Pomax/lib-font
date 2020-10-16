@@ -82,8 +82,9 @@ class Format4 {
 
   reverse(glyphID) {
     let s = this.segments.find((v) => v.glyphIDs.includes(glyphID));
-    if (!s) return;
-    return s.startCode + s.glyphIDs.indexOf(glyphID);
+    if (!s) return {};
+    const code = s.startCode + s.glyphIDs.indexOf(glyphID);
+    return { code, unicode: String.fromCodePoint(code) };
   }
 
   getGlyphId(charCode) {

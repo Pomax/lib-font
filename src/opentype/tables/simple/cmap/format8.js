@@ -24,6 +24,7 @@ class Format8 {
 
   reverse(glyphID) {
     console.warn(`reverse not implemented for cmap subtable format 8`);
+    return {};
   }
 
   getSupportedCharCodes(preservePropNames = false) {

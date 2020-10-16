@@ -29,8 +29,10 @@ class Format12 {
       if (start === glyphID) return group.startCharCode;
       let end = start + (group.endCharCode - group.startCharCode);
       if (end < glyphID) continue;
-      return group.startCharCode + (glyphID - start);
+      const code = group.startCharCode + (glyphID - start);
+      return { code, unicode: String.fromCodePoint(code) };
     }
+    return {};
   }
 
   getSupportedCharCodes(preservePropNames = false) {

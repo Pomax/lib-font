@@ -35,6 +35,7 @@ class Format2 {
 
   reverse(glyphID) {
     console.warn(`reverse not implemented for cmap subtable format 2`);
+    return {};
   }
 
   getSupportedCharCodes(preservePropNames = false) {

@@ -9,9 +9,8 @@ function testGSUB(tables) {
   expect(name).toBeDefined();
 
   function letterFor(glyphid) {
-    let code = cmap.reverse(glyphid);
-    let letter = code ? String.fromCharCode(code) : `[${glyphid}:??]`;
-    return letter;
+    let reversed = cmap.reverse(glyphid);
+    return reversed.unicode ?? `[${glyphid}:??]`;
   }
 
   let scripts = GSUB.getSupportedScripts();

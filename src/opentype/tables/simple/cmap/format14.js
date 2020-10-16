@@ -28,6 +28,7 @@ class Format14 {
 
   reverse(glyphID) {
     console.warn(`reverse not implemented for cmap subtable format 14`);
+    return {};
   }
 
   getSupportedVariations() {
