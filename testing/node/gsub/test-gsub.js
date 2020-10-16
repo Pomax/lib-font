@@ -58,19 +58,20 @@ function testGSUB(tables) {
             lookup.subtableOffsets.forEach((_, i) => {
               const subtable = lookup.getSubTable(i);
               const coverage = subtable.getCoverageTable();
-              subtable.ligatureSetOffsets.forEach((_, i) => {
-                const ligatureSet = subtable.getLigatureSet(i);
 
-                ligatureSet.ligatureOffsets.forEach((_, i) => {
-                  const ligatureTable = ligatureSet.getLigature(i);
+              subtable.ligatureSetOffsets.forEach((_, setIndex) => {
+                const ligatureSet = subtable.getLigatureSet(setIndex);
+
+                ligatureSet.ligatureOffsets.forEach((_, ligIndex) => {
+                  const ligatureTable = ligatureSet.getLigature(ligIndex);
 
                   const sequence = [
-                    coverage.glyphArray[0],
+                    coverage.glyphArray[setIndex],
                     ...ligatureTable.componentGlyphIDs,
                   ];
 
                   console.log(
-                    `${script}[${lang}].${feature.featureTag}[${id}]: ligature [ ${
+                    `ligature set [${setIndex}], ligature table [${ligIndex}]: ${script}[${lang}].${feature.featureTag}[${id}]: ligature (coverage:${coverage.coverageFormat}) [ ${
                       sequence.map(letterFor).join(` + `)
                     } ] -> ${
                       letterFor(ligatureTable.ligatureGlyph)
