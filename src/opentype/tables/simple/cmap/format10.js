@@ -1,8 +1,10 @@
 import lazy from "../../../../lazy.js";
+import { Subtable } from "./subtable.js";
 
 // basically Format 6, but for 32 bit characters
-class Format10 {
-  constructor(p) {
+class Format10 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 10;
     p.uint16;
     this.length = p.uint32;
@@ -19,6 +21,11 @@ class Format10 {
     if (charCode < this.startCharCode) return false;
     if (charCode > this.startCharCode + this.numChars) return false;
     return charCode - this.startCharCode;
+  }
+
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 10`);
+    return {};
   }
 
   getSupportedCharCodes(preservePropNames = false) {

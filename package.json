@@ -9,8 +9,13 @@
     "src": "src"
   },
   "scripts": {
+    "start": "",
     "clean": "prettier --write \"src/**/*.js\"",
-    "jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./test/"
+    "test": "run-s clean test:jest test:browser",
+    "test:browser": "run-p test:server test:puppeteer",
+    "test:server": "node ./testing/browser/server.js",
+    "test:puppeteer": "node ./testing/browser/puppeteer.js",
+    "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/"
   },
   "repository": {
     "type": "git",
@@ -32,7 +37,11 @@
   "homepage": "https://github.com/Pomax/font.js#readme",
   "devDependencies": {
     "cross-env": "^7.0.2",
+    "express": "^4.17.1",
     "jest": "^26.5.3",
-    "prettier": "^2.1.1"
+    "npm-run-all": "^4.1.5",
+    "open-cli": "^6.0.1",
+    "prettier": "^2.1.1",
+    "puppeteer": "^5.3.1"
   }
 }

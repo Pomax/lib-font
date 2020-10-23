@@ -6,8 +6,8 @@ import { ParsedData } from "../../../../parser.js";
 class ScriptList extends ParsedData {
   static EMPTY = {
     scriptCount: 0,
-    scriptRecords: []
-  }
+    scriptRecords: [],
+  };
 
   constructor(p) {
     super(p);

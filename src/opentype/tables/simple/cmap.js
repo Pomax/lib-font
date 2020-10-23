@@ -40,7 +40,7 @@ class cmap extends SimpleTable {
   }
 
   reverse(glyphid) {
-    for(let i=0; i<this.numTables; i++) {
+    for (let i = 0; i < this.numTables; i++) {
       let code = this.getSubTable(i).reverse(glyphid);
       if (code) return code;
     }
@@ -77,13 +77,13 @@ class cmap extends SimpleTable {
  */
 class EncodingRecord {
   constructor(p, tableStart) {
-    this.platformID = p.uint16;
-    this.encodingID = p.uint16;
-    this.offset = p.Offset32; // from cmap table start
+    const platformID = (this.platformID = p.uint16);
+    const encodingID = (this.encodingID = p.uint16);
+    const offset = (this.offset = p.Offset32); // from cmap table start
 
     lazy(this, `table`, () => {
-      p.currentPosition = tableStart + this.offset;
-      return createSubTable(p);
+      p.currentPosition = tableStart + offset;
+      return createSubTable(p, platformID, encodingID);
     });
   }
 }

@@ -1,7 +1,9 @@
 import lazy from "../../../../lazy.js";
+import { Subtable } from "./subtable.js";
 
-class Format14 {
-  constructor(p) {
+class Format14 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.subTableStart = p.currentPosition;
     this.format = 14;
     this.length = p.uint32;
@@ -24,6 +26,11 @@ class Format14 {
   supportsVariation(variation) {
     let v = this.varSelector.find((uvs) => uvs.varSelector === variation);
     return v ? v : false;
+  }
+
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 14`);
+    return {};
   }
 
   getSupportedVariations() {

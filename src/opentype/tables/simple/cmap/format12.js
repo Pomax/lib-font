@@ -1,8 +1,10 @@
 import lazy from "../../../../lazy.js";
+import { Subtable } from "./subtable.js";
 
 // basically Format 8, but for 32 bit characters
-class Format12 {
-  constructor(p) {
+class Format12 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 12;
     p.uint16;
     this.length = p.uint32;
@@ -20,6 +22,19 @@ class Format12 {
         (s) => s.startCharCode <= charCode && charCode <= s.endCharCode
       ) !== -1
     );
+  }
+
+  reverse(glyphID) {
+    for (let group of this.groups) {
+      let start = group.startGlyphID;
+      if (start > glyphID) continue;
+      if (start === glyphID) return group.startCharCode;
+      let end = start + (group.endCharCode - group.startCharCode);
+      if (end < glyphID) continue;
+      const code = group.startCharCode + (glyphID - start);
+      return { code, unicode: String.fromCodePoint(code) };
+    }
+    return {};
   }
 
   getSupportedCharCodes(preservePropNames = false) {

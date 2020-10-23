@@ -1,8 +1,9 @@
 import lazy from "../../../../lazy.js";
-import { ParsedData } from "../../../../parser.js";
+import { Subtable } from "./subtable.js";
 
-class Format4 {
-  constructor(p) {
+class Format4 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 4;
     this.length = p.uint16;
     this.language = p.uint16;
@@ -26,8 +27,10 @@ class Format4 {
     );
 
     const idDeltaPosition = startCodePosition + this.segCountX2;
-    lazy(this, `idDelta`, () =>
-      p.readBytes(this.segCount, idDeltaPosition, 16, true) // Note that idDelta values are signed
+    lazy(
+      this,
+      `idDelta`,
+      () => p.readBytes(this.segCount, idDeltaPosition, 16, true) // Note that idDelta values are signed
     );
 
     const idRangePosition = idDeltaPosition + this.segCountX2;
@@ -36,35 +39,38 @@ class Format4 {
     );
 
     const glyphIdArrayPosition = idRangePosition + this.segCountX2;
-    const glyphIdArrayLength = this.length - (glyphIdArrayPosition - this.tableStart);
+    const glyphIdArrayLength =
+      this.length - (glyphIdArrayPosition - this.tableStart);
     lazy(this, `glyphIdArray`, () =>
       p.readBytes(glyphIdArrayLength, glyphIdArrayPosition, 16)
     );
 
     // also, while not in the spec, we really want to organise all that data into convenient segments
-    lazy(this, `segments`, () => this.buildSegments(idRangePosition, glyphIdArrayPosition, p));
+    lazy(this, `segments`, () =>
+      this.buildSegments(idRangePosition, glyphIdArrayPosition, p)
+    );
   }
 
   buildSegments(idRangePosition, glyphIdArrayPosition, p) {
     const build = (_, i) => {
       let startCode = this.startCode[i],
-          endCode = this.endCode[i],
-          idDelta = this.idDelta[i],
-          idRangeOffset = this.idRangeOffset[i],
-          idRangeOffsetPointer = idRangePosition + 2*i,
-          glyphIDs = [];
+        endCode = this.endCode[i],
+        idDelta = this.idDelta[i],
+        idRangeOffset = this.idRangeOffset[i],
+        idRangeOffsetPointer = idRangePosition + 2 * i,
+        glyphIDs = [];
 
       // simple case
       if (idRangeOffset === 0) {
-        for(let i=startCode + idDelta, e=endCode + idDelta; i<=e; i++) {
+        for (let i = startCode + idDelta, e = endCode + idDelta; i <= e; i++) {
           glyphIDs.push(i);
         }
       }
 
       // not so simple case
       else {
-        for(let i=0, e=endCode-startCode; i<=e; i++) {
-          p.currentPosition = idRangeOffsetPointer + idRangeOffset + i*2;
+        for (let i = 0, e = endCode - startCode; i <= e; i++) {
+          p.currentPosition = idRangeOffsetPointer + idRangeOffset + i * 2;
           glyphIDs.push(p.uint16);
         }
       }
@@ -76,15 +82,16 @@ class Format4 {
   }
 
   reverse(glyphID) {
-    let s = this.segments.find(v => v.glyphIDs.includes(glyphID));
-    if (!s) return;
-    return s.startCode + s.glyphIDs.indexOf(glyphID);
+    let s = this.segments.find((v) => v.glyphIDs.includes(glyphID));
+    if (!s) return {};
+    const code = s.startCode + s.glyphIDs.indexOf(glyphID);
+    return { code, unicode: String.fromCodePoint(code) };
   }
 
   getGlyphId(charCode) {
     if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
-    let segment = this.segments.find(s =>
-      s.startCode <= charCode && charCode <= s.endCode
+    let segment = this.segments.find(
+      (s) => s.startCode <= charCode && charCode <= s.endCode
     );
     if (!segment) return 0;
     return segment.glyphIDs[charCode - segment.startCode];

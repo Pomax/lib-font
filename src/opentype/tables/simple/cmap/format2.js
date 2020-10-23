@@ -1,7 +1,9 @@
 import lazy from "../../../../lazy.js";
+import { Subtable } from "./subtable.js";
 
-class Format2 {
-  constructor(p) {
+class Format2 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 2;
     this.length = p.uint16;
     this.language = p.uint16;
@@ -31,6 +33,11 @@ class Format2 {
     const first = subheader.firstCode;
     const last = first + subheader.entryCount;
     return first <= low && low <= last;
+  }
+
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 2`);
+    return {};
   }
 
   getSupportedCharCodes(preservePropNames = false) {

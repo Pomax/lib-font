@@ -1,5 +1,8 @@
-class Format0 {
-  constructor(p) {
+import { Subtable } from "./subtable.js";
+
+class Format0 extends Subtable {
+  constructor(p, platformID, encodingID) {
+    super(p, platformID, encodingID);
     this.format = 0;
     this.length = p.uint16;
     this.language = p.uint16;
@@ -10,6 +13,11 @@ class Format0 {
   supports(charCode) {
     if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
     return 0 <= charCode && charCode <= 255;
+  }
+
+  reverse(glyphID) {
+    console.warn(`reverse not implemented for cmap subtable format 0`);
+    return {};
   }
 
   getSupportedCharCodes() {
