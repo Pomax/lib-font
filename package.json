@@ -4,6 +4,8 @@
   "description": "A JS based OpenType font inspector",
   "main": "Font.js",
   "type": "module",
+  "author": "Pomax",
+  "license": "LICENSE.md",
   "directories": {
     "lib": "lib",
     "src": "src"
@@ -30,8 +32,6 @@
     "inspect",
     "debug"
   ],
-  "author": "Pomax",
-  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/Pomax/font.js/issues"
   },
