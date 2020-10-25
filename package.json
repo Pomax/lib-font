@@ -1,6 +1,6 @@
 {
-  "name": "font.js",
-  "version": "0.78.0",
+  "name": "font-js",
+  "version": "1.0.0",
   "description": "A JS based OpenType font inspector",
   "main": "Font.js",
   "type": "module",
@@ -9,13 +9,14 @@
     "src": "src"
   },
   "scripts": {
-    "start": "",
+    "start": "npm test",
     "clean": "prettier --write \"src/**/*.js\"",
-    "test": "run-s clean test:jest test:browser",
+    "test": "run-s clean test:jest test:browser build",
     "test:browser": "run-p test:server test:puppeteer",
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
-    "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/"
+    "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/",
+    "build": "rollup --no-treeshake --format=esm Font.js > dist/font.js"
   },
   "repository": {
     "type": "git",
@@ -42,6 +43,7 @@
     "npm-run-all": "^4.1.5",
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
-    "puppeteer": "^5.3.1"
+    "puppeteer": "^5.3.1",
+    "rollup": "^2.32.1"
   }
 }

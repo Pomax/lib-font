@@ -31,7 +31,8 @@ if(!fetch) {
         });
     };
 
-    import('fs').then(fs => {
+    import('fs')
+    .then(fs => {
         fetch = async function(path) {
             return new Promise((resolve, reject) => {
                 fs.readFile(path, (err, data) => {
@@ -48,6 +49,10 @@ if(!fetch) {
             let instruction = backlog.shift();
             fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
         }
+    })
+    .catch(err => {
+        console.error(err);
+        throw new Error(`Font.js cannot run unless either the Fetch API or Node's filesystem module is available.`);
     });
 }
 

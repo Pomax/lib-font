@@ -69,13 +69,13 @@ function testGSUB(tables) {
                     ...ligatureTable.componentGlyphIDs,
                   ];
 
-                  console.log(
-                    `ligature set [${setIndex}], ligature table [${ligIndex}]: ${script}[${lang}].${feature.featureTag}[${id}]: ligature (coverage:${coverage.coverageFormat}) [ ${
-                      sequence.map(letterFor).join(` + `)
-                    } ] -> ${
-                      letterFor(ligatureTable.ligatureGlyph)
-                    }`
-                  );
+                  // console.log(
+                  //   `ligature set [${setIndex}], ligature table [${ligIndex}]: ${script}[${lang}].${feature.featureTag}[${id}]: ligature (coverage:${coverage.coverageFormat}) [ ${
+                  //     sequence.map(letterFor).join(` + `)
+                  //   } ] -> ${
+                  //     letterFor(ligatureTable.ligatureGlyph)
+                  //   }`
+                  // );
                 });
               });
             });
