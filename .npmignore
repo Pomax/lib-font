@@ -1,0 +1,7 @@
+fonts
+node_modules
+protected
+testing
+.gitignore
+index.html
+index.js
