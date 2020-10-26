@@ -62,7 +62,7 @@ function doSomeFontThings(evt) {
 }
 ```
 
-You can also pass in a file directly, e.g. using the [HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). In that case, you'll need to use `fromDataBuffer` instead of `loadFont`, and pass the original filename explicity so that the type of font can be determined from the extension:
+You can also pass in a file directly, e.g. using the [HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). In order to deal with the font as bytecode, you can use the `font.fromDataBuffer(bytecode, filename)` function to kick off the font loading:
 
 ```js
 const myFont = new Font(`Adobe Source Code Pro`);
