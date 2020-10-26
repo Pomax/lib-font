@@ -86,7 +86,7 @@ reader.onload = function() {
 
 ## API
 
-The API is currently lacking documentation. As of right now, a lot of the functions and properties are pretty easily found if you know your way around an OpenType font already by looking at the source as well as the tests, but that's not ideal - API docs [will be forthcoming](https://github.com/Pomax/Font.js/issues/93) but can always use help.
+The uplifted library API is still pending... As of right now, a lot of the functions and properties are pretty easily found if you know your way around an OpenType font already by looking at the source as well as the tests, but that's not ideal - API docs [will be forthcoming](https://github.com/Pomax/Font.js/issues/93) but can always use help.
 
 
 ## Building this code
