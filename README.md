@@ -17,7 +17,8 @@ const myFont = new Font(`Adobe Source Code Pro`);
 myFont.onerror = evt => console.error(evt);
 myFont.onload = evt => doSomeFontThings(evt);
 
-// Kick off the font load by setting a source file, exactly as you would for an <img>
+// Kick off the font load by setting a source file, exactly as you would
+// for an <img> or <script> element when building them as nodes in JS.
 myFont.src = `./fonts/SourceCodeVariable-Roman.otf`;
 
 // When the font's up and loaded in, let's do some testing!
