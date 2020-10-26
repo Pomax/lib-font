@@ -137,7 +137,7 @@ Proper OpenType text shaping is _incredibly complex_ and requires _a lot_ of spe
 
 ## Why would I use this instead of OpenType.js or Fontkit or something?
 
-I don't have a good answer to that. Those are some great projects, you probably _should_ use them if they do what you need? The reason _I_ needed this is because it doesn't do text shaping: it just lets me query the opentype data to get me the information I need, without being too big of a library. And I've written enough OpenType parsers to know how much code goes into the actual shaping.
+I don't have a good answer to that. Those are some great projects, you probably _should_ use them if they do what you need? The reason _I_ needed this is because it doesn't do text shaping: it just lets me query the opentype data to get me the information I need, without being too big of a library. And [I've written](https://github.com/Pomax/PHP-Font-Parser) enough [OpenType parsers](https://github.com/Pomax/A-binary-parser-generator) to know [how much code](http://processingjs.nihongoresources.com/glyphing/) goes into the [actual shaping](https://pomax.github.io/CFF-glyphlet-fonts/).
 
 
 ## Alright, what if I have opinions?
