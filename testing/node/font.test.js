@@ -38,3 +38,14 @@ describe("Basic font testing", () => {
     testGSUB(font.opentype.tables);
   });
 });
+
+describe("Font loading", () => {
+  test("error when path is not a font", (done) => {
+    font.onerror = (evt) => {
+      expect(evt.detail.message).toEqual("'./LICENSE' is not a font.");
+      done();
+    };
+
+    font.src = "./LICENSE";
+  });
+});

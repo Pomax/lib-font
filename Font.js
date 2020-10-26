@@ -84,9 +84,8 @@ function getFontCSSFormat(path) {
         ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`
     }[ext];
 
-    if (!msg) msg = `${url} is not a font.`;
-
-    this.dispatch(new Event(`error`, {}, msg));
+    if (!msg) msg = `'${path}' is not a font.`;
+    throw new Error(msg);
 }
 
 
@@ -132,8 +131,14 @@ class Font extends EventManager {
      */
     defineFontFace(name, url, options) {
         if (typeof document !== "undefined") {
-            let format = getFontCSSFormat(url);
-            if (!format) return;
+            let format;
+
+            try {
+                format = getFontCSSFormat(url);
+            } catch(_e) {
+                return;
+            }
+
             let style = document.createElement(`style`);
             style.className = `injected by Font.js`;
             let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
