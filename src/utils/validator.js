@@ -1,8 +1,8 @@
 // Known font header byte sequences
 const TTF = [0, 1, 0, 0];
-const OTF = [`O`, `T`, `T`, `O`].map((v) => v.codePointAt(0));
-const WOFF = [`w`, `O`, `F`, `F`].map((v) => v.codePointAt(0));
-const WOFF2 = [`w`, `O`, `F`, `2`].map((v) => v.codePointAt(0));
+const OTF = [0x4f, 0x54, 0x54, 0x4f];  // "OTTO"
+const WOFF = [0x77, 0x4f, 0x46, 0x46 ];  // "wOFF"
+const WOFF2 = [0x77, 0x4f, 0x46, 0x32 ];  // "wOF2"
 
 /**
  * Array matching function
