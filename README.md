@@ -113,7 +113,7 @@ The `npm test` command should be all you need in order to run the tests, provide
 This library is designed to run both in any browser and version of Node.js versions that supports [es modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
 
 - Browsers: see the [caniuse matrix](https://caniuse.com/?search=modules) (tl;dr: basically everything except IE11).
-- Node: v14 and up.
+- Node: native support as of v14 (`--experimental-modules` runtime option as of v12).
 
 
 ## Why don't woff/woff2 work?
