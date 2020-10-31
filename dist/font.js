@@ -1,79 +1,54 @@
 
 [36m[1m//→ Font.js:[22m[39m
-export { F as Font } from './Font-5934e2bc.js';
+export { F as Font } from './Font-f35f45c4.js';
 
-[36m[1m//→ Font-5934e2bc.js:[22m[39m
-// Shim for "man" template tag
+[36m[1m//→ Font-f35f45c4.js:[22m[39m
+/**
+ * A shim for the Fetch API. If not defined, we assume we're running
+ * in Node.js and shim the fetch function using the `fs` module.
+ */
 
-(function (scope) {
-  scope.man = function man(argv) {
-    const term = argv[0];
-    let data = scope[term].manPage;
-    if (data) {
-      if (typeof data === "string") console.log(data);
-      else console.log(data.text, ...data.styles);
-    }
+let fetch$1 = globalThis.fetch;
+
+if (!fetch$1) {
+  let backlog = [];
+
+  fetch$1 = globalThis.fetch = (...args) => {
+    return new Promise((resolve, reject) => {
+      backlog.push({ args, resolve, reject });
+    });
   };
-})(globalThis);
 
-// data containers
+  import('fs')
+    .then((fs) => {
+      fetch$1 = globalThis.fetch = async function (path) {
+        return new Promise((resolve, reject) => {
+          fs.readFile(path, (err, data) => {
+            if (err) return reject(err);
+            resolve({
+              ok: true,
+              arrayBuffer: () => data.buffer,
+            });
+          });
+        });
+      };
 
-const text = [];
-const styles = [];
+      while (backlog.length) {
+        let instruction = backlog.shift();
+        fetch$1(...instruction.args)
+          .then((data) => instruction.resolve(data))
+          .catch((err) => instruction.reject(err));
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      throw new Error(
+        `Font.js cannot run unless either the Fetch API or Node's filesystem module is available.`
+      );
+    });
+}
 
-// manpage writing function
-
-const add = (t, style = ``) => {
-  text.push(t);
-  styles.push(`${style};display:block`);
-};
-
-// common styles
-
-const heading = `font-size: 1.5em; padding: 10px 0;`;
-const dt = `font-weight: bold; margin-left: 1em;`;
-const dd = `margin-left: 2em;`;
-const code = `font-family: monospace; background: #FFE; width: 100%;`;
-
-// The actual manpage data
-
-add(`Usage`, heading);
-add(
-  `let myFont = new Font(name, options);
-myFont.onerror = evt => ...
-myFont.onload = evt => ...
-myFont.onunload = evt => ...
-font.src = urlString;`,
-  code
-);
-
-add(`Constructor options:`, heading);
-add(`name`, dt);
-add(`The name used as font-family CSS property for this font.`, dd);
-add(`options`, dt);
-add(
-  `An optional key/value object for additional CSS properties. See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face for which properties you can specify.`,
-  dd
-);
-
-add(`load events:`, heading);
-add(`onerror`, dt);
-add(`...`, dd);
-add(`onload`, dt);
-add(`...`, dd);
-add(`onunload`, dt);
-add(`...`, dd);
-
-add(`Details:`, heading);
-add(`This can only get more delicious...`);
-
-add(
-  `For additional information, please visit https://github.com/Pomax/Font.js`
-);
-
-// Assemble and return
-
-const manPage = { text: `%c${text.join(`%c`)}`, styles };
+var shimFetch = "shim activated";
 
 /**
  * Simple event object so people can write the
@@ -692,63 +667,63 @@ let tableClassesLoaded = false;
 // until every class definition has been loaded.
 Promise.all([
   // opentype tables
-  import('./cmap-d87c11d3.js'),
-  import('./head-efcde693.js'),
-  import('./hhea-7acef134.js'),
-  import('./hmtx-7a443569.js'),
-  import('./maxp-9e9c72b5.js'),
-  import('./name-6bd5a396.js'),
-  import('./OS2-3192aeb8.js'),
-  import('./post-fb7c78e7.js'),
+  import('./cmap-1beba1c6.js'),
+  import('./head-7705bf27.js'),
+  import('./hhea-0368b0f8.js'),
+  import('./hmtx-2692501b.js'),
+  import('./maxp-63491b8a.js'),
+  import('./name-5dda1f13.js'),
+  import('./OS2-2604fef5.js'),
+  import('./post-89267887.js'),
 
   // opentype tables that rely on the "common layout tables" data structures
-  import('./BASE-094c4cbf.js'),
-  import('./GDEF-d3237e58.js'),
-  import('./GSUB-a21cfe47.js'),
-  import('./GPOS-6fb6a261.js'),
+  import('./BASE-c3174147.js'),
+  import('./GDEF-3c4ed55e.js'),
+  import('./GSUB-37c0d517.js'),
+  import('./GPOS-b3f506c7.js'),
 
   // SVG tables... err... table
-  import('./SVG-31a57f84.js'),
+  import('./SVG-62cfe622.js'),
 
   // Variable fonts
-  import('./fvar-54ac68d1.js'),
+  import('./fvar-ed7fbf4c.js'),
 
   // TTF tables
-  import('./cvt-617966e5.js'),
-  import('./fpgm-d53c85e4.js'),
-  import('./gasp-d972832e.js'),
-  import('./glyf-cbb6db33.js'),
-  import('./loca-b7c0d13a.js'),
-  import('./prep-d97b9cfe.js'),
+  import('./cvt-ae9f2819.js'),
+  import('./fpgm-2bc5348c.js'),
+  import('./gasp-09372e8d.js'),
+  import('./glyf-ce78a7a8.js'),
+  import('./loca-b427a282.js'),
+  import('./prep-e552031d.js'),
 
   // CFF
-  import('./CFF-ac80172c.js'),
-  import('./CFF2-6a7433aa.js'),
-  import('./VORG-4b091d01.js'),
+  import('./CFF-bde87723.js'),
+  import('./CFF2-c604c4d2.js'),
+  import('./VORG-a7827af9.js'),
 
   // bitmap
-  import('./EBLC-662fb809.js'),
-  import('./EBDT-59856632.js'),
-  import('./EBSC-0cebe394.js'),
-  import('./CBLC-44e9c193.js'),
-  import('./CBDT-2b994183.js'),
-  import('./sbix-da19c78f.js'),
+  import('./EBLC-ff0572d2.js'),
+  import('./EBDT-4df4825f.js'),
+  import('./EBSC-eb7f9ca7.js'),
+  import('./CBLC-93c8865c.js'),
+  import('./CBDT-1ac8926b.js'),
+  import('./sbix-ec13b071.js'),
 
   // color
-  import('./COLR-0b398598.js'),
-  import('./CPAL-2e86bc9f.js'),
+  import('./COLR-df23202c.js'),
+  import('./CPAL-300a62a4.js'),
 
   // "other" tables
-  import('./DSIG-b92ed033.js'),
-  import('./hdmx-db21330f.js'),
-  import('./kern-706fa5d4.js'),
-  import('./LTSH-ee8dcd16.js'),
-  import('./MERG-2c331ebc.js'),
-  import('./meta-3dc71e07.js'),
-  import('./PCLT-a244f82d.js'),
-  import('./VDMX-b4ff031f.js'),
-  import('./vhea-3ea12775.js'),
-  import('./vmtx-4f36adc4.js'),
+  import('./DSIG-46422b7c.js'),
+  import('./hdmx-26b497b1.js'),
+  import('./kern-9a21f13c.js'),
+  import('./LTSH-26213acb.js'),
+  import('./MERG-d71f5546.js'),
+  import('./meta-d19f5d26.js'),
+  import('./PCLT-975c347d.js'),
+  import('./VDMX-d1d89905.js'),
+  import('./vhea-1f98ec41.js'),
+  import('./vmtx-8bcbebc3.js'),
 ])
 
   // Step 3: rebind all the class imports so that
@@ -790,93 +765,102 @@ function loadTableClasses() {
   return new Promise((resolve, reject) => checkLoaded(resolve));
 }
 
-// basic inmports
+/**
+ * Guess the font's CSS "format" by analysing the asset path.
+ */
+function getFontCSSFormat(path, errorOnStyle) {
+  let pos = path.lastIndexOf(`.`);
+  let ext = (path.substring(pos + 1) || ``).toLowerCase();
 
-const PERMITTED_TYPES = [
-    `ttf`,
-    `otf`,
-    `woff`,
-    `woff2`,
-];
+  let format = {
+    ttf: `truetype`,
+    otf: `opentype`,
+    woff: `woff`,
+    woff2: `woff2`,
+  }[ext];
 
-const ILLEGAL_TYPES = [
-    `eot`,
-    `svg`,
-    `fon`,
-    `ttc`,
-];
+  if (format) return format;
 
-const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
+  let msg = {
+    eot: `The .eot format is not supported: it died in January 12, 2016, when Microsoft retired all versions of IE that didn't already support WOFF.`,
+    svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again.`,
+    fon: `The .fon format is not supported: this is an ancient Windows bitmap font format.`,
+    ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`,
+  }[ext];
 
-let fetch = globalThis.fetch;
+  if (!msg) msg = `${path} is not a known webfont format.`;
 
-if(!fetch) {
-    let backlog = [];
-
-    fetch = (...args) => {
-        return new Promise((resolve, reject) => {
-            backlog.push({ args, resolve, reject});
-        });
-    };
-
-    import('fs')
-    .then(fs => {
-        fetch = async function(path) {
-            return new Promise((resolve, reject) => {
-                fs.readFile(path, (err, data) => {
-                    if (err) return reject(err);
-                    resolve({
-                        ok: true,
-                        arrayBuffer: () => data.buffer
-                    });
-                });
-            });
-        };
-
-        while(backlog.length) {
-            let instruction = backlog.shift();
-            fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        throw new Error(`Font.js cannot run unless either the Fetch API or Node's filesystem module is available.`);
-    });
+  if (errorOnStyle) {
+    // hard stop if the user wants stylesheet errors to count as true errors,
+    throw new Error(msg);
+  } else {
+    // otherwise, only leave a warning in the output log.
+    console.warn(`Could not load font: ${msg}`);
+  }
 }
-
 
 /**
- * either return the appropriate CSS format
- * for a specific font URL, or generate an
- * error if someone is trying to use a
- * font that died years ago.
- *
- * @param {*} path
+ * Create an @font-face stylesheet for browser use.
  */
-function getFontCSSFormat(path) {
-    let pos = path.lastIndexOf(`.`);
-    let ext = (path.substring(pos + 1) || ``).toLowerCase();
-    let format = {
-        ttf: `truetype`,
-        otf: `opentype`,
-        woff: `woff`,
-        woff2: `woff2`
-    }[ext];
+async function setupFontFace(name, url, options = {}) {
+  if (!globalThis.document) return;
 
-    if (format) return format;
+  let format = getFontCSSFormat(url, options.errorOnStyle);
+  if (!format) return;
 
-    let msg = {
-        eot: `The .eot format is not supported: it died in January 12, 2016, when Microsoft retired all versions of IE that didn't already support WOFF.`,
-        svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again.`,
-        fon: `The .fon format is not supported: this is an ancient Windows bitmap font format.`,
-        ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`
-    }[ext];
+  let style = document.createElement(`style`);
+  style.className = `injected by Font.js`;
 
-    if (!msg) msg = `${url} is not a font.`;
+  let rules = [];
+  if (options.styleRules) {
+    rules = Object.entries(options.styleRules).map(
+      ([key, value]) => `${key}: ${value};`
+    );
+  }
 
-    this.dispatch(new Event(`error`, {}, msg));
+  style.textContent = `
+@font-face {
+    font-family: "${name}";
+    ${rules.join(`\n\t`)}
+    src: url("${url}") format("${format}");
+}`;
+  globalThis.document.head.appendChild(style);
+  return style;
 }
 
+// Known font header byte sequences
+const TTF = [0, 1, 0, 0];
+const OTF = [`O`, `T`, `T`, `O`].map((v) => v.codePointAt(0));
+const WOFF$1 = [`w`, `O`, `F`, `F`].map((v) => v.codePointAt(0));
+const WOFF2$1 = [`w`, `O`, `F`, `2`].map((v) => v.codePointAt(0));
+
+/**
+ * Array matching function
+ */
+function match(ar1, ar2) {
+  if (ar1.length !== ar2.length) return;
+  for (let i = 0; i < ar1.length; i++) {
+    if (ar1[i] !== ar2[i]) return;
+  }
+  return true;
+}
+
+/**
+ * verify a bytestream, based on the values we know
+ * should be found at the first four bytes.
+ */
+function validFontFormat(dataview) {
+  const LEAD_BYTES = [
+    dataview.getUint8(0),
+    dataview.getUint8(1),
+    dataview.getUint8(2),
+    dataview.getUint8(3),
+  ];
+
+  if (match(LEAD_BYTES, TTF) || match(LEAD_BYTES, OTF)) return `SFNT`;
+  if (match(LEAD_BYTES, WOFF$1)) return `WOFF`;
+  if (match(LEAD_BYTES, WOFF2$1)) return `WOFF2`;
+}
 
 /**
  * Borderline trivial http response helper function
@@ -907,40 +891,23 @@ class Font extends EventManager {
      * Just like Image and Audio, we kick everything off when
      * our `src` gets assigned.
      *
-     * @param {string} url
+     * @param {string} source url for this font ("real" or blob/base64)
      */
-    set src(url) {
-        this.__src = url;
-        this.defineFontFace(this.name, url, this.options);
-        this.loadFont(url);
-    }
-
-    /**
-     * This is a blocking operation.
-     */
-    defineFontFace(name, url, options) {
-        if (typeof document !== "undefined") {
-            let format = getFontCSSFormat(url);
-            if (!format) return;
-            let style = document.createElement(`style`);
-            style.className = `injected by Font.js`;
-            let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
-            style.textContent = `
-    @font-face {
-        font-family: "${name}";
-        ${rules}
-        src: url("${url}") format("${format}");
-    }`;
-            this.styleElement = style;
-            document.head.appendChild(style);
-        }
+    set src(src) {
+        this.__src = src;
+        (async() => {
+            if (globalThis.document && !this.options.skipStyleSheet) {
+                await setupFontFace(this.name, src, this.options);
+            }
+            this.loadFont(src);
+        })();
     }
 
     /**
      * This is a non-blocking operation.
      *
      * @param {String} url The URL for the font in question
-     * @param {String} filename The filename when URL is a base64 string
+     * @param {String} filename The filename to use when URL is a blob/base64 string
      */
     async loadFont(url, filename) {
         fetch(url)
@@ -959,11 +926,12 @@ class Font extends EventManager {
      * @param {Buffer} buffer The binary data associated with this font.
      */
     async fromDataBuffer(buffer, typeOrPath) {
-        let type = typeOrPath;
-        if (!ALL_TYPES.includes(typeOrPath)) {
-            type = getFontCSSFormat(typeOrPath);
+        this.fontData = new DataView(buffer); // Big Endian
+        let type = validFontFormat(this.fontData);
+        if (!type) {
+            // handled in loadFont's .catch()
+            throw new Error(`${typeOrPath} is either an unsupported font format, or not a font at all.`);
         }
-        this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
         await this.parseBasicData(type);
         const evt = new Event("load", { font: this });
         this.dispatch(evt);
@@ -975,13 +943,13 @@ class Font extends EventManager {
      */
     async parseBasicData(type) {
         return loadTableClasses().then(createTable => {
-            if (type === `truetype` || type === `opentype`) {
+            if (type === `SFNT`) {
                 this.opentype = new SFNT(this.fontData, createTable);
             }
-            if (type === `woff`) {
+            if (type === `WOFF`) {
                 this.opentype = new WOFF(this.fontData, createTable);
             }
-            if (type === `woff2`) {
+            if (type === `WOFF2`) {
                 this.opentype = new WOFF2(this.fontData, createTable);
             }
             return this.opentype;
@@ -1073,14 +1041,12 @@ class Font extends EventManager {
     }
 }
 
-Font.manPage = manPage;
-
 globalThis.Font = Font;
 
 export { Font as F, ParsedData as P, SimpleTable as S, lazy as l };
 
-[36m[1m//→ cmap-d87c11d3.js:[22m[39m
-import { P as ParsedData, l as lazy, S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ cmap-1beba1c6.js:[22m[39m
+import { P as ParsedData, l as lazy, S as SimpleTable } from './Font-f35f45c4.js';
 
 class Subtable extends ParsedData {
   constructor(p, plaformID, encodingID) {
@@ -1653,8 +1619,8 @@ class EncodingRecord {
 
 export { cmap };
 
-[36m[1m//→ head-efcde693.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ head-7705bf27.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `head` table.
@@ -1689,8 +1655,8 @@ class head extends SimpleTable {
 
 export { head };
 
-[36m[1m//→ hhea-7acef134.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ hhea-0368b0f8.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `hhea` table.
@@ -1726,8 +1692,8 @@ class hhea extends SimpleTable {
 
 export { hhea };
 
-[36m[1m//→ hmtx-7a443569.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ hmtx-2692501b.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `hmtx` table.
@@ -1768,8 +1734,8 @@ class LongHorMetric {
 
 export { hmtx };
 
-[36m[1m//→ maxp-9e9c72b5.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ maxp-63491b8a.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `maxp` table.
@@ -1805,8 +1771,8 @@ class maxp extends SimpleTable {
 
 export { maxp };
 
-[36m[1m//→ name-6bd5a396.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ name-5dda1f13.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `name` table.
@@ -1905,8 +1871,8 @@ function decodeString(p, record) {
 
 export { name };
 
-[36m[1m//→ OS2-3192aeb8.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ OS2-2604fef5.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `OS/2` table.
@@ -1972,8 +1938,8 @@ class OS2 extends SimpleTable {
 
 export { OS2 };
 
-[36m[1m//→ post-fb7c78e7.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ post-89267887.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `post` table.
@@ -2018,8 +1984,8 @@ class post extends SimpleTable {
 
 export { post };
 
-[36m[1m//→ BASE-094c4cbf.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ BASE-c3174147.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `BASE` table.
@@ -2219,9 +2185,9 @@ class BaseCoordTable {
 
 export { BASE };
 
-[36m[1m//→ GDEF-d3237e58.js:[22m[39m
-import { S as SimpleTable, l as lazy, P as ParsedData } from './Font-5934e2bc.js';
-import { C as CoverageTable } from './coverage-3797e67c.js';
+[36m[1m//→ GDEF-3c4ed55e.js:[22m[39m
+import { S as SimpleTable, l as lazy, P as ParsedData } from './Font-f35f45c4.js';
+import { C as CoverageTable } from './coverage-27c34490.js';
 
 class ClassDefinition {
   constructor(p) {
@@ -2460,8 +2426,8 @@ class MarkGlyphSetsTable extends ParsedData {
 
 export { GDEF };
 
-[36m[1m//→ coverage-3797e67c.js:[22m[39m
-import { P as ParsedData } from './Font-5934e2bc.js';
+[36m[1m//→ coverage-27c34490.js:[22m[39m
+import { P as ParsedData } from './Font-f35f45c4.js';
 
 class CoverageTable extends ParsedData {
   constructor(p) {
@@ -2493,10 +2459,10 @@ class CoverageRangeRecord {
 
 export { CoverageTable as C };
 
-[36m[1m//→ GSUB-a21cfe47.js:[22m[39m
-import './Font-5934e2bc.js';
-import './coverage-3797e67c.js';
-import { C as CommonLayoutTable } from './common-layout-table-d336a04f.js';
+[36m[1m//→ GSUB-37c0d517.js:[22m[39m
+import './Font-f35f45c4.js';
+import './coverage-27c34490.js';
+import { C as CommonLayoutTable } from './common-layout-table-407131b1.js';
 
 class GSUB extends CommonLayoutTable {
   constructor(dict, dataview) {
@@ -2510,9 +2476,9 @@ class GSUB extends CommonLayoutTable {
 
 export { GSUB };
 
-[36m[1m//→ common-layout-table-d336a04f.js:[22m[39m
-import { P as ParsedData, S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
-import { C as CoverageTable } from './coverage-3797e67c.js';
+[36m[1m//→ common-layout-table-407131b1.js:[22m[39m
+import { P as ParsedData, S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
+import { C as CoverageTable } from './coverage-27c34490.js';
 
 /**
  * ...
@@ -3394,10 +3360,10 @@ class CommonLayoutTable extends SimpleTable {
 
 export { CommonLayoutTable as C };
 
-[36m[1m//→ GPOS-6fb6a261.js:[22m[39m
-import './Font-5934e2bc.js';
-import './coverage-3797e67c.js';
-import { C as CommonLayoutTable } from './common-layout-table-d336a04f.js';
+[36m[1m//→ GPOS-b3f506c7.js:[22m[39m
+import './Font-f35f45c4.js';
+import './coverage-27c34490.js';
+import { C as CommonLayoutTable } from './common-layout-table-407131b1.js';
 
 class GPOS extends CommonLayoutTable {
   constructor(dict, dataview) {
@@ -3410,8 +3376,8 @@ class GPOS extends CommonLayoutTable {
 
 export { GPOS };
 
-[36m[1m//→ SVG-31a57f84.js:[22m[39m
-import { S as SimpleTable, P as ParsedData } from './Font-5934e2bc.js';
+[36m[1m//→ SVG-62cfe622.js:[22m[39m
+import { S as SimpleTable, P as ParsedData } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `SVG` table.
@@ -3482,8 +3448,8 @@ class SVGDocumentRecord {
 
 export { SVG };
 
-[36m[1m//→ fvar-54ac68d1.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ fvar-ed7fbf4c.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `fvar` table.
@@ -3558,8 +3524,8 @@ class InstanceRecord {
 
 export { fvar };
 
-[36m[1m//→ cvt-617966e5.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ cvt-ae9f2819.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `cvt` table.
@@ -3583,8 +3549,8 @@ class cvt extends SimpleTable {
 
 export { cvt };
 
-[36m[1m//→ fpgm-d53c85e4.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ fpgm-2bc5348c.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `fpgm` table.
@@ -3606,8 +3572,8 @@ class fpgm extends SimpleTable {
 
 export { fpgm };
 
-[36m[1m//→ gasp-d972832e.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ gasp-09372e8d.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `gasp` table.
@@ -3639,8 +3605,8 @@ class GASPRange {
 
 export { gasp };
 
-[36m[1m//→ glyf-cbb6db33.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ glyf-ce78a7a8.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `glyf` table.
@@ -3661,8 +3627,8 @@ class glyf extends SimpleTable {
 
 export { glyf };
 
-[36m[1m//→ loca-b7c0d13a.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ loca-b427a282.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `loca` table.
@@ -3692,8 +3658,8 @@ class loca extends SimpleTable {
 
 export { loca };
 
-[36m[1m//→ prep-d97b9cfe.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ prep-e552031d.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `prep` table.
@@ -3715,8 +3681,8 @@ class prep extends SimpleTable {
 
 export { prep };
 
-[36m[1m//→ CFF-ac80172c.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ CFF-bde87723.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `CFF` table.
@@ -3732,8 +3698,8 @@ class CFF extends SimpleTable {
 
 export { CFF };
 
-[36m[1m//→ CFF2-6a7433aa.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ CFF2-c604c4d2.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `CFF2` table.
@@ -3749,8 +3715,8 @@ class CFF2 extends SimpleTable {
 
 export { CFF2 };
 
-[36m[1m//→ VORG-4b091d01.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ VORG-a7827af9.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `VORG` table.
@@ -3783,8 +3749,8 @@ class VertOriginYMetric {
 
 export { VORG };
 
-[36m[1m//→ EBLC-662fb809.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ EBLC-ff0572d2.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 import { B as BitmapSize } from './shared-78f1b51e.js';
 
 /**
@@ -3903,8 +3869,8 @@ class IndexSubTableArray {
 
 export { BitmapSize as B, BitmapScale as a };
 
-[36m[1m//→ EBDT-59856632.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ EBDT-4df4825f.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `EBDT` table.
@@ -3924,8 +3890,8 @@ class EBDT extends SimpleTable {
 
 export { EBDT };
 
-[36m[1m//→ EBSC-0cebe394.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ EBSC-eb7f9ca7.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 import { a as BitmapScale } from './shared-78f1b51e.js';
 
 /**
@@ -3949,10 +3915,10 @@ class EBSC extends SimpleTable {
 
 export { EBSC };
 
-[36m[1m//→ CBLC-44e9c193.js:[22m[39m
-import './Font-5934e2bc.js';
+[36m[1m//→ CBLC-93c8865c.js:[22m[39m
+import './Font-f35f45c4.js';
 import './shared-78f1b51e.js';
-import { EBLC } from './EBLC-662fb809.js';
+import { EBLC } from './EBLC-ff0572d2.js';
 
 /**
  * The OpenType `CBLC` table.
@@ -3967,9 +3933,9 @@ class CBLC extends EBLC {
 
 export { CBLC };
 
-[36m[1m//→ CBDT-2b994183.js:[22m[39m
-import './Font-5934e2bc.js';
-import { EBDT } from './EBDT-59856632.js';
+[36m[1m//→ CBDT-1ac8926b.js:[22m[39m
+import './Font-f35f45c4.js';
+import { EBDT } from './EBDT-4df4825f.js';
 
 /**
  * The OpenType `CBDT` table.
@@ -3986,8 +3952,8 @@ class CBDT extends EBDT {
 
 export { CBDT };
 
-[36m[1m//→ sbix-da19c78f.js:[22m[39m
-import { S as SimpleTable, l as lazy, P as ParsedData } from './Font-5934e2bc.js';
+[36m[1m//→ sbix-ec13b071.js:[22m[39m
+import { S as SimpleTable, l as lazy, P as ParsedData } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `sbix` table.
@@ -4044,8 +4010,8 @@ class GlyphData {
 
 export { sbix };
 
-[36m[1m//→ COLR-0b398598.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ COLR-df23202c.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `COLR` table.
@@ -4124,8 +4090,8 @@ class LayerRecord {
 
 export { COLR };
 
-[36m[1m//→ CPAL-2e86bc9f.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ CPAL-300a62a4.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `CPAL` table.
@@ -4209,8 +4175,8 @@ class PaletteEntryLabelArray {
 
 export { CPAL };
 
-[36m[1m//→ DSIG-b92ed033.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ DSIG-46422b7c.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `DSIG` table.
@@ -4257,8 +4223,8 @@ class SignatureBlockFormat1 {
 
 export { DSIG };
 
-[36m[1m//→ hdmx-db21330f.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ hdmx-26b497b1.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `hdmx` table.
@@ -4288,8 +4254,8 @@ class DeviceRecord {
 
 export { hdmx };
 
-[36m[1m//→ kern-706fa5d4.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ kern-9a21f13c.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `kern` table.
@@ -4375,8 +4341,8 @@ class Pair {
 
 export { kern };
 
-[36m[1m//→ LTSH-ee8dcd16.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ LTSH-26213acb.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `LTSH` table.
@@ -4394,8 +4360,8 @@ class LTSH extends SimpleTable {
 
 export { LTSH };
 
-[36m[1m//→ MERG-2c331ebc.js:[22m[39m
-import { S as SimpleTable, l as lazy } from './Font-5934e2bc.js';
+[36m[1m//→ MERG-d71f5546.js:[22m[39m
+import { S as SimpleTable, l as lazy } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `MERG` table.
@@ -4427,8 +4393,8 @@ class MERG extends SimpleTable {
 
 export { MERG };
 
-[36m[1m//→ meta-3dc71e07.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ meta-d19f5d26.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `meta` table.
@@ -4469,8 +4435,8 @@ class DataMap {
 
 export { meta };
 
-[36m[1m//→ PCLT-a244f82d.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ PCLT-975c347d.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `PCLT` table.
@@ -4491,8 +4457,8 @@ class PCLT extends SimpleTable {
 
 export { PCLT };
 
-[36m[1m//→ VDMX-b4ff031f.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ VDMX-d1d89905.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `VDMX` table.
@@ -4541,8 +4507,8 @@ class vTable {
 
 export { VDMX };
 
-[36m[1m//→ vhea-3ea12775.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ vhea-1f98ec41.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `vhea` table.
@@ -4578,8 +4544,8 @@ class vhea extends SimpleTable {
 
 export { vhea };
 
-[36m[1m//→ vmtx-4f36adc4.js:[22m[39m
-import { S as SimpleTable } from './Font-5934e2bc.js';
+[36m[1m//→ vmtx-8bcbebc3.js:[22m[39m
+import { S as SimpleTable } from './Font-f35f45c4.js';
 
 /**
  * The OpenType `vmtx` table.

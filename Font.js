@@ -1,94 +1,9 @@
-// basic inmports
-import { manPage } from "./src/manpage.js";
+import "./src/utils/shim-fetch.js";
 import { Event, EventManager } from "./src/eventing.js";
 import { SFNT, WOFF, WOFF2 } from "./src/opentype/index.js";
 import { loadTableClasses } from "./src/opentype/tables/createTable.js";
-
-const PERMITTED_TYPES = [
-    `ttf`,
-    `otf`,
-    `woff`,
-    `woff2`,
-];
-
-const ILLEGAL_TYPES = [
-    `eot`,
-    `svg`,
-    `fon`,
-    `ttc`,
-];
-
-const ALL_TYPES = [...PERMITTED_TYPES, ...ILLEGAL_TYPES];
-
-let fetch = globalThis.fetch;
-
-if(!fetch) {
-    let backlog = [];
-
-    fetch = (...args) => {
-        return new Promise((resolve, reject) => {
-            backlog.push({ args, resolve, reject});
-        });
-    };
-
-    import('fs')
-    .then(fs => {
-        fetch = async function(path) {
-            return new Promise((resolve, reject) => {
-                fs.readFile(path, (err, data) => {
-                    if (err) return reject(err);
-                    resolve({
-                        ok: true,
-                        arrayBuffer: () => data.buffer
-                    });
-                });
-            });
-        };
-
-        while(backlog.length) {
-            let instruction = backlog.shift();
-            fetch(...instruction.args).then(data => instruction.resolve(data)).catch(err => instruction.reject(err));
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        throw new Error(`Font.js cannot run unless either the Fetch API or Node's filesystem module is available.`);
-    });
-}
-
-
-/**
- * either return the appropriate CSS format
- * for a specific font URL, or generate an
- * error if someone is trying to use a
- * font that died years ago.
- *
- * @param {*} path
- */
-function getFontCSSFormat(path) {
-    let pos = path.lastIndexOf(`.`);
-    let ext = (path.substring(pos + 1) || ``).toLowerCase();
-    let format = {
-        ttf: `truetype`,
-        otf: `opentype`,
-        woff: `woff`,
-        woff2: `woff2`
-    }[ext];
-
-    if (format) return format;
-
-    let msg = {
-        eot: `The .eot format is not supported: it died in January 12, 2016, when Microsoft retired all versions of IE that didn't already support WOFF.`,
-        svg: `The .svg format is not supported: SVG fonts (not to be confused with OpenType with embedded SVG) were so bad we took the entire fonts chapter out of the SVG specification again.`,
-        fon: `The .fon format is not supported: this is an ancient Windows bitmap font format.`,
-        ttc: `Based on the current CSS specification, font collections are not (yet?) supported.`
-    }[ext];
-
-    if (!msg) msg = `${url} is not a font.`;
-
-    this.dispatch(new Event(`error`, {}, msg));
-}
-
+import { setupFontFace } from "./src/utils/fontface.js";
+import { validFontFormat } from  "./src/utils/validator.js";
 
 /**
  * Borderline trivial http response helper function
@@ -119,40 +34,23 @@ class Font extends EventManager {
      * Just like Image and Audio, we kick everything off when
      * our `src` gets assigned.
      *
-     * @param {string} url
+     * @param {string} source url for this font ("real" or blob/base64)
      */
-    set src(url) {
-        this.__src = url;
-        this.defineFontFace(this.name, url, this.options);
-        this.loadFont(url);
-    }
-
-    /**
-     * This is a blocking operation.
-     */
-    defineFontFace(name, url, options) {
-        if (typeof document !== "undefined") {
-            let format = getFontCSSFormat(url);
-            if (!format) return;
-            let style = document.createElement(`style`);
-            style.className = `injected by Font.js`;
-            let rules = Object.keys(options).map(r => `${r}: ${options[r]};`).join(`\n\t`);
-            style.textContent = `
-    @font-face {
-        font-family: "${name}";
-        ${rules}
-        src: url("${url}") format("${format}");
-    }`;
-            this.styleElement = style;
-            document.head.appendChild(style);
-        }
+    set src(src) {
+        this.__src = src;
+        (async() => {
+            if (globalThis.document && !this.options.skipStyleSheet) {
+                await setupFontFace(this.name, src, this.options);
+            }
+            this.loadFont(src);
+        })();
     }
 
     /**
      * This is a non-blocking operation.
      *
      * @param {String} url The URL for the font in question
-     * @param {String} filename The filename when URL is a base64 string
+     * @param {String} filename The filename to use when URL is a blob/base64 string
      */
     async loadFont(url, filename) {
         fetch(url)
@@ -171,11 +69,12 @@ class Font extends EventManager {
      * @param {Buffer} buffer The binary data associated with this font.
      */
     async fromDataBuffer(buffer, typeOrPath) {
-        let type = typeOrPath;
-        if (!ALL_TYPES.includes(typeOrPath)) {
-            type = getFontCSSFormat(typeOrPath);
+        this.fontData = new DataView(buffer); // Big Endian
+        let type = validFontFormat(this.fontData);
+        if (!type) {
+            // handled in loadFont's .catch()
+            throw new Error(`${typeOrPath} is either an unsupported font format, or not a font at all.`);
         }
-        this.fontData = new DataView(buffer); // Because we want to enforce Big Endian everywhere
         await this.parseBasicData(type);
         const evt = new Event("load", { font: this });
         this.dispatch(evt);
@@ -187,13 +86,13 @@ class Font extends EventManager {
      */
     async parseBasicData(type) {
         return loadTableClasses().then(createTable => {
-            if (type === `truetype` || type === `opentype`) {
+            if (type === `SFNT`) {
                 this.opentype = new SFNT(this.fontData, createTable);
             }
-            if (type === `woff`) {
+            if (type === `WOFF`) {
                 this.opentype = new WOFF(this.fontData, createTable);
             }
-            if (type === `woff2`) {
+            if (type === `WOFF2`) {
                 this.opentype = new WOFF2(this.fontData, createTable);
             }
             return this.opentype;
@@ -284,8 +183,6 @@ class Font extends EventManager {
         }
     }
 }
-
-Font.manPage = manPage;
 
 globalThis.Font = Font;
 
