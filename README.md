@@ -82,7 +82,7 @@ reader.onload = function() {
     };
 };
 ```
-#### What about a <font> tag?
+#### What about a tag?
     
 This library does not offer a `<font src="..." ...>` tag, in part because proper custom elements _must_ have a hyphen in their name, but primarily because the only DOM related work that a `<font>` tag would be useful for is already handled by `<style>` (for declaring a `@font-face`) and `<link>` (for importing a `@font-face` stylesheet).
 
