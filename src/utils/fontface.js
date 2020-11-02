@@ -42,7 +42,7 @@ async function setupFontFace(name, url, options = {}) {
   if (!format) return;
 
   let style = document.createElement(`style`);
-  style.className = `injected by Font.js`;
+  style.className = `injected-by-Font-js`;
 
   let rules = [];
   if (options.styleRules) {
