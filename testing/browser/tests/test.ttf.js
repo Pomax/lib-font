@@ -8,14 +8,20 @@ import {
 
 import { testSFNT } from "./test-SFNT.js";
 
-const font = new Font();
+const name = `Source Code Pro Regular (ttf)`;
+const font = new Font(name);
 
 font.onload = () => {
   heading(`Plain TTF tests`);
 
   unindent(true);
+
+  const fontName = font.name;
+  assertEqual(fontName, name, `Font object has correct name property`);
+
   const SFNT = font.opentype;
   assertNotEqual(SFNT, undefined, `SFNT EXISTS`);
+
   indent();
 
   assertEqual(SFNT.version, 0x00010000, `Version is 0x0001.0x0000`);
