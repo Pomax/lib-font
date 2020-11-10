@@ -91,6 +91,40 @@ This library does not offer a `<font src="..." ...>` tag, in part because proper
 
 The uplifted library API is still pending... As of right now, a lot of the functions and properties are pretty easily found if you know your way around an OpenType font already by looking at the source as well as the tests, but that's not ideal - API docs [will be forthcoming](https://github.com/Pomax/Font.js/issues/93) but can always use help.
 
+That said, this section will keep getting expanded as the API gets consolidated.
+
+### Font.js
+
+#### ● `const f = new Font(fontFamilyName, optionsObject)`
+
+The family name is use for stylesheet building, and the options object can contain the following fields:
+
+fieldname | type | default | description
+--- | --- | --- | ---
+skipStyleSheet | boolean | false | Determines whether not to build the `@font-face` stylesheet.
+styleRules | object | `{}` | A set of key/value pairs representing CSS rules to add to the `@font-face` declaration
+errorOnStyle | boolean | false | Whether to error out, or merely warn, if the font type cannot be determined from the `src` assignment.
+
+#### ● `f.onerror = evt => ...` / `f.addEventListener('error', evt => ...)`
+
+Error handling for anything font related
+
+#### ● `f.onload = evt => ...` / `f.addEventListener('load', evt => ...)`
+
+Load handling for anything font related
+
+#### ● `f.src = ...`
+
+Bind a font to a source URL. This can be a fully qualified URL, a relative URL, a Blob URL, or a Data-URL.
+
+#### ● `const actualFont = f.opentype`
+
+The actual opentype font representation is font in the `.opentype` property.
+
+#### ● `const fontTables = f.opentype.tables`
+
+This is the main access point for any font table, where each table is accessed directly by name. E.g. in order to access the `cmap` table, you use `const cmap = f.opentype.tables.cmap`, GSUB is `const GSUB = f.opentype.tables.GSUB`, etc.
+
 
 ## Building this code
 
@@ -106,9 +140,13 @@ Note that this does not include the `inflate` and `unbrotli` libraries from the 
 
 Also note that this is not minified code: gzip is already pretty great at making things small, and if you need things even smaller than that, your project presumably has its own minification task(s) in place.
 
+
 ### Testing
 
 The `npm test` command should be all you need in order to run the tests, provided you ran `npm install` first, of course.
+
+- Node based testing uses Jest tests, found in the `./testing/node` dir.
+- Browser based testing uses Puppetter, found in the `./testing/browser/tests` dir.
 
 
 ## Compatibility
