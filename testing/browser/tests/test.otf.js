@@ -74,6 +74,6 @@ font.onload = () => {
   );
 };
 
-font.src = `../fonts/SourceCodePro-Regular.otf`;
+font.src = `../fonts/SourceCodePro/SourceCodePro-Regular.otf`;
 
 export { font };

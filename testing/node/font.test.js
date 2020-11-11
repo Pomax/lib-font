@@ -9,7 +9,7 @@ describe("Basic font testing", () => {
       throw err;
     };
     font.onload = async () => done();
-    font.src = "./fonts/SourceCodePro-Regular.ttf";
+    font.src = "./fonts/SourceCodePro/SourceCodePro-Regular.ttf";
   });
 
   test("font loaded", () => {

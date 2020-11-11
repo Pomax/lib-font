@@ -78,6 +78,6 @@ font.onload = () => {
   );
 };
 
-font.src = `../fonts/SourceCodePro-Regular.ttf`;
+font.src = `../fonts/SourceCodePro/SourceCodePro-Regular.ttf`;
 
 export { font };

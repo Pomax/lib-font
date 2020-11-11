@@ -13,7 +13,6 @@ class Format14 extends Subtable {
         (_) => new VariationSelector(p)
       )
     );
-    console.warn(`cmap subtable format 14 has not been fully implemented`);
   }
 
   supports() {
