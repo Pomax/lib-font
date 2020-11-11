@@ -1,16 +1,11 @@
 {
-  "name": "font-js",
-  "scope": "@font-js",
+  "name": "@font-js/font-js",
   "version": "1.0.3",
   "description": "A JS based OpenType font inspector",
   "main": "Font.js",
   "type": "module",
   "author": "Pomax",
-  "license": "LICENSE.md",
-  "directories": {
-    "lib": "lib",
-    "src": "src"
-  },
+  "license": "SEE LICENSE IN LICENSE.md",
   "scripts": {
     "start": "npm test",
     "clean": "prettier --write \"src/**/*.js\"",
@@ -21,22 +16,26 @@
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/",
     "build": "rollup --no-treeshake --external=fs --format=esm Font.js > dist/font.js"
   },
+  "homepage": "https://github.com/Pomax/font.js#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Pomax/font.js.git"
   },
-  "keywords": [
-    "opentype",
-    "font",
-    "webfont",
-    "parse",
-    "inspect",
-    "debug"
-  ],
   "bugs": {
     "url": "https://github.com/Pomax/font.js/issues"
   },
-  "homepage": "https://github.com/Pomax/font.js#readme",
+  "keywords": [
+    "opentype",
+    "truetype",
+    "font",
+    "fonts",
+    "webfont",
+    "webfonts",
+    "parser",
+    "inspector",
+    "debugger",
+    "profiler"
+  ],
   "devDependencies": {
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
