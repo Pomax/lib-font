@@ -8,24 +8,24 @@ class Format14 extends Subtable {
     this.format = 14;
     this.length = p.uint32;
     this.numVarSelectorRecords = p.uint32;
-    const getter = () =>
+    lazy(this, `varSelectors`, () =>
       [...new Array(this.numVarSelectorRecords)].map(
         (_) => new VariationSelector(p)
-      );
-    lazy(this, `varSelectors`, getter);
+      )
+    );
+    console.warn(`cmap subtable format 14 has not been fully implemented`);
   }
 
   supports() {
-    return false;
+    console.warn(`supports not implemented for cmap subtable format 14`);
+    return 0;
   }
 
   getSupportedCharCodes() {
-    return false;
-  }
-
-  supportsVariation(variation) {
-    let v = this.varSelector.find((uvs) => uvs.varSelector === variation);
-    return v ? v : false;
+    console.warn(
+      `getSupportedCharCodes not implemented for cmap subtable format 14`
+    );
+    return [];
   }
 
   reverse(glyphID) {
@@ -33,8 +33,13 @@ class Format14 extends Subtable {
     return {};
   }
 
+  supportsVariation(variation) {
+    let v = this.varSelector.find((uvs) => uvs.varSelector === variation);
+    return v ? v : false;
+  }
+
   getSupportedVariations() {
-    return []; // TODO: implement this function?
+    return this.varSelectors.map((v) => v.varSelector);
   }
 }
 

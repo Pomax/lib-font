@@ -16,7 +16,7 @@ class Format13 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0); // assumed safe, might not be?
     return (
       this.groups.findIndex(
         (s) => s.startCharCode <= charCode && charCode <= s.endCharCode

@@ -90,6 +90,14 @@ class Format4 extends Subtable {
 
   getGlyphId(charCode) {
     if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+
+    // surrogate pair value?
+    if (0xd800 <= charCode && charCode <= 0xdfff) return 0;
+
+    // one of the exactly 66 noncharacters?
+    if ((charCode & 0xfffe) === 0xfffe || (charCode & 0xffff) === 0xffff)
+      return 0;
+
     let segment = this.segments.find(
       (s) => s.startCode <= charCode && charCode <= s.endCode
     );

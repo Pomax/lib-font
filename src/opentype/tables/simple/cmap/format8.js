@@ -16,7 +16,13 @@ class Format8 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+    if (charCode.charCodeAt) {
+      // TODO: FIXME: https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-8-mixed-16-bit-and-32-bit-coverage is kind of incredible
+      charCode = -1;
+      console.warn(
+        `supports(character) not implemented for cmap subtable format 8. only supports(id) is implemented.`
+      );
+    }
     return (
       this.groups.findIndex(
         (s) => s.startcharCode <= charCode && charCode <= s.endcharCode

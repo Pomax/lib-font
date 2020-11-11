@@ -17,6 +17,14 @@ class Format12 extends Subtable {
 
   supports(charCode) {
     if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+
+    // surrogate pair value?
+    if (0xd800 <= charCode && charCode <= 0xdfff) return 0;
+
+    // one of the exactly 66 noncharacters?
+    if ((charCode & 0xfffe) === 0xfffe || (charCode & 0xffff) === 0xffff)
+      return 0;
+
     return (
       this.groups.findIndex(
         (s) => s.startCharCode <= charCode && charCode <= s.endCharCode

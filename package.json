@@ -18,7 +18,7 @@
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/",
-    "build": "rollup --no-treeshake --format=esm Font.js > dist/font.js"
+    "build": "rollup --no-treeshake --external=fs --format=esm Font.js > dist/font.js"
   },
   "repository": {
     "type": "git",

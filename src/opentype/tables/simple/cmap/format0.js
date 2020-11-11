@@ -11,7 +11,13 @@ class Format0 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+    if (charCode.charCodeAt) {
+      // TODO: FIXME: map this character to a number based on the Apple standard character to glyph mapping
+      charCode = -1;
+      console.warn(
+        `supports(character) not implemented for cmap subtable format 0. only supports(id) is implemented.`
+      );
+    }
     return 0 <= charCode && charCode <= 255;
   }
 

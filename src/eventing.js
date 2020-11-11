@@ -1,6 +1,6 @@
 /**
- * Simple event object so people can write the
- * same code they would for anything else.
+ * Simple event manager so people can write the
+ * same code in the browser and in Node.
  */
 class Event {
   constructor(type, detail = {}, msg) {
@@ -14,7 +14,7 @@ class Event {
     this.__mayPropagate = true;
   }
   preventDefault() {
-    /* doesnothing */
+    /* does nothing */
   }
   stopPropagation() {
     this.__mayPropagate = false;
@@ -31,7 +31,7 @@ class Event {
 
 /**
  * Simple event manager so people can write the
- * same code they would for anything else.
+ * same code in the browser and in Node.
  */
 class EventManager {
   constructor() {

@@ -19,6 +19,7 @@ describe("Basic font testing", () => {
   test("Glyph support", () => {
     expect(font.supports(`f`)).toBe(true);
     expect(font.supports(`i`)).toBe(true);
+    expect(font.supports(String.fromCharCode(0xffff))).toBe(false);
   });
 
   test("HEAD table", () => {

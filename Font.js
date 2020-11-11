@@ -68,12 +68,12 @@ class Font extends EventManager {
      *
      * @param {Buffer} buffer The binary data associated with this font.
      */
-    async fromDataBuffer(buffer, typeOrPath) {
+    async fromDataBuffer(buffer, filenameOrUrL) {
         this.fontData = new DataView(buffer); // Big Endian
         let type = validFontFormat(this.fontData);
         if (!type) {
             // handled in loadFont's .catch()
-            throw new Error(`${typeOrPath} is either an unsupported font format, or not a font at all.`);
+            throw new Error(`${filenameOrUrL} is either an unsupported font format, or not a font at all.`);
         }
         await this.parseBasicData(type);
         const evt = new Event("load", { font: this });

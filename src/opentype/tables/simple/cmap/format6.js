@@ -16,7 +16,13 @@ class Format6 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+    if (charCode.charCodeAt) {
+      // TODO: FIXME: This can be anything, and depends on the Macintosh language indicated by this.language...
+      charCode = -1;
+      console.warn(
+        `supports(character) not implemented for cmap subtable format 6. only supports(id) is implemented.`
+      );
+    }
     if (charCode < this.firstCode) return {};
     if (charCode > this.firstCode + this.entryCount) return {};
     const code = charCode - this.firstCode;
