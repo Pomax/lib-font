@@ -1,6 +1,6 @@
 {
   "name": "@font-js/font-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A JS based OpenType font inspector",
   "main": "Font.js",
   "type": "module",
