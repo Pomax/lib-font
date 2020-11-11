@@ -1,7 +1,7 @@
 {
   "name": "font-js",
   "scope": "@font-js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A JS based OpenType font inspector",
   "main": "Font.js",
   "type": "module",
