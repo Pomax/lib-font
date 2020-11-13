@@ -49,6 +49,10 @@ class Parser {
     this.offset = 0;
   }
 
+  skip(n = 0, bits = 8) {
+    this.offset += (n * bits) / 8;
+  }
+
   getValue(type, increment) {
     let pos = this.start + this.offset;
     this.offset += increment;

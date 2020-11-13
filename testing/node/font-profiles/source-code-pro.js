@@ -1,4 +1,4 @@
-const expectations = {
+export default {
   DFLT: {
     langsys: [`dflt`],
     features: {
@@ -329,5 +329,3 @@ const expectations = {
     },
   },
 };
-
-export { expectations };

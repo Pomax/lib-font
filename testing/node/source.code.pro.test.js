@@ -1,7 +1,8 @@
 import { Font } from "../../../Font.js";
 import { testGSUB } from "./gsub/test-gsub.js";
 
-const font = new Font("basic font testing");
+const font = new Font("source code pro");
+let letterFor = function(){};
 
 describe("Basic font testing", () => {
   beforeAll((done) => {
@@ -14,6 +15,11 @@ describe("Basic font testing", () => {
 
   test("font loaded", () => {
     expect(font.opentype).toBeDefined();
+
+    letterFor = function(glyphid) {
+      let reversed = font.opentype.tables.cmap.reverse(glyphid);
+      return reversed.unicode ?? `[${glyphid}:??]`;
+    };
   });
 
   test("Glyph support", () => {
@@ -36,6 +42,60 @@ describe("Basic font testing", () => {
   });
 
   test("GSUB table", () => {
-    testGSUB(font.opentype.tables);
+    testGSUB(font, {
+      script: [],
+      feature: [],
+      lookup: [
+        oneForOneSubstitution,
+        ligatureSubstitutions,
+      ]
+    });
   });
 });
+
+
+function oneForOneSubstitution(font, script, lang, feature, lookupId, lookup) {
+  if (lookup.lookupType !== 1) return;
+
+  lookup.subtableOffsets.forEach((_, i) => {
+    const subtable = lookup.getSubTable(i);
+    const coverage = subtable.getCoverageTable();
+    let glyphs = coverage.glyphArray;
+    if (!glyphs) {
+      glyphs = coverage.rangeRecords.map(
+        (r) => `${r.startGlyphID}-${r.endGlyphID}`
+      );
+    }
+  });
+}
+
+
+function ligatureSubstitutions(font, script, lang, feature, lookupId, lookup) {
+  if (lookup.lookupType !== 4) return;
+
+  lookup.subtableOffsets.forEach((_, i) => {
+    const subtable = lookup.getSubTable(i);
+    const coverage = subtable.getCoverageTable();
+
+    subtable.ligatureSetOffsets.forEach((_, setIndex) => {
+      const ligatureSet = subtable.getLigatureSet(setIndex);
+
+      ligatureSet.ligatureOffsets.forEach((_, ligIndex) => {
+        const ligatureTable = ligatureSet.getLigature(ligIndex);
+
+        const sequence = [
+          coverage.glyphArray[setIndex],
+          ...ligatureTable.componentGlyphIDs,
+        ];
+
+        // console.log(
+        //   `ligature set [${setIndex}], ligature table [${ligIndex}]: ${script}[${lang}].${feature.featureTag}[${id}]: ligature (coverage:${coverage.coverageFormat}) [ ${
+        //     sequence.map(letterFor).join(` + `)
+        //   } ] -> ${
+        //     letterFor(ligatureTable.ligatureGlyph)
+        //   }`
+        // );
+      });
+    });
+  });
+}
