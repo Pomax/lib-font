@@ -173,7 +173,7 @@ To make this work on your own pages, add the following bit to your document head
 
 Because you already have lots of text shaping engines available. In the browser, it's literally your browser (you can already draw all the text you need, properly shaped and typeset, both in HTML and on a Canvas). In node, it's whatever graphics library you're using to already draw everything else you need to draw.
 
-Proper OpenType text shaping is _incredibly complex_ and requires _a lot_ of specialized code; there is no reason for this library to pretend it supports text shaping when it's guaranteed to do it worse that other technologies you're already using.
+Proper OpenType text shaping is _incredibly complex_ and requires _a lot_ of specialized code; there is no reason for this library to pretend it supports text shaping when it's guaranteed to do it worse than other technologies you're already using.
 
 
 ## Why would I use this instead of OpenType.js or Fontkit or something?
