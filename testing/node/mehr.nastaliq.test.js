@@ -34,6 +34,6 @@ function type6LookupTest(font, script, langsys, feature, lookupId, lookup) {
 }
 
 function type8LookupTest(font, script, langsys, feature, lookupId, lookup) {
-  if (lookup.lookupType !== 6) return;
+  if (lookup.lookupType !== 8) return;
   console.log(script, langsys, feature, lookupId);
 }
