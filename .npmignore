@@ -4,5 +4,5 @@ protected
 testing
 .gitignore
 index.html
-index.js
+/index.js
 test.js
