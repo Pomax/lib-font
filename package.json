@@ -19,7 +19,7 @@
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/",
-    "build": "cross-env NO_COLOR=1 rollup --no-treeshake --no-treeshake.unknownGlobalSideEffects --external=fs --format=esm lib-font > dist/lib-font"
+    "build": "cross-env NO_COLOR=1 rollup --no-treeshake --no-treeshake.unknownGlobalSideEffects --external=fs --format=esm lib-font.js > ./dist/lib-font.js"
   },
   "repository": {
     "type": "git",
