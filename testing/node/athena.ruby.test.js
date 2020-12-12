@@ -1,4 +1,4 @@
-import { Font } from "../../Font.js";
+import { Font } from "../../lib-font.js";
 import { testGSUB } from "./gsub/test-gsub.js";
 
 const font = new Font("athena ruby");

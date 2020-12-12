@@ -1,8 +1,9 @@
 {
-  "name": "font-js",
+  "name": "lib-font",
   "version": "1.0.6",
   "description": "A JS based OpenType font inspector",
-  "main": "Font.js",
+  "main": "./lib-font.js",
+  "exports": "./lib-font.js",
   "type": "module",
   "author": "Pomax",
   "license": "LICENSE.md",
@@ -13,16 +14,16 @@
   "scripts": {
     "start": "npm test",
     "clean": "prettier --write \"src/**/*.js\"",
-    "test": "run-s clean test:jest test:browser build",
+    "test": "run-s clean build test:jest test:browser",
     "test:browser": "run-p test:server test:puppeteer",
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/",
-    "build": "rollup --no-treeshake --external=fs --format=esm Font.js > dist/font.js"
+    "build": "cross-env NO_COLOR=1 rollup --no-treeshake --no-treeshake.unknownGlobalSideEffects --external=fs --format=esm lib-font > dist/lib-font"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pomax/font.js.git"
+    "url": "git+https://github.com/Pomax/lib-font.git"
   },
   "keywords": [
     "opentype",
@@ -33,9 +34,9 @@
     "debug"
   ],
   "bugs": {
-    "url": "https://github.com/Pomax/font.js/issues"
+    "url": "https://github.com/Pomax/lib-font/issues"
   },
-  "homepage": "https://github.com/Pomax/font.js#readme",
+  "homepage": "https://github.com/Pomax/lib-font#readme",
   "devDependencies": {
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
@@ -44,6 +45,6 @@
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
     "puppeteer": "^5.3.1",
-    "rollup": "^2.32.1"
+    "rollup": "^2.34.2"
   }
 }

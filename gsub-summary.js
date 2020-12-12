@@ -1,4 +1,4 @@
-import { Font } from "./Font.js";
+import { Font } from "./lib-font.js";
 
 let font = new Font("test");
 font.onerror = evt => console.error(evt);

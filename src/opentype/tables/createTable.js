@@ -86,7 +86,9 @@ function createTable(tables, dict, dataview) {
   let name = dict.tag.replace(/[^\w\d]/g, ``);
   let Type = tableClasses[name];
   if (Type) return new Type(dict, dataview, tables);
-  console.warn(`Font.js has no definition for ${name}. The table was skipped.`);
+  console.warn(
+    `lib-font has no definition for ${name}. The table was skipped.`
+  );
   return {};
 }
 

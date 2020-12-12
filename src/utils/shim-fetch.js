@@ -38,7 +38,7 @@ if (!fetch) {
     .catch((err) => {
       console.error(err);
       throw new Error(
-        `Font.js cannot run unless either the Fetch API or Node's filesystem module is available.`
+        `lib-font cannot run unless either the Fetch API or Node's filesystem module is available.`
       );
     });
 }
