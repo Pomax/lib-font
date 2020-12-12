@@ -13,9 +13,13 @@ Note that there is no legacy commonjs version of this library available. Node LT
 
 #### Browser "installation"
 
-Download the [`./dist/lib-font.js`](https://github.com/Pomax/lib-font/tree/master/dist/lib-font.js) file and put it wherever your codebase puts third party libraries. Then load it in the browser using a modern module script tag in the `<head>`, of the form `<script type="module" src=".../lib-font.js" async>`.
+As all modern browsers support ES modules, simply [download]() place the `lib-font` dir in your JS asset dir, and then load it in the browser using a modern module script tag in the `<head>`, of the form `<script type="module" src=".../lib-font.js">`.
 
-Note that there is no legacy ES5 version of this library available. Every modern browser supports ES modules. Have a lookt at [babel](https://babeljs.io/) if you really have no choice but to use ES5.
+If you want a single-file solution, then download the rolled up [`./dist/lib-font.js`](https://github.com/Pomax/lib-font/tree/master/dist/lib-font.js) file and put it wherever your codebase puts third party libraries.
+
+**WARNING: THIS DOES NOT CURRENTLY YIELD A WORKING FILE, DUE TO ROLLUP RENAMING CRUCIAL VARIABLES**
+
+Note that there is no legacy ES5 version of this library available. Have a look at [babel](https://babeljs.io/) if you really have no choice but to use ES5.
 
 ## Introduction
 
