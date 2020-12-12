@@ -152,7 +152,7 @@ class LookupType5 extends LookupType {
 
     if (this.substFormat === 3) {
       // undo the coverageOffset parsing, because this format uses an
-      // entire *array* of coverage offsets instead.
+      // entire *array* of coverage offsets instead, like 6.3
       p.currentPosition -= 2;
       delete this.coverageOffset;
 
@@ -279,6 +279,11 @@ class LookupType6 extends LookupType {
     }
 
     if (this.substFormat === 3) {
+      // undo the coverageOffset parsing, because this format uses an
+      // entire *array* of coverage offsets instead, like 5.3
+      p.currentPosition -= 2;
+      delete this.coverageOffset;
+
       this.backtrackGlyphCount = p.uint16;
       this.backtrackCoverageOffsets = [
         ...new Array(this.backtrackGlyphCount),
