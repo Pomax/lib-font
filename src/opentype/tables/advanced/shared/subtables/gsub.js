@@ -14,6 +14,12 @@ class LookupType extends ParsedData {
   }
 }
 
+function undoCoverageOffsetParsing(instance) {
+  instance.parser.currentPosition -= 2;
+  delete instance.coverageOffset;
+  delete instance.getCoverageTable;
+}
+
 // ===================================================================================
 
 class LookupType1 extends LookupType {
@@ -153,8 +159,7 @@ class LookupType5 extends LookupType {
     if (this.substFormat === 3) {
       // undo the coverageOffset parsing, because this format uses an
       // entire *array* of coverage offsets instead, like 6.3
-      p.currentPosition -= 2;
-      delete this.coverageOffset;
+      undoCoverageOffsetParsing(this);
 
       this.glyphCount = p.uint16;
       this.substitutionCount = p.uint16;
@@ -281,8 +286,7 @@ class LookupType6 extends LookupType {
     if (this.substFormat === 3) {
       // undo the coverageOffset parsing, because this format uses an
       // entire *array* of coverage offsets instead, like 5.3
-      p.currentPosition -= 2;
-      delete this.coverageOffset;
+      undoCoverageOffsetParsing(this);
 
       this.backtrackGlyphCount = p.uint16;
       this.backtrackCoverageOffsets = [
@@ -404,7 +408,7 @@ class ChainSubClassRuleTable {
 
 // ===================================================================================
 
-class LookupType7 extends LookupType {
+class LookupType7 extends ParsedData { // note: not "extends LookupType"
   constructor(p) {
     super(p);
     this.substFormat = p.uint16;
@@ -418,8 +422,6 @@ class LookupType7 extends LookupType {
 class LookupType8 extends LookupType {
   constructor(p) {
     super(p);
-    this.substFormat = p.uint16;
-    this.coverageOffset = p.Offset16;
     this.backtrackGlyphCount = p.uint16;
     this.backtrackCoverageOffsets = [
       ...new Array(this.backtrackGlyphCount),
