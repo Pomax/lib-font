@@ -1,4 +1,5 @@
 import { SimpleTable } from "../../simple-table.js";
+import lazy from "../../../../lazy.js";
 
 /**
  * The OpenType `fpgm` table.
