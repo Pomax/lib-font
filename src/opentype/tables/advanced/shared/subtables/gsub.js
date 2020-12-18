@@ -300,9 +300,9 @@ class LookupType6 extends LookupType {
       this.lookaheadCoverageOffsets = [
         ...new Array(this.lookaheadGlyphCount),
       ].map((_) => p.Offset16);
-      this.substitutionCount = p.uint16;
-      this.substLookupRecords = [...new Array(this.substitutionCount)].map(
-        (_) => new SubstLookupRecord(p)
+      this.seqLookupCount = p.uint16;
+      this.seqLookupRecords = [...new Array(this.substitutionCount)].map(
+        (_) => new SequenceLookupRecord(p)
       );
     }
   }
@@ -399,16 +399,24 @@ class ChainSubClassRuleTable {
     );
     this.substitutionCount = p.uint16;
     this.substLookupRecords = [...new Array(this.substitutionCount)].map(
-      (_) => new SubstLookupRecord(p)
+      (_) => new SequenceLookupRecord(p)
     );
   }
 }
 
-// 6.3 does not rely on additional classes
+// 6.3
+
+class SequenceLookupRecord extends ParsedData {
+  constructor(p) {
+    this.sequenceIndex = p.uint16;
+    this.lookupListIndex = p.uint16;
+  }
+}
 
 // ===================================================================================
 
-class LookupType7 extends ParsedData { // note: not "extends LookupType"
+class LookupType7 extends ParsedData {
+  // note: not "extends LookupType"
   constructor(p) {
     super(p);
     this.substFormat = p.uint16;

@@ -30,10 +30,15 @@ describe("Basic font testing", () => {
 
 function type6LookupTest(font, script, langsys, feature, lookupId, lookup) {
   if (lookup.lookupType !== 6) return;
-  console.log(script, langsys, feature, lookupId);
+  // console.log(script, langsys, feature, lookupId);
+  console.log(lookup);
+  for(let i=0; i<lookup.subTableCount; i++) {
+    let subtable = lookup.getSubTable(i);
+    console.log(`format: ${subtable.substFormat}`);
+  }
 }
 
 function type8LookupTest(font, script, langsys, feature, lookupId, lookup) {
   if (lookup.lookupType !== 8) return;
-  console.log(script, langsys, feature, lookupId);
+  // console.log(script, langsys, feature, lookupId);
 }
