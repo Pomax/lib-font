@@ -15,10 +15,6 @@ Note that there is no legacy commonjs version of this library available. Node LT
 
 As all modern browsers support ES modules, simply [download]() place the `lib-font` dir in your JS asset dir, and then load it in the browser using a modern module script tag in the `<head>`, of the form `<script type="module" src=".../lib-font.js">`.
 
-If you want a single-file solution, then download the rolled up [`./dist/lib-font.js`](https://github.com/Pomax/lib-font/tree/master/dist/lib-font.js) file and put it wherever your codebase puts third party libraries.
-
-**WARNING: THIS DOES NOT CURRENTLY YIELD A WORKING FILE, DUE TO ROLLUP RENAMING CRUCIAL VARIABLES**
-
 Note that there is no legacy ES5 version of this library available. Have a look at [babel](https://babeljs.io/) if you really have no choice but to use ES5.
 
 ## Introduction
@@ -149,19 +145,7 @@ This is the main access point for any font table, where each table is accessed d
 
 ## Development
 
-While the whole point of ES modules is that you don't need to bundle anything because both the browser and node can be told to load the main file, and dependencies are automatically resolved, there is a `dist` build task that can be run using `npm run build` that builds a rolled up version of the library as a single file.
-
-This is equivalent to running the following command:
-
-```bash
-$ npx rollup --no-treeshake --format=esm lib-font.js > dist/lib-font.js
-```
-
-Note that this does not include the `inflate` and `unbrotli` libraries from the `./lib` directory: as optional dependencies, they're intentionally left out when you roll up the code. Without them, plain opentype parsing will still work perfectly fine, but woff and woff2 parsing obviously won't.
-
-Also note that this is not minified code: gzip is already pretty great at making things small, and if you need things even smaller than that, your project presumably has its own minification task(s) in place.
-
-**WARNING: THIS DOES NOT CURRENTLY YIELD A WORKING FILE, DUE TO ROLLUP RENAMING CRUCIAL VARIABLES**
+The main entry point for this library is `./lib-font.js`, with all code dependencies found in the `./src` directory,.
 
 ### Testing
 
@@ -169,7 +153,6 @@ The `npm test` command should be all you need in order to run the tests, provide
 
 - Node based testing uses Jest tests, found in the `./testing/node` dir.
 - Browser based testing uses Puppetter, found in the `./testing/browser/tests` dir.
-
 
 
 ## Compatibility

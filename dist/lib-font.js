@@ -1,19 +1,19 @@
 
 //→ lib-font.js:
-export { F as Font } from './lib-font-009abab9.js';
+export { F as Font } from './lib-font-010e217a.js';
 
-//→ lib-font-009abab9.js:
+//→ lib-font-010e217a.js:
 /**
  * A shim for the Fetch API. If not defined, we assume we're running
  * in Node.js and shim the fetch function using the `fs` module.
  */
 
-let fetch$1 = globalThis.fetch;
+let fetchFunction = globalThis.fetch;
 
-if (!fetch$1) {
+if (!fetchFunction) {
   let backlog = [];
 
-  fetch$1 = globalThis.fetch = (...args) => {
+  fetchFunction = globalThis.fetch = (...args) => {
     return new Promise((resolve, reject) => {
       backlog.push({ args, resolve, reject });
     });
@@ -21,7 +21,7 @@ if (!fetch$1) {
 
   import('fs')
     .then((fs) => {
-      fetch$1 = globalThis.fetch = async function (path) {
+      fetchFunction = globalThis.fetch = async function (path) {
         return new Promise((resolve, reject) => {
           fs.readFile(path, (err, data) => {
             if (err) return reject(err);
@@ -35,7 +35,7 @@ if (!fetch$1) {
 
       while (backlog.length) {
         let instruction = backlog.shift();
-        fetch$1(...instruction.args)
+        fetchFunction(...instruction.args)
           .then((data) => instruction.resolve(data))
           .catch((err) => instruction.reject(err));
       }
@@ -47,8 +47,6 @@ if (!fetch$1) {
       );
     });
 }
-
-var shimFetch = "shim activated";
 
 /**
  * Simple event manager so people can write the
@@ -671,63 +669,63 @@ let tableClassesLoaded = false;
 // until every class definition has been loaded.
 Promise.all([
   // opentype tables
-  import('./cmap-610deb19.js'),
-  import('./head-331ff939.js'),
-  import('./hhea-75dbb71c.js'),
-  import('./hmtx-adb0acf4.js'),
-  import('./maxp-be06acd1.js'),
-  import('./name-d01f8c82.js'),
-  import('./OS2-4dde541c.js'),
-  import('./post-0ab467dd.js'),
+  import('./cmap-d7175649.js'),
+  import('./head-490118f1.js'),
+  import('./hhea-b8b3f859.js'),
+  import('./hmtx-7870ebe8.js'),
+  import('./maxp-384fb1cd.js'),
+  import('./name-c42f0c11.js'),
+  import('./OS2-4b65c57c.js'),
+  import('./post-2195a9f7.js'),
 
   // opentype tables that rely on the "common layout tables" data structures
-  import('./BASE-d87a0c44.js'),
-  import('./GDEF-6fdaf83f.js'),
-  import('./GSUB-a1e87f54.js'),
-  import('./GPOS-fd625d64.js'),
+  import('./BASE-0599ab56.js'),
+  import('./GDEF-3bf6d7f3.js'),
+  import('./GSUB-77e25e90.js'),
+  import('./GPOS-b8bdff76.js'),
 
   // SVG tables... err... table
-  import('./SVG-d0d5bc3e.js'),
+  import('./SVG-9ba42b33.js'),
 
   // Variable fonts
-  import('./fvar-008ed73c.js'),
+  import('./fvar-18e1f77e.js'),
 
   // TTF tables
-  import('./cvt-58b32334.js'),
-  import('./fpgm-3b5d5004.js'),
-  import('./gasp-628c75bc.js'),
-  import('./glyf-66a8acb5.js'),
-  import('./loca-8b8e996f.js'),
-  import('./prep-eff6479b.js'),
+  import('./cvt-b17f8712.js'),
+  import('./fpgm-d630fa35.js'),
+  import('./gasp-b80f0647.js'),
+  import('./glyf-48aba669.js'),
+  import('./loca-c659f185.js'),
+  import('./prep-ecd0f1ea.js'),
 
   // CFF
-  import('./CFF-52cd4523.js'),
-  import('./CFF2-393639de.js'),
-  import('./VORG-d143834a.js'),
+  import('./CFF-bf00a8d2.js'),
+  import('./CFF2-ac2aa12d.js'),
+  import('./VORG-24763627.js'),
 
   // bitmap
-  import('./EBLC-8f7bff62.js'),
-  import('./EBDT-a5f1b460.js'),
-  import('./EBSC-801581ee.js'),
-  import('./CBLC-9b534eb0.js'),
-  import('./CBDT-aa3d7bf0.js'),
-  import('./sbix-77063ac0.js'),
+  import('./EBLC-ae1079d8.js'),
+  import('./EBDT-e9a575da.js'),
+  import('./EBSC-38e8584a.js'),
+  import('./CBLC-74c58e5b.js'),
+  import('./CBDT-876c64c5.js'),
+  import('./sbix-879dae6b.js'),
 
   // color
-  import('./COLR-fa85f581.js'),
-  import('./CPAL-d4ca40fb.js'),
+  import('./COLR-a0a391db.js'),
+  import('./CPAL-c407666f.js'),
 
   // "other" tables
-  import('./DSIG-48ff9f39.js'),
-  import('./hdmx-a720a765.js'),
-  import('./kern-be789af2.js'),
-  import('./LTSH-6609c7c6.js'),
-  import('./MERG-49e9166b.js'),
-  import('./meta-b063acce.js'),
-  import('./PCLT-60f4a492.js'),
-  import('./VDMX-125e0fcc.js'),
-  import('./vhea-927af843.js'),
-  import('./vmtx-67c98e85.js'),
+  import('./DSIG-cd7e5600.js'),
+  import('./hdmx-633b64ef.js'),
+  import('./kern-a5d48804.js'),
+  import('./LTSH-446fb910.js'),
+  import('./MERG-44379f63.js'),
+  import('./meta-364be82c.js'),
+  import('./PCLT-cf7d553b.js'),
+  import('./VDMX-003e77e7.js'),
+  import('./vhea-0a74a75b.js'),
+  import('./vmtx-b1f7f0eb.js'),
 ])
 
   // Step 3: rebind all the class imports so that
@@ -1051,8 +1049,8 @@ globalThis.Font = Font;
 
 export { Font as F, ParsedData as P, SimpleTable as S, lazy as l };
 
-//→ cmap-610deb19.js:
-import { P as ParsedData, l as lazy, S as SimpleTable } from './lib-font-009abab9.js';
+//→ cmap-d7175649.js:
+import { P as ParsedData, l as lazy, S as SimpleTable } from './lib-font-010e217a.js';
 
 class Subtable extends ParsedData {
   constructor(p, plaformID, encodingID) {
@@ -1676,8 +1674,8 @@ class EncodingRecord {
 
 export { cmap };
 
-//→ head-331ff939.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ head-490118f1.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `head` table.
@@ -1712,8 +1710,8 @@ class head extends SimpleTable {
 
 export { head };
 
-//→ hhea-75dbb71c.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ hhea-b8b3f859.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `hhea` table.
@@ -1749,8 +1747,8 @@ class hhea extends SimpleTable {
 
 export { hhea };
 
-//→ hmtx-adb0acf4.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ hmtx-7870ebe8.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `hmtx` table.
@@ -1791,8 +1789,8 @@ class LongHorMetric {
 
 export { hmtx };
 
-//→ maxp-be06acd1.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ maxp-384fb1cd.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `maxp` table.
@@ -1828,8 +1826,8 @@ class maxp extends SimpleTable {
 
 export { maxp };
 
-//→ name-d01f8c82.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ name-c42f0c11.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `name` table.
@@ -1928,8 +1926,8 @@ function decodeString(p, record) {
 
 export { name };
 
-//→ OS2-4dde541c.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ OS2-4b65c57c.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `OS/2` table.
@@ -1995,8 +1993,8 @@ class OS2 extends SimpleTable {
 
 export { OS2 };
 
-//→ post-0ab467dd.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ post-2195a9f7.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `post` table.
@@ -2338,8 +2336,8 @@ const macStrings = [
 
 export { post };
 
-//→ BASE-d87a0c44.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ BASE-0599ab56.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `BASE` table.
@@ -2539,9 +2537,9 @@ class BaseCoordTable {
 
 export { BASE };
 
-//→ GDEF-6fdaf83f.js:
-import { S as SimpleTable, l as lazy, P as ParsedData } from './lib-font-009abab9.js';
-import { C as CoverageTable } from './coverage-79ae9647.js';
+//→ GDEF-3bf6d7f3.js:
+import { S as SimpleTable, l as lazy, P as ParsedData } from './lib-font-010e217a.js';
+import { C as CoverageTable } from './coverage-98059f3a.js';
 
 class ClassDefinition {
   constructor(p) {
@@ -2584,39 +2582,6 @@ class ItemVariationStoreTable {
     this.itemVariationDataOffsets = [
       ...new Array(this.itemVariationDataCount),
     ].map((_) => p.Offset32);
-  }
-}
-
-class ItemVariationData {
-  constructor(p) {
-    this.itemCount = p.uint16;
-    this.shortDeltaCount = p.uint16;
-    this.regionIndexCount = p.uint16;
-    this.regionIndexes = p.uint16;
-    this.deltaSets = [...new Array(this.itemCount)].map(
-      (_) => new DeltaSet(p, this.shortDeltaCount, this.regionIndexCount)
-    );
-  }
-}
-
-class DeltaSet {
-  constructor(p, shortDeltaCount, regionIndexCount) {
-    // the documentation here seems problematic:
-    //
-    // "Logically, each DeltaSet record has regionIndexCount number of elements.
-    //  The first shortDeltaCount elements are represented as signed 16-bit values
-    //  (int16), and the remaining regionIndexCount - shortDeltaCount elements are
-    //  represented as signed 8-bit values (int8). The length of the data for each
-    //  row is shortDeltaCount + regionIndexCount."
-    //
-    // I'm assuming that should be "the remaining regionIndexCount elements are".
-    this.DeltaData = [];
-    while (shortDeltaCount-- > 0) {
-      this.DeltaData.push(p.in16);
-    }
-    while (regionIndexCount-- > 0) {
-      this.DeltaData.push(p.int8);
-    }
   }
 }
 
@@ -2780,8 +2745,8 @@ class MarkGlyphSetsTable extends ParsedData {
 
 export { GDEF };
 
-//→ coverage-79ae9647.js:
-import { P as ParsedData } from './lib-font-009abab9.js';
+//→ coverage-98059f3a.js:
+import { P as ParsedData } from './lib-font-010e217a.js';
 
 class CoverageTable extends ParsedData {
   constructor(p) {
@@ -2813,10 +2778,10 @@ class CoverageRangeRecord {
 
 export { CoverageTable as C };
 
-//→ GSUB-a1e87f54.js:
-import './lib-font-009abab9.js';
-import './coverage-79ae9647.js';
-import { C as CommonLayoutTable } from './common-layout-table-9dd94efd.js';
+//→ GSUB-77e25e90.js:
+import './lib-font-010e217a.js';
+import './coverage-98059f3a.js';
+import { C as CommonLayoutTable } from './common-layout-table-321ce987.js';
 
 class GSUB extends CommonLayoutTable {
   constructor(dict, dataview) {
@@ -2830,9 +2795,9 @@ class GSUB extends CommonLayoutTable {
 
 export { GSUB };
 
-//→ common-layout-table-9dd94efd.js:
-import { P as ParsedData, S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
-import { C as CoverageTable } from './coverage-79ae9647.js';
+//→ common-layout-table-321ce987.js:
+import { P as ParsedData, S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
+import { C as CoverageTable } from './coverage-98059f3a.js';
 
 /**
  * ...
@@ -3279,9 +3244,9 @@ class LookupType6 extends LookupType {
       this.lookaheadCoverageOffsets = [
         ...new Array(this.lookaheadGlyphCount),
       ].map((_) => p.Offset16);
-      this.substitutionCount = p.uint16;
-      this.substLookupRecords = [...new Array(this.substitutionCount)].map(
-        (_) => new SubstLookupRecord(p)
+      this.seqLookupCount = p.uint16;
+      this.seqLookupRecords = [...new Array(this.substitutionCount)].map(
+        (_) => new SequenceLookupRecord(p)
       );
     }
   }
@@ -3378,12 +3343,20 @@ class ChainSubClassRuleTable {
     );
     this.substitutionCount = p.uint16;
     this.substLookupRecords = [...new Array(this.substitutionCount)].map(
-      (_) => new SubstLookupRecord(p)
+      (_) => new SequenceLookupRecord(p)
     );
   }
 }
 
-// 6.3 does not rely on additional classes
+// 6.3
+
+class SequenceLookupRecord extends ParsedData {
+  constructor(p) {
+    super(p);
+    this.sequenceIndex = p.uint16;
+    this.lookupListIndex = p.uint16;
+  }
+}
 
 // ===================================================================================
 
@@ -3722,10 +3695,10 @@ class CommonLayoutTable extends SimpleTable {
 
 export { CommonLayoutTable as C };
 
-//→ GPOS-fd625d64.js:
-import './lib-font-009abab9.js';
-import './coverage-79ae9647.js';
-import { C as CommonLayoutTable } from './common-layout-table-9dd94efd.js';
+//→ GPOS-b8bdff76.js:
+import './lib-font-010e217a.js';
+import './coverage-98059f3a.js';
+import { C as CommonLayoutTable } from './common-layout-table-321ce987.js';
 
 class GPOS extends CommonLayoutTable {
   constructor(dict, dataview) {
@@ -3738,8 +3711,8 @@ class GPOS extends CommonLayoutTable {
 
 export { GPOS };
 
-//→ SVG-d0d5bc3e.js:
-import { S as SimpleTable, P as ParsedData } from './lib-font-009abab9.js';
+//→ SVG-9ba42b33.js:
+import { S as SimpleTable, P as ParsedData } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `SVG` table.
@@ -3810,8 +3783,8 @@ class SVGDocumentRecord {
 
 export { SVG };
 
-//→ fvar-008ed73c.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ fvar-18e1f77e.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `fvar` table.
@@ -3886,8 +3859,8 @@ class InstanceRecord {
 
 export { fvar };
 
-//→ cvt-58b32334.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ cvt-b17f8712.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `cvt` table.
@@ -3911,8 +3884,8 @@ class cvt extends SimpleTable {
 
 export { cvt };
 
-//→ fpgm-3b5d5004.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ fpgm-d630fa35.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `fpgm` table.
@@ -3934,8 +3907,8 @@ class fpgm extends SimpleTable {
 
 export { fpgm };
 
-//→ gasp-628c75bc.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ gasp-b80f0647.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `gasp` table.
@@ -3967,8 +3940,8 @@ class GASPRange {
 
 export { gasp };
 
-//→ glyf-66a8acb5.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ glyf-48aba669.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `glyf` table.
@@ -3989,8 +3962,8 @@ class glyf extends SimpleTable {
 
 export { glyf };
 
-//→ loca-8b8e996f.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ loca-c659f185.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `loca` table.
@@ -4020,8 +3993,8 @@ class loca extends SimpleTable {
 
 export { loca };
 
-//→ prep-eff6479b.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ prep-ecd0f1ea.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `prep` table.
@@ -4043,8 +4016,8 @@ class prep extends SimpleTable {
 
 export { prep };
 
-//→ CFF-52cd4523.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ CFF-bf00a8d2.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `CFF` table.
@@ -4060,8 +4033,8 @@ class CFF extends SimpleTable {
 
 export { CFF };
 
-//→ CFF2-393639de.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ CFF2-ac2aa12d.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `CFF2` table.
@@ -4077,8 +4050,8 @@ class CFF2 extends SimpleTable {
 
 export { CFF2 };
 
-//→ VORG-d143834a.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ VORG-24763627.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `VORG` table.
@@ -4111,9 +4084,9 @@ class VertOriginYMetric {
 
 export { VORG };
 
-//→ EBLC-8f7bff62.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
-import { B as BitmapSize } from './shared-78f1b51e.js';
+//→ EBLC-ae1079d8.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
+import { B as BitmapSize } from './shared-800f134c.js';
 
 /**
  * The OpenType `EBLC` table.
@@ -4136,7 +4109,7 @@ class EBLC extends SimpleTable {
 
 export { EBLC };
 
-//→ shared-78f1b51e.js:
+//→ shared-800f134c.js:
 class BitmapSize {
   constructor(p) {
     this.indexSubTableArrayOffset = p.Offset32; // from beginning of CBLC
@@ -4182,57 +4155,10 @@ class SbitLineMetrics {
   }
 }
 
-class IndexSubHeader {
-  constructor(p) {
-    this.indexFormat = p.uint16;
-    this.imageFormat = p.uint16;
-    this.imageDataOffset = p.Offset32; // Offset to image data in EBDT table.
-  }
-}
-
-class BigGlyphMetrics {
-  constructor(p) {
-    this.height = uint8;
-    this.width = uint8;
-    this.horiBearingX = int8;
-    this.horiBearingY = int8;
-    this.horiAdvance = uint8;
-    this.vertBearingX = int8;
-    this.vertBearingY = int8;
-    this.vertAdvance = uint8;
-  }
-}
-
-class SmallGlyphMetrics {
-  constructor(p) {
-    this.height = p.uint8;
-    this.width = p.uint8;
-    this.bearingX = p.int8;
-    this.bearingY = p.int8;
-    this.advance = p.uint8;
-  }
-}
-
-class EBDTComponent {
-  constructor(p) {
-    this.glyphID = p.uint16;
-    this.xOffset = p.int8;
-    this.yOffset = p.int8;
-  }
-}
-
-class IndexSubTableArray {
-  constructor(p) {
-    this.firstGlyphIndex = p.uint16;
-    this.lastGlyphIndex = p.uint16;
-    this.additionalOffsetToIndexSubtable = p.Offset32; // from beginning of EBLC.
-  }
-}
-
 export { BitmapSize as B, BitmapScale as a };
 
-//→ EBDT-a5f1b460.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ EBDT-e9a575da.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `EBDT` table.
@@ -4252,9 +4178,9 @@ class EBDT extends SimpleTable {
 
 export { EBDT };
 
-//→ EBSC-801581ee.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
-import { a as BitmapScale } from './shared-78f1b51e.js';
+//→ EBSC-38e8584a.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
+import { a as BitmapScale } from './shared-800f134c.js';
 
 /**
  * The OpenType `EBSC` table.
@@ -4277,10 +4203,10 @@ class EBSC extends SimpleTable {
 
 export { EBSC };
 
-//→ CBLC-9b534eb0.js:
-import './lib-font-009abab9.js';
-import './shared-78f1b51e.js';
-import { EBLC } from './EBLC-8f7bff62.js';
+//→ CBLC-74c58e5b.js:
+import './lib-font-010e217a.js';
+import './shared-800f134c.js';
+import { EBLC } from './EBLC-ae1079d8.js';
 
 /**
  * The OpenType `CBLC` table.
@@ -4295,9 +4221,9 @@ class CBLC extends EBLC {
 
 export { CBLC };
 
-//→ CBDT-aa3d7bf0.js:
-import './lib-font-009abab9.js';
-import { EBDT } from './EBDT-a5f1b460.js';
+//→ CBDT-876c64c5.js:
+import './lib-font-010e217a.js';
+import { EBDT } from './EBDT-e9a575da.js';
 
 /**
  * The OpenType `CBDT` table.
@@ -4314,8 +4240,8 @@ class CBDT extends EBDT {
 
 export { CBDT };
 
-//→ sbix-77063ac0.js:
-import { S as SimpleTable, l as lazy, P as ParsedData } from './lib-font-009abab9.js';
+//→ sbix-879dae6b.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `sbix` table.
@@ -4343,37 +4269,10 @@ class sbix extends SimpleTable {
   // TODO: add a strike accessor
 }
 
-class Strike extends ParsedData {
-  constructor(p, numGlyphs) {
-    this.ppem = p.uint16;
-    this.ppi = p.uint16;
-    lazy(this, `glyphDataOffsets`, () =>
-      [...new Array(numGlyphs + 1)].map((_) => p.Offset32)
-    ); // from the beginning of the strike data header
-  }
-
-  // TODO: add a glyph data accessor
-}
-
-class GlyphData {
-  constructor(p) {
-    this.originOffsetX = p.int16;
-    this.originOffsetY = p.int16;
-    this.graphicType = p.tag;
-
-    // The actual embedded graphic data has a byte length that is inferred from sequential
-    // entries in the strike.glyphDataOffsets array + the fixed size (8 bytes) of the preceding fields.
-    const len = 0;
-    lazy(this, `data`, () => p.readBytes(len));
-
-    // TODO: make this.data load in the correct data
-  }
-}
-
 export { sbix };
 
-//→ COLR-fa85f581.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ COLR-a0a391db.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `COLR` table.
@@ -4452,8 +4351,8 @@ class LayerRecord {
 
 export { COLR };
 
-//→ CPAL-d4ca40fb.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ CPAL-c407666f.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `CPAL` table.
@@ -4537,8 +4436,8 @@ class PaletteEntryLabelArray {
 
 export { CPAL };
 
-//→ DSIG-48ff9f39.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ DSIG-cd7e5600.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `DSIG` table.
@@ -4585,8 +4484,8 @@ class SignatureBlockFormat1 {
 
 export { DSIG };
 
-//→ hdmx-a720a765.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ hdmx-633b64ef.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `hdmx` table.
@@ -4616,8 +4515,8 @@ class DeviceRecord {
 
 export { hdmx };
 
-//→ kern-be789af2.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ kern-a5d48804.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `kern` table.
@@ -4703,8 +4602,8 @@ class Pair {
 
 export { kern };
 
-//→ LTSH-6609c7c6.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ LTSH-446fb910.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `LTSH` table.
@@ -4722,8 +4621,8 @@ class LTSH extends SimpleTable {
 
 export { LTSH };
 
-//→ MERG-49e9166b.js:
-import { S as SimpleTable, l as lazy } from './lib-font-009abab9.js';
+//→ MERG-44379f63.js:
+import { S as SimpleTable, l as lazy } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `MERG` table.
@@ -4755,8 +4654,8 @@ class MERG extends SimpleTable {
 
 export { MERG };
 
-//→ meta-b063acce.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ meta-364be82c.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `meta` table.
@@ -4797,8 +4696,8 @@ class DataMap {
 
 export { meta };
 
-//→ PCLT-60f4a492.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ PCLT-cf7d553b.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `PCLT` table.
@@ -4819,8 +4718,8 @@ class PCLT extends SimpleTable {
 
 export { PCLT };
 
-//→ VDMX-125e0fcc.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ VDMX-003e77e7.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `VDMX` table.
@@ -4869,8 +4768,8 @@ class vTable {
 
 export { VDMX };
 
-//→ vhea-927af843.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ vhea-0a74a75b.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `vhea` table.
@@ -4906,8 +4805,8 @@ class vhea extends SimpleTable {
 
 export { vhea };
 
-//→ vmtx-67c98e85.js:
-import { S as SimpleTable } from './lib-font-009abab9.js';
+//→ vmtx-b1f7f0eb.js:
+import { S as SimpleTable } from './lib-font-010e217a.js';
 
 /**
  * The OpenType `vmtx` table.

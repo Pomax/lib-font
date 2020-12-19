@@ -3,12 +3,12 @@
  * in Node.js and shim the fetch function using the `fs` module.
  */
 
-let fetch = globalThis.fetch;
+let fetchFunction = globalThis.fetch;
 
-if (!fetch) {
+if (!fetchFunction) {
   let backlog = [];
 
-  fetch = globalThis.fetch = (...args) => {
+  fetchFunction = globalThis.fetch = (...args) => {
     return new Promise((resolve, reject) => {
       backlog.push({ args, resolve, reject });
     });
@@ -16,7 +16,7 @@ if (!fetch) {
 
   import("fs")
     .then((fs) => {
-      fetch = globalThis.fetch = async function (path) {
+      fetchFunction = globalThis.fetch = async function (path) {
         return new Promise((resolve, reject) => {
           fs.readFile(path, (err, data) => {
             if (err) return reject(err);
@@ -30,7 +30,7 @@ if (!fetch) {
 
       while (backlog.length) {
         let instruction = backlog.shift();
-        fetch(...instruction.args)
+        fetchFunction(...instruction.args)
           .then((data) => instruction.resolve(data))
           .catch((err) => instruction.reject(err));
       }

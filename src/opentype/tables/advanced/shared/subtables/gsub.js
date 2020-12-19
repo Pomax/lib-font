@@ -326,6 +326,16 @@ class LookupType6 extends LookupType {
     p.currentPosition = this.start + this.chainSubClassSetOffsets[index];
     return new ChainSubClassSetTable(p);
   }
+
+  getCoverageFromOffset(offset) {
+    if (this.substFormat !== 3)
+      throw new Error(
+        `lookup type 6.${this.substFormat} does not use contextual coverage offsets.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + offset;
+    return new CoverageTable(p);
+  }
 }
 
 // 6.1
@@ -408,6 +418,7 @@ class ChainSubClassRuleTable {
 
 class SequenceLookupRecord extends ParsedData {
   constructor(p) {
+    super(p);
     this.sequenceIndex = p.uint16;
     this.lookupListIndex = p.uint16;
   }
