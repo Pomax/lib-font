@@ -2,6 +2,13 @@ import { SimpleTable } from "./tables/simple-table.js";
 import lazy from "../lazy.js";
 
 const brotliDecode = globalThis.unbrotli;
+let nativeBrotliDecode = undefined;
+
+if (!brotliDecode) {
+  import("zlib").then((zlib) => {
+    nativeBrotliDecode = (buffer) => zlib.brotliDecompressSync(buffer);
+  });
+}
 
 /**
  * The WOFF2 header
@@ -10,7 +17,7 @@ const brotliDecode = globalThis.unbrotli;
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for font information
  */
 class WOFF2 extends SimpleTable {
-  constructor(dataview, createTable) {
+  constructor(font, dataview, createTable) {
     const { p } = super({ offset: 0, length: 48 }, dataview, `woff2`);
     this.signature = p.tag;
     this.flavor = p.uint32;
@@ -33,24 +40,37 @@ class WOFF2 extends SimpleTable {
     this.directory = [...new Array(this.numTables)].map(
       (_) => new Woff2TableDirectoryEntry(p)
     );
-    let dictOffset = p.currentPosition;
+    let dictOffset = p.currentPosition; // = start of CompressedFontData block
 
     // compute table byte offsets in the decompressed data
-    this.directory[0].origOffset = 0;
+    this.directory[0].offset = 0;
     this.directory.forEach((e, i) => {
-      let t = this.directory[i + 1];
-      if (t) {
-        const useTransform = typeof e.transformLength !== "undefined";
-        t.origOffset =
-          e.origOffset + (useTransform ? e.transformLength : e.origLength);
+      let next = this.directory[i + 1];
+      if (next) {
+        next.offset =
+          e.offset + (e.transformLength ? e.transformLength : e.origLength);
       }
     });
 
     // then decompress the original data and lazy-bind
-    let decoded = brotliDecode(
-      new Uint8Array(dataview.buffer.slice(dictOffset))
-    );
-    buildWoff2LazyLookups(this, decoded, createTable);
+    let buffer = dataview.buffer.slice(dictOffset);
+
+    if (brotliDecode) {
+      const decoded = brotliDecode(
+        new Uint8Array(buffer)
+      );
+      buildWoff2LazyLookups(this, decoded, createTable);
+    }
+
+    else if (nativeBrotliDecode) {
+      const decoded = new Uint8Array(nativeBrotliDecode(buffer));
+      buildWoff2LazyLookups(this, decoded, createTable);
+    }
+
+    else {
+      const msg = `no brotli decoder available to decode WOFF2 font`;
+      if (font.onerror) font.onerror(msg);
+    }
   }
 }
 
@@ -68,38 +88,44 @@ class Woff2TableDirectoryEntry {
       this.tag = getWOFF2Tag(tagNumber);
     }
 
+    /*
+        "Bits 6 and 7 indicate the preprocessing transformation version number (0-3)
+        that was applied to each table. For all tables in a font, except for 'glyf'
+        and 'loca' tables, transformation version 0 indicates the null transform
+        where the original table data is passed directly to the Brotli compressor
+        for inclusion in the compressed data stream. For 'glyf' and 'loca' tables,
+        transformation version 3 indicates the null transform"
+    */
+    const transformVersion = (this.transformVersion = (this.flags & 192) >> 6);
+    let hasTransforms = transformVersion !== 0;
+    if (this.tag === `glyf` || this.tag === `loca`) {
+      hasTransforms = this.transformVersion !== 3;
+    }
+
     this.origLength = p.uint128;
-    const pptVersion = (this.pptVersion = this.flags >> 6);
-    if (
-      pptVersion !== 0 ||
-      ((this.tag === "glyf" || this.tag === "loca") && pptVersion !== 3)
-    ) {
+    if (hasTransforms) {
       this.transformLength = p.uint128;
     }
-    this.length = p.offset; // FIXME: we can probably calculat this without asking the parser
   }
 }
 
 /**
  * Build late-evaluating properties for each table in a
- * woff/woff2 font, so that accessing a table via the
- * woff.tables.tableName or woff2.tables.tableName
- * property kicks off a table parse on first access.
+ * woff2 font, so that accessing a table via the
+ * font.opentype.tables.tableName property kicks off
+ * a table parse on first access.
  *
- * @param {*} woff the woff or woff2 font object
- * @param {DataView} dataview passed when dealing with woff
- * @param {buffer} decoded passed when dealing with woff2
+ * @param {*} woff2 the woff2 font object
+ * @param {decoded} the original (decompressed) SFNT data
+ * @param {createTable} the opentype table builder function
  */
 function buildWoff2LazyLookups(woff2, decoded, createTable) {
   woff2.tables = {};
   woff2.directory.forEach((entry) => {
     lazy(woff2.tables, entry.tag.trim(), () => {
-      const useTransform = typeof entry.transformLength !== "undefined";
-      const data = decoded.slice(
-        entry.origOffset,
-        entry.origOffset +
-          (useTransform ? entry.transformLength : entry.origLength)
-      );
+      const start = entry.offset;
+      const end = start + (entry.transformLength ? entry.transformLength : entry.origLength);
+      const data = decoded.slice(start, end);
       return createTable(
         woff2.tables,
         { tag: entry.tag, offset: 0, length: entry.origLength },
@@ -179,7 +205,7 @@ function getWOFF2Tag(flag) {
     `Gloc`,
     `Feat`,
     `Sill`,
-  ][flag];
+  ][flag & 63];
 }
 
 export { WOFF2 };

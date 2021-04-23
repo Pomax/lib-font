@@ -7,7 +7,7 @@ import lazy from "../lazy.js";
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for more information
  */
 class SFNT extends SimpleTable {
-  constructor(dataview, createTable) {
+  constructor(font, dataview, createTable) {
     const { p } = super({ offset: 0, length: 12 }, dataview, `sfnt`);
 
     this.version = p.uint32;

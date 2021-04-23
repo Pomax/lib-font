@@ -10,7 +10,7 @@ const gzipDecode = globalThis.pako ? globalThis.pako.inflate : undefined;
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/overview for font information
  */
 class WOFF extends SimpleTable {
-  constructor(dataview, createTable) {
+  constructor(font, dataview, createTable) {
     const { p } = super({ offset: 0, length: 44 }, dataview, `woff`);
 
     this.signature = p.tag;
