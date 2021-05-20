@@ -56,18 +56,12 @@ class WOFF2 extends SimpleTable {
     let buffer = dataview.buffer.slice(dictOffset);
 
     if (brotliDecode) {
-      const decoded = brotliDecode(
-        new Uint8Array(buffer)
-      );
+      const decoded = brotliDecode(new Uint8Array(buffer));
       buildWoff2LazyLookups(this, decoded, createTable);
-    }
-
-    else if (nativeBrotliDecode) {
+    } else if (nativeBrotliDecode) {
       const decoded = new Uint8Array(nativeBrotliDecode(buffer));
       buildWoff2LazyLookups(this, decoded, createTable);
-    }
-
-    else {
+    } else {
       const msg = `no brotli decoder available to decode WOFF2 font`;
       if (font.onerror) font.onerror(msg);
     }
@@ -124,7 +118,9 @@ function buildWoff2LazyLookups(woff2, decoded, createTable) {
   woff2.directory.forEach((entry) => {
     lazy(woff2.tables, entry.tag.trim(), () => {
       const start = entry.offset;
-      const end = start + (entry.transformLength ? entry.transformLength : entry.origLength);
+      const end =
+        start +
+        (entry.transformLength ? entry.transformLength : entry.origLength);
       const data = decoded.slice(start, end);
       return createTable(
         woff2.tables,
