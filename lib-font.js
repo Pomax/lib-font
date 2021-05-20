@@ -87,13 +87,13 @@ class Font extends EventManager {
     async parseBasicData(type) {
         return loadTableClasses().then(createTable => {
             if (type === `SFNT`) {
-                this.opentype = new SFNT(this.fontData, createTable);
+                this.opentype = new SFNT(this, this.fontData, createTable);
             }
             if (type === `WOFF`) {
-                this.opentype = new WOFF(this.fontData, createTable);
+                this.opentype = new WOFF(this, this.fontData, createTable);
             }
             if (type === `WOFF2`) {
-                this.opentype = new WOFF2(this.fontData, createTable);
+                this.opentype = new WOFF2(this, this.fontData, createTable);
             }
             return this.opentype;
         });

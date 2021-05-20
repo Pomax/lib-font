@@ -15,8 +15,8 @@ import lazy from "../../lazy.js";
  * See https://docs.microsoft.com/en-us/typography/opentype/spec/GPOS
  */
 class CommonLayoutTable extends SimpleTable {
-  constructor(name, dict, dataview) {
-    const { p, tableStart } = super(name, dict, dataview);
+  constructor(dict, dataview, name) {
+    const { p, tableStart } = super(dict, dataview, name);
 
     this.majorVersion = p.uint16;
     this.minorVersion = p.uint16;
