@@ -1,4 +1,4 @@
-// This example is taken from LibFont's README
+// This is the "introduction" example from LibFont's README
 
 // Import the LibFont library
 import { Font } from "../lib-font.js";
