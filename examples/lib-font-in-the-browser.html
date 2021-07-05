@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Use LibFont in the browser</title>
+    <script src="../lib/inflate.js" defer></script>
+    <script src="../lib/unbrotli.js" defer></script>
+    <script src="../lib-font.js" type="module" defer></script>
+</head>
+<body>
+
+    <h1>Use LibFont in the browser</h1>
+
+    <p>Note: you have to serve this from a
+    <a href="https://gist.github.com/willurd/5720255">local web server</a>.
+    It won't work if you open this file from the filesystem.</p>
+
+    <p>Load font: <input type="file" class="upload"></p>
+
+    <p class="output"></p>
+
+    <script>
+        // Watch the <input> element to see if a file has been picked
+        const upload = document.querySelector(".upload");
+        upload.onchange = (evt) => {
+            // Grab file frop drop event or file upload
+            const file = evt.target.files[0];
+
+            // Use FileReader to, well, read the file
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+
+            reader.onload = () => {
+                // Create a font object
+                const font = new Font("My Font Name");
+
+                // Pass the buffer, and the original filename
+                font.fromDataBuffer(reader.result, file.name);
+
+                font.onload = (evt) => {
+                  // Map the details LibFont gathered from the font to the
+                  // "font" variable
+                  const font = evt.detail.font;
+
+                  // From all the OpenType tables in the font, take the "name"
+                  // table so we can inspect it further
+                  const { name } = font.opentype.tables;
+
+                  // From the name table, take the entry with ID "1". This is
+                  // the Font Family name. More info and names you can grab:
+                  // https://docs.microsoft.com/en-us/typography/opentype/spec/name
+                  const fontname = name.get(1);
+
+                  // Tell us the name!
+                  const message = `This font is called ${fontname}.`;
+                  const output = document.querySelector(".output");
+                  output.innerText = `${message}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
