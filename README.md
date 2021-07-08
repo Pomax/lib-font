@@ -22,7 +22,7 @@ As all modern browsers support ES modules, simply [download](https://github.com/
     <meta charset="utf-8">
     <title>...</title>
     ...
-    <script type="module" src=".../lib-font.js" async>
+    <script type="module" src=".../lib-font.js" async></script>
   </head>
       
   <body>
