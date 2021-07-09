@@ -76,7 +76,9 @@ class NameRecord {
  * different ways.
  */
 function decodeString(p, record) {
-  const { nameID, platformID, encodingID, length } = record;
+  const { platformID, length } = record;
+
+  if (length === 0) return ``;
 
   // We decode strings for the Unicode/Microsoft platforms as UTF-16
   if (platformID === 0 || platformID === 3) {

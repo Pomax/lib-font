@@ -14,11 +14,12 @@
   "scripts": {
     "start": "npm test",
     "clean": "prettier --write \"src/**/*.js\"",
-    "test": "run-s clean test:jest test:browser",
+    "test": "run-s clean test:jest:node test:browser",
     "test:browser": "run-p test:server test:puppeteer",
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
-    "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false ./testing/node/",
+    "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false",
+    "test:jest:node": "npm run test:jest -- ./testing/node/",
     "test:manual": "http-server -o testing/manual/index.html"
   },
   "repository": {
