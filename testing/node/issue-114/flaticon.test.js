@@ -20,6 +20,9 @@ describe("Basic font testing", () => {
 
     expect(name).toBeDefined();
     expect(name.count).toBe(14);
+
+    const ID3 = `FontForge 2.0 : Flaticon : 21-12-2019`;
+    expect(name.get(3)).toBe(ID3);
   });
 });
 
