@@ -19,6 +19,7 @@ describe("Basic font testing", () => {
     const { name } = font.opentype.tables;
 
     expect(name).toBeDefined();
+    expect(name.count).toBe(14);
   });
 });
 
