@@ -48,23 +48,26 @@ class WOFF2 extends SimpleTable {
       let next = this.directory[i + 1];
       if (next) {
         next.offset =
-          e.offset + (e.transformLength ? e.transformLength : e.origLength);
+          e.offset +
+          (e.transformLength !== undefined ? e.transformLength : e.origLength);
       }
     });
 
     // then decompress the original data and lazy-bind
+    let decoded;
     let buffer = dataview.buffer.slice(dictOffset);
 
     if (brotliDecode) {
-      const decoded = brotliDecode(new Uint8Array(buffer));
-      buildWoff2LazyLookups(this, decoded, createTable);
+      decoded = brotliDecode(new Uint8Array(buffer));
     } else if (nativeBrotliDecode) {
-      const decoded = new Uint8Array(nativeBrotliDecode(buffer));
-      buildWoff2LazyLookups(this, decoded, createTable);
+      decoded = new Uint8Array(nativeBrotliDecode(buffer));
     } else {
       const msg = `no brotli decoder available to decode WOFF2 font`;
       if (font.onerror) font.onerror(msg);
+      throw new Error(msg);
     }
+
+    buildWoff2LazyLookups(this, decoded, createTable);
   }
 }
 
@@ -121,12 +124,16 @@ function buildWoff2LazyLookups(woff2, decoded, createTable) {
       const end =
         start +
         (entry.transformLength ? entry.transformLength : entry.origLength);
-      const data = decoded.slice(start, end);
-      return createTable(
-        woff2.tables,
-        { tag: entry.tag, offset: 0, length: entry.origLength },
-        new DataView(data.buffer)
-      );
+      const data = new DataView(decoded.slice(start, end).buffer);
+      try {
+        return createTable(
+          woff2.tables,
+          { tag: entry.tag, offset: 0, length: entry.origLength },
+          data
+        );
+      } catch (e) {
+        console.error(e);
+      }
     });
   });
 }
