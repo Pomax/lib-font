@@ -14,13 +14,16 @@
   "scripts": {
     "start": "npm test",
     "clean": "prettier --write \"src/**/*.js\"",
-    "test": "run-s clean test:jest:node test:browser",
+    "test": "run-s clean test:jest:node test:browser bundle",
     "test:browser": "run-p test:server test:puppeteer",
     "test:server": "node ./testing/browser/server.js",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false",
     "test:jest:node": "npm run test:jest -- ./testing/node/",
-    "test:manual": "http-server -o testing/manual/index.html"
+    "test:manual": "http-server -o testing/manual/index.html",
+    "bundle": "run-s rollup terser",
+    "rollup": "rollup -i lib-font.js -n Font -o bundle.js --inlineDynamicImports --external fs,zlib",
+    "terser": "terser bundle.js -o bundle.js"
   },
   "repository": {
     "type": "git",
@@ -46,6 +49,8 @@
     "npm-run-all": "^4.1.5",
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
-    "puppeteer": "^5.3.1"
+    "puppeteer": "^5.3.1",
+    "rollup": "^2.53.0",
+    "terser": "^5.7.1"
   }
 }
