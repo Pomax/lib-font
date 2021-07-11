@@ -31,7 +31,7 @@ You can either use the pre-built `lib-font.browser.js` bundle, or you can [downl
 </html>
 ```
 
-Note that there is no legacy ES5 version of this library available. Except for IE11, there are no ES5 browsers anymore, so if you _really_ need to target dead browsers, have a look at [babel](https://babeljs.io/).
+Note that there is no legacy ES5 version of this library available. There are no ES5 browsers outside of IE11 anymore, so if you _really_ need to target dead browsers, have a look at [babel](https://babeljs.io/).
 
 ## Introduction
 
