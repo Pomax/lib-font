@@ -22,8 +22,8 @@
     "test:jest:node": "npm run test:jest -- ./testing/node/",
     "test:manual": "http-server -o testing/manual/index.html",
     "bundle": "run-s rollup terser",
-    "rollup": "rollup -i lib-font.js -n Font -o bundle.js --inlineDynamicImports --external fs,zlib",
-    "terser": "terser bundle.js -o bundle.js"
+    "rollup": "rollup -i lib-font.js -n Font -o lib-font.browser.js --inlineDynamicImports --external fs,zlib",
+    "terser": "terser lib-font.browser.js -o lib-font.browser.js"
   },
   "repository": {
     "type": "git",

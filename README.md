@@ -5,15 +5,15 @@ If you're looking for the (really) old ES5 version of LibFont, when it was still
 
 ## td;dr:
 
-#### Node installation
+### Node installation
 
 Use `npm install lib-font`, after which the package can be imported using `import { Font } from "lib-font"`.
 
 Note that there is no legacy commonjs version of this library available. Node LTS 14 and above have native support for ES modules - Have a look at `babel`'s [transform-modules-commonjs](https://babeljs.io/docs/en/babel-plugin-transform-modules-commonjs) plugin if you really have no choice but to use commonjs.
 
-#### Browser "installation"
+### Browser "installation"
 
-As all modern browsers support ES modules, simply [download](https://github.com/Pomax/lib-font/releases/tag/v2.1.1) the code and place the `lib-font` dir in your JS asset dir, then load it in the browser using a modern module script tag in the `<head>`:
+You can either use the pre-built `lib-font.browser.js` bundle, or you can [download](https://github.com/Pomax/lib-font/releases/tag/v2.3.2) the code and unpack it into a vendor directory, then point to the `lib-font.js` file in that directory. Either way, remember to tell the browser that this is modern ES module code by using `type="module"` in the script tag, and be kind to your users and remember the `async` attribute, too:
 
 ```html
 <!doctype html>
@@ -24,14 +24,14 @@ As all modern browsers support ES modules, simply [download](https://github.com/
     ...
     <script type="module" src=".../lib-font.js" async></script>
   </head>
-      
+
   <body>
     ...
   </body>
 </html>
 ```
 
-Note that there is no legacy ES5 version of this library available. Have a look at [babel](https://babeljs.io/) if you really have no choice but to use ES5.
+Note that there is no legacy ES5 version of this library available. Except for IE11, there are no ES5 browsers anymore, so if you _really_ need to target dead browsers, have a look at [babel](https://babeljs.io/).
 
 ## Introduction
 
