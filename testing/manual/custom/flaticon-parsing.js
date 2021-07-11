@@ -1,8 +1,12 @@
 import { Font } from "../../../lib-font.js";
 
 const font = new Font("flaticon");
-font.onload = (evt) => testFont(evt.detail.font);
-font.src = "./fonts/issue-114/Flaticon.woff2";
+font.onload = (evt) => {
+  try { testFont(evt.detail.font); }
+  catch (e) { console.error(e); }
+};
+
+font.src = "./fonts/proprietary/helvetica.woff";
 
 function testFont(font) {
   const { directory, tables } = font.opentype;

@@ -2,6 +2,13 @@ import { SimpleTable } from "./tables/simple-table.js";
 import lazy from "../lazy.js";
 
 const gzipDecode = globalThis.pako ? globalThis.pako.inflate : undefined;
+let nativeGzipDecode = undefined;
+
+if (!gzipDecode) {
+  import("zlib").then((zlib) => {
+    nativeGzipDecode = (buffer) => zlib.unzipSync(buffer);
+  });
+}
 
 /**
  * The WOFF header
@@ -67,11 +74,22 @@ function buildWoffLazyLookups(woff, dataview, createTable) {
       let view = dataview;
       // compressed data?
       if (entry.compLength !== entry.origLength) {
-        const unpacked = gzipDecode(
-          new Uint8Array(
-            dataview.buffer.slice(entry.offset, entry.offset + entry.compLength)
-          )
+        const data = dataview.buffer.slice(
+          entry.offset,
+          entry.offset + entry.compLength
         );
+
+        let unpacked;
+        if (gzipDecode) {
+          unpacked = gzipDecode(new Uint8Array(data));
+        } else if (nativeGzipDecode) {
+          unpacked = nativeGzipDecode(new Uint8Array(data));
+        } else {
+          const msg = `no brotli decoder available to decode WOFF2 font`;
+          if (font.onerror) font.onerror(msg);
+          throw new Error(msg);
+        }
+
         view = new DataView(unpacked.buffer);
       }
       // uncompressed data.

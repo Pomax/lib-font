@@ -1,9 +1,9 @@
-import { Font } from "./lib-font.js";
+import { Font } from "../lib-font.js";
 
 let font = new Font("test");
 font.onerror = evt => console.error(evt);
 font.onload = evt => load();
-font.src = "./fonts/MehrNastaliqWeb-Regular.ttf";
+font.src = "...";
 
 
 function load() {
