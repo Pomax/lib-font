@@ -20,7 +20,7 @@ export class LookupType extends ParsedData {
   }
 }
 
-// used by types 5 through 8
+// used by types 5 and 6
 export class SubstLookupRecord {
   constructor(p) {
     this.glyphSequenceIndex = p.uint16; // Index into current glyph sequence — first glyph = 0.
