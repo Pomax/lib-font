@@ -1,5 +1,5 @@
-import { ParsedData } from "../../../../../../parser.js";
-import { LookupType } from "./gsub.js";
+import { ParsedData } from "../../../../../parser.js";
+import { LookupType } from "./gsub-lookup.js";
 
 export class LookupType4 extends LookupType {
   constructor(p) {

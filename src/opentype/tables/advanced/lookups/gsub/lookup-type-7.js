@@ -1,4 +1,4 @@
-import { ParsedData } from "../../../../../../parser.js";
+import { ParsedData } from "../../../../../parser.js";
 
 export class LookupType7 extends ParsedData {
   // note: not "extends LookupType"

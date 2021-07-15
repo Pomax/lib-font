@@ -1,4 +1,4 @@
-import { LookupType } from "./gsub.js";
+import { LookupType } from "./gsub-lookup.js";
 
 export class LookupType2 extends LookupType {
   constructor(p) {

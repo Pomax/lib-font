@@ -1,5 +1,5 @@
-import { ParsedData } from "../../../../../../parser.js";
-import { CoverageTable } from "../../coverage.js";
+import { ParsedData } from "../../../../../parser.js";
+import { CoverageTable } from "../../shared/coverage.js";
 
 export function undoCoverageOffsetParsing(instance) {
   instance.parser.currentPosition -= 2;

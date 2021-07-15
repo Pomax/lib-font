@@ -1,6 +1,6 @@
-import { ParsedData } from "../../../../../../parser.js";
-import { LookupType, undoCoverageOffsetParsing } from "./gsub.js";
-import { CoverageTable } from "../../coverage.js";
+import { ParsedData } from "../../../../../parser.js";
+import { LookupType, undoCoverageOffsetParsing } from "./gsub-lookup.js";
+import { CoverageTable } from "../../shared/coverage.js";
 
 export class LookupType5 extends LookupType {
   constructor(p) {

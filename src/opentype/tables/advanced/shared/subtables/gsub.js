@@ -1,11 +1,11 @@
-import { LookupType1 } from "./lookuptypes/gsub-1.js";
-import { LookupType2 } from "./lookuptypes/gsub-2.js";
-import { LookupType3 } from "./lookuptypes/gsub-3.js";
-import { LookupType4 } from "./lookuptypes/gsub-4.js";
-import { LookupType5 } from "./lookuptypes/gsub-5.js";
-import { LookupType6 } from "./lookuptypes/gsub-6.js";
-import { LookupType7 } from "./lookuptypes/gsub-7.js";
-import { LookupType8 } from "./lookuptypes/gsub-8.js";
+import { LookupType1 } from "../../lookups/gsub/lookup-type-1.js";
+import { LookupType2 } from "../../lookups/gsub/lookup-type-2.js";
+import { LookupType3 } from "../../lookups/gsub/lookup-type-3.js";
+import { LookupType4 } from "../../lookups/gsub/lookup-type-4.js";
+import { LookupType5 } from "../../lookups/gsub/lookup-type-5.js";
+import { LookupType6 } from "../../lookups/gsub/lookup-type-6.js";
+import { LookupType7 } from "../../lookups/gsub/lookup-type-7.js";
+import { LookupType8 } from "../../lookups/gsub/lookup-type-8.js";
 
 export default {
   buildSubtable: function (type, p) {
