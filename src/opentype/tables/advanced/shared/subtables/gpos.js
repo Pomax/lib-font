@@ -1,56 +1,12 @@
-class LookupType1 {
-  constructor(p) {
-    console.log(`lookup type 1`);
-  }
-}
-
-class LookupType2 {
-  constructor(p) {
-    console.log(`lookup type 2`);
-  }
-}
-
-class LookupType3 {
-  constructor(p) {
-    console.log(`lookup type 3`);
-  }
-}
-
-class LookupType4 {
-  constructor(p) {
-    console.log(`lookup type 4`);
-  }
-}
-
-class LookupType5 {
-  constructor(p) {
-    console.log(`lookup type 5`);
-  }
-}
-
-class LookupType6 {
-  constructor(p) {
-    console.log(`lookup type 6`);
-  }
-}
-
-class LookupType7 {
-  constructor(p) {
-    console.log(`lookup type 7`);
-  }
-}
-
-class LookupType8 {
-  constructor(p) {
-    console.log(`lookup type 8`);
-  }
-}
-
-class LookupType9 {
-  constructor(p) {
-    console.log(`lookup type 9`);
-  }
-}
+import { LookupType1 } from "../../lookups/gpos/lookup-type-1.js";
+import { LookupType2 } from "../../lookups/gpos/lookup-type-2.js";
+import { LookupType3 } from "../../lookups/gpos/lookup-type-3.js";
+import { LookupType4 } from "../../lookups/gpos/lookup-type-4.js";
+import { LookupType5 } from "../../lookups/gpos/lookup-type-5.js";
+import { LookupType6 } from "../../lookups/gpos/lookup-type-6.js";
+import { LookupType7 } from "../../lookups/gpos/lookup-type-7.js";
+import { LookupType8 } from "../../lookups/gpos/lookup-type-8.js";
+import { LookupType9 } from "../../lookups/gpos/lookup-type-9.js";
 
 export default {
   buildSubtable: function (type, p) {
