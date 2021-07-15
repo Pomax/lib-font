@@ -36,10 +36,10 @@ function testFont(font) {
           const lookup = GSUB.getLookup(id);
 
           lookup.subtableOffsets.forEach((_, i) => {
-            console.log(
-              `Getting subtable ${i}, lookup ${id}, feature ${feature.featureTag}, script ${script} , lang ${lang}`
-            );
             const subtable = lookup.getSubTable(i);
+            console.log(
+              `Getting subtable ${i}, lookup ${id}, lookuptype ${subtable.substFormat}, feature ${feature.featureTag}, script ${script} , lang ${lang}`
+            );
           });
         });
       });
