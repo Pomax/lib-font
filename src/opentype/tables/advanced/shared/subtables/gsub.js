@@ -22,5 +22,5 @@ export default {
     ][type](p);
     subtable.type = type;
     return subtable;
-  }
+  },
 };
