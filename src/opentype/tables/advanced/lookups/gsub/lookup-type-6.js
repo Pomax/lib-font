@@ -20,7 +20,6 @@ class LookupType6 extends LookupType {
     }
 
     if (this.substFormat === 2) {
-      this.coverageOffset = p.Offset16;
       this.backtrackClassDefOffset = p.Offset16;
       this.inputClassDefOffset = p.Offset16;
       this.lookaheadClassDefOffset = p.Offset16;
