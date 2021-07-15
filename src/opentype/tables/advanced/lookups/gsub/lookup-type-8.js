@@ -1,6 +1,6 @@
 import { LookupType } from "./gsub-lookup.js";
 
-export class LookupType8 extends LookupType {
+class LookupType8 extends LookupType {
   constructor(p) {
     super(p);
     this.backtrackGlyphCount = p.uint16;
@@ -17,3 +17,5 @@ export class LookupType8 extends LookupType {
     );
   }
 }
+
+export { LookupType8 };

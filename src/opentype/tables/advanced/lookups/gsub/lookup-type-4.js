@@ -1,7 +1,7 @@
 import { ParsedData } from "../../../../../parser.js";
 import { LookupType } from "./gsub-lookup.js";
 
-export class LookupType4 extends LookupType {
+class LookupType4 extends LookupType {
   constructor(p) {
     super(p);
     this.ligatureSetCount = p.uint16;
@@ -40,3 +40,5 @@ class LigatureTable {
     );
   }
 }
+
+export { LookupType4 };

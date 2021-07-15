@@ -1,6 +1,6 @@
 import { ParsedData } from "../../../../../parser.js";
 
-export class LookupType7 extends ParsedData {
+class LookupType7 extends ParsedData {
   // note: not "extends LookupType"
   constructor(p) {
     super(p);
@@ -9,3 +9,5 @@ export class LookupType7 extends ParsedData {
     this.extensionOffset = p.Offset32;
   }
 }
+
+export { LookupType7 };

@@ -1,8 +1,12 @@
 import { ParsedData } from "../../../../../parser.js";
-import { LookupType, undoCoverageOffsetParsing } from "./gsub-lookup.js";
+import {
+  LookupType,
+  undoCoverageOffsetParsing,
+  SubstLookupRecord,
+} from "./gsub-lookup.js";
 import { CoverageTable } from "../../shared/coverage.js";
 
-export class LookupType5 extends LookupType {
+class LookupType5 extends LookupType {
   constructor(p) {
     super(p);
 
@@ -123,3 +127,5 @@ class SubClassRuleTable extends SubRuleTable {
     super(p);
   }
 }
+
+export { LookupType5 };
