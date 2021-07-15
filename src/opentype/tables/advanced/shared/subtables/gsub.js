@@ -9,23 +9,18 @@ import { LookupType8 } from "../../lookups/gsub/lookup-type-8.js";
 
 export default {
   buildSubtable: function (type, p) {
-    switch (type) {
-      case 1:
-        return new LookupType1(p);
-      case 2:
-        return new LookupType2(p);
-      case 3:
-        return new LookupType3(p);
-      case 4:
-        return new LookupType4(p);
-      case 5:
-        return new LookupType5(p);
-      case 6:
-        return new LookupType6(p);
-      case 7:
-        return new LookupType7(p);
-      case 8:
-        return new LookupType8(p);
-    }
-  },
+    const subtable = new [
+      undefined,
+      LookupType1,
+      LookupType2,
+      LookupType3,
+      LookupType4,
+      LookupType5,
+      LookupType6,
+      LookupType7,
+      LookupType8,
+    ][type](p);
+    subtable.type = type;
+    return subtable;
+  }
 };

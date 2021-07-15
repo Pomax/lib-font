@@ -38,7 +38,7 @@ function testFont(font) {
           lookup.subtableOffsets.forEach((_, i) => {
             const subtable = lookup.getSubTable(i);
             console.log(
-              `Getting subtable ${i}, lookup ${id}, lookuptype ${subtable.substFormat}, feature ${feature.featureTag}, script ${script} , lang ${lang}`
+              `Getting lookup ${`${id}`.padStart(2, ' ')}, subtable ${i}, lookuptype ${subtable.type}, format ${subtable.substFormat}, feature ${feature.featureTag}, script ${script}, lang ${lang}`
             );
           });
         });
