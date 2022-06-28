@@ -10,7 +10,7 @@ class SVG extends SimpleTable {
   constructor(dict, dataview) {
     const { p } = super(dict, dataview);
 
-    this.version = uint16;
+    this.version = p.uint16;
     this.offsetToSVGDocumentList = p.Offset32; // from the start of the SVG table
 
     p.currentPosition = this.tableStart + this.offsetToSVGDocumentList;
