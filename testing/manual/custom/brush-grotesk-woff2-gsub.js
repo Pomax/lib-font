@@ -1,4 +1,4 @@
-import { Font } from "./lib-font.js";
+import { Font } from "../../../lib-font.js";
 
 const font = new Font("woff2 testing");
 font.src = `./fonts/broken/BrushPosterGrotesk.woff2`;
