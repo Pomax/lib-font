@@ -31,6 +31,8 @@ You can either use the pre-built `lib-font.browser.js` bundle, or you can [downl
 </html>
 ```
 
+(Although you'll generally want to use this _in_ something so your HTML would look more like `<script type="module" src="./js/myscript.js" async></script>` with the `myscript.js` file having an `import { Font } from "./lib-font";` instead)
+
 Note that there is no legacy ES5 version of this library available. There are no ES5 browsers outside of IE11 anymore, so if you _really_ need to target dead browsers, have a look at [babel](https://babeljs.io/).
 
 ## Introduction
