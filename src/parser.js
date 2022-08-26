@@ -183,7 +183,7 @@ class ParsedData {
       let props = Object.getOwnPropertyDescriptor(struct, p);
       if (props.get) {
         this[p] = props.get.bind(this);
-      } else if (props.value) {
+      } else if (props.value !== undefined) {
         this[p] = props.value;
       }
     });
