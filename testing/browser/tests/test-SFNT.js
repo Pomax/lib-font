@@ -259,6 +259,7 @@ function testSFNT(SFNT, isTTF) { try {
         assertNotEqual(loca, undefined, `loca EXISTS`);
         const glyf = tables.glyf;
         assertNotEqual(glyf, undefined, `glyf EXISTS`);
+        assertEqual(!!loca.x2, tables.head.indexToLocFormat === 0, `Correct interpretation of indexToLocFormat`);
         indent();
     }
 
