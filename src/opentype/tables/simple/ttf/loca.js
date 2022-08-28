@@ -12,7 +12,7 @@ class loca extends SimpleTable {
 
     const n = tables.maxp.numGlyphs + 1; // "plus one" because the offset list needs one extra element to determine the block length for the last supported glyph.
 
-    if (tables.hmtx.indexToLocFormat === 0) {
+    if (tables.head.indexToLocFormat === 0) {
       this.x2 = true;
       lazy(this, `offsets`, () => [...new Array(n)].map((_) => p.Offset16));
     } else {
