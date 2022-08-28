@@ -7,6 +7,5 @@ font.onload = (evt) => {
   const font = evt.detail.font;
   const { tables } = font.opentype;
   const SVGTable = tables["SVG"];
-
   console.log(SVGTable);
 };
