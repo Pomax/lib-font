@@ -1,17 +1,20 @@
+import { Font } from "../../lib-font.js";
+
 const font = new Font("woff2 testing");
 font.onerror = (evt) => console.error(evt);
 font.onload = (evt) => {
   let font = evt.detail.font;
 
-  const { GSUB } = font.opentype.tables;
-  processGSUB(GSUB);
+  Object.entries(font.opentype.tables).forEach(v =>
+    console.log(v[0])
+  );
+
+  // const { GSUB } = font.opentype.tables;
+  // processGSUB(GSUB);
 };
 
 const fonts = [
-  `/fonts/broken/BrushPosterGrotesk.woff2`,
-  `/fonts/broken/135abd30-1390-4f9c-b6a2-d843157c3468.woff2`, // No GSUB table?
-  `/fonts/broken/64017d81-9430-4cba-8219-8f5cc28b923e.woff2`, // No GSUB table?
-  `/fonts/broken/proximanova-regular-webfont.woff2`,
+  `./fonts/AthenaRuby_b018.ttf`,
 ];
 
 font.src = fonts[0];

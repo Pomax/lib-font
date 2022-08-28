@@ -15,5 +15,6 @@ export default function lazy(object, property, getter) {
       val = getter();
       return val;
     },
+    enumerable: true,
   });
 }
