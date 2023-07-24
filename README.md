@@ -207,7 +207,7 @@ I don't have a good answer to that. Those are some great projects, you probably 
 
 #### Alright, what if I have opinions?
 
-Tweet at me! [@TheRealPomax](http://twitter.com/TheRealPomax) or [@TheRealPomax@Mastodon.social](https://mastodon.social/@TheRealPomax) should do nicely, but if you want to have an in-depth discussion, I'd recommend filing an issue, since 280 characters per message is not really sufficient to dig into OpenType details.
+Drop me a message! [@TheRealPomax](https://mastodon.social/@TheRealPomax) should do nicely, but if you want to have an in-depth discussion, I'd recommend filing an issue, since 280 characters per message is not really sufficient to dig into OpenType details.
 
 #### And if I just want to use this?
 
