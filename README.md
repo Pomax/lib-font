@@ -33,7 +33,7 @@ You can either use the pre-built `lib-font.browser.js` bundle, or you can [downl
 
 (Although you'll generally want to use this _in_ something so your HTML would look more like `<script type="module" src="./js/myscript.js" async></script>` with the `myscript.js` file having an `import { Font } from "./lib-font";` instead)
 
-Note that there is no legacy ES5 version of this library available. There are no ES5 browsers outside of IE11 anymore, so if you _really_ need to target dead browsers, have a look at [babel](https://babeljs.io/).
+Note that there is no legacy ES5 version of this library available, because there are no ES5 browsers anymore, every single still in support browser supports ES Modules, so if you _really_ need to target dead browsers have a look at [babel](https://babeljs.io/).
 
 ## Introduction
 
@@ -42,6 +42,13 @@ What if you could actually inspect your fonts? In the same context that you actu
 That's what this is for:
 
 ```js
+// On the Node side: import { Font } from "lib-font";
+// In browser-ESM context: import { Font } from "your/js/dir/lib-font-browser.js";
+//
+// Also note that on the browser side, you can either use the ESM import 
+// or you can load the library "on its own" using its own script tag,
+// which sets up a global `Font` object for you to use.
+
 // Create a font object
 const myFont = new Font(`Adobe Source Code Pro`);
 
@@ -115,10 +122,9 @@ reader.onload = function() {
 };
 ```
 
-#### What about a tag?
+#### What about a tag/element?
 
 This library does not offer a `<font src="..." ...>` tag, in part because proper custom elements _must_ have a hyphen in their name, but primarily because the only DOM related work that a `<font>` tag would be useful for is already handled by `<style>` (for declaring a `@font-face`) and `<link>` (for importing a `@font-face` stylesheet).
-
 
 
 ## API
@@ -204,6 +210,29 @@ Proper OpenType text shaping is _incredibly complex_ and requires _a lot_ of spe
 #### Why would I use this instead of OpenType.js or Fontkit or something?
 
 I don't have a good answer to that. Those are some great projects, you probably _should_ use them if they do what you need? The reason _I_ needed this is because it doesn't do text shaping: it just lets me query the opentype data to get me the information I need, without being too big of a library. And [I've written](https://github.com/Pomax/PHP-Font-Parser) enough [OpenType parsers](https://github.com/Pomax/A-binary-parser-generator) to know [how much code](http://processingjs.nihongoresources.com/glyphing/) goes into the [actual shaping](https://pomax.github.io/CFF-glyphlet-fonts/).
+
+#### How do I use this with webpack?
+
+By first remembering that bundling was born out of JS not having a module system, where we needed to deliver code in a way that required a single `<script>` element instead of tens or even hundreds of script tags that all had to load in a specific order - an order that could not be guaranteed so needed _additional_ code to manage execution dependencies. Bundling solved that problem at a terrible price: it broke browser caching. You well organized code consisting of small files was now a megabyte+ monster and changing even a single letter invalidated the entire bundle. Chunking "tried to solve that" but was a classic "deal with the symptom instead of solving the problem" solution. And then the real solution landed: _JS has a module system now_ and every single browser on the market supports it. Bundling has not been necessary since the summer of 2022, when Microsoft finally killed off the Internet Explorer line of browsers, removing the last reason people had for using things like Browserify or Webpack. This is something you should give serious thought: bundling is a legacy practice, and if your codebase allows for it: stop.
+
+Second, consider switching to [esbuild](https://esbuild.github.io), which is remarkably straight forward to switch to even with complex webpack configurations, and puts your project on a modern and both (_much_) faster and better documented bundler instead. JS tooling like formatters, bundlers, and minifiers should not themselves be written _in_ JS.
+
+However, if you're _absolutely stuck_ with webpack, be on the latest version of Webpack and tell it to ignore `fs` and `zlib`.
+
+```js
+// webpack.config.js
+module.exports = {
+    ...
+    resolve: {
+        fallback: {
+            "fs": false,
+            "zlib": false
+        },
+    }
+}
+```
+
+These modules are not loaded "up front", they are dynamic imports and if you're running in the browser they will never trigger. Simply make webpack ignore them, because the browser will, too.
 
 #### Alright, what if I have opinions?
 
