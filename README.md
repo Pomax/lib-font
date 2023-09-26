@@ -213,13 +213,13 @@ I don't have a good answer to that. Those are some great projects, you probably 
 
 #### How do I use this with webpack?
 
-By first remembering that bundling was born out of JS not having a module system, where we needed to deliver code in a way that required a single `<script>` element instead of tens or even hundreds of script tags that all had to load in a specific order - an order that could not be guaranteed so needed _additional_ code to manage execution dependencies. Bundling solved that problem at a terrible price: it broke browser caching. Your well organized code, consisting of individual files for each role, was now a single megabyt-plus monster file and if you needed to change even a single letter, you'd invalidate the cache entry for that entire bundle. Chunking tried to solve that, but was a classic "deal with the symptom instead of solving the problem" solution. The real solution landed quite a while ago now: _JS has a module system_ called ESM, and every single browser on the market supports it. Bundling has not been necessary since the summer of 2022, when Microsoft finally killed off the Internet Explorer line of browsers, removing the last reason people still had for using things like Browserify or Webpack (and really, it hasn't been necessary since a few years prior, because plenty of sites had the luxury of just not bothering to support IE, because even Microsoft was vocal about the fact that IE was going to get killed off because it was hopelessly out of date for years prior).
+By first remembering that bundling was born out of JS not having a module system, where we needed to deliver code in a way that required a single `<script>` element instead of tens or even hundreds of script tags that all had to load in a specific order - an order that could not be guaranteed so needed _additional_ code to manage execution dependencies. Bundling solved that problem, but at a terrible price: it broke browser caching. Your well organized code consisting of individual files for each role was now a single, megabyte-plus monster file and if you needed to change even a single letter, you'd invalidate the cache entry for that entire bundle. Chunking tried to solve that, but was a classic "deal with the symptom instead of addressing the problem" solution. The real solution landed quite a while ago now: _JS got its own module system_ called ES modules, often just referred to as "ESM", and every single browser on the market supports it. Bundling has not been necessary since the summer of 2022, when Microsoft finally killed off the Internet Explorer line of browsers, removing the last reason people still had for using things like Browserify or Webpack (and really, it hasn't been necessary since a few years prior, because plenty of sites had the luxury of just not bothering to support IE once Edge was available concurrently, because even Microsoft was vocal about the fact that IE was going to get killed off for being hopelessly out of date and incompatible with the web).
 
-This is something you should give serious thought: bundling is a legacy practice, and if your codebase permits it: stop.
+This is something you should give serious thought to: bundling is a legacy practice, and if your codebase permits it, stop bundling. You don't need to, and your pages and even web apps will be more performance if you don't.
 
-Second, consider switching to [esbuild](https://esbuild.github.io), which is remarkably straight forward to switch to even with complex webpack configurations, and puts your project on a modern and both (_much_) faster and better documented bundler instead. JS tooling like formatters, bundlers, and minifiers should not themselves be written _in_ JS.
+Second, if you're somehow still stuck with "needing" to bundle, consider switching to [esbuild](https://esbuild.github.io), which is remarkably straight forward to switch to from webpack, even with complex configurations, and puts your project on a modern and both (_much_) faster and better documented bundler instead. JS tooling like formatters, bundlers, and minifiers should not themselves be written _in_ JS.
 
-However, if you're _absolutely stuck_ with webpack, be on the latest version of Webpack and tell it to ignore `fs` and `zlib`.
+However, if you're _absolutely stuck_ with webpack, then as least be on the latest version of Webpack, and tell it to ignore `fs` and `zlib`.
 
 ```js
 // webpack.config.js
@@ -234,7 +234,7 @@ module.exports = {
 }
 ```
 
-These modules are not loaded "up front", they are dynamic imports and if you're running in the browser they will never trigger. Simply make webpack ignore them, because the browser will, too.
+These modules are not loaded "up front" by lib-font, they are dynamic imports that only run when necessary, so if you're running lib-font in the browser those imports will never trigger, and the fact that webpack didn't bundle anything in for them will never result in a code failure or error. Simply make webpack ignore them, because the browser will, too.
 
 #### Alright, what if I have opinions?
 
