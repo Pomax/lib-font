@@ -1,4 +1,5 @@
 import { SimpleTable } from "../../simple-table.js";
+import lazy from "../../../../lazy.js";
 
 /**
  * The OpenType `vmtx` table.
@@ -11,7 +12,7 @@ import { SimpleTable } from "../../simple-table.js";
  */
 class vmtx extends SimpleTable {
   constructor(dict, dataview, tables) {
-    super(dict, dataview);
+    const { p } = super(dict, dataview);
     const numOfLongVerMetrics = tables.vhea.numOfLongVerMetrics;
     const numGlyphs = tables.maxp.numGlyphs;
 
@@ -19,7 +20,7 @@ class vmtx extends SimpleTable {
     lazy(this, `vMetrics`, () => {
       p.currentPosition = metricsStart;
       return [...new Array(numOfLongVerMetrics)].map(
-        (_) => new LongVertMetric(p.uint16, p.int16)
+        (_) => new LongVerMetric(p.uint16, p.int16)
       );
     });
 
@@ -35,7 +36,8 @@ class vmtx extends SimpleTable {
   }
 }
 
-class LongVertMetric {
+class LongVerMetric {
+  // https://learn.microsoft.com/en-us/typography/opentype/spec/vmtx#vertical-metrics-table-format
   constructor(h, b) {
     this.advanceHeight = h;
     this.topSideBearing = b;
