@@ -26,7 +26,7 @@ class cmap extends SimpleTable {
   getSupportedEncodings() {
     return this.encodingRecords.map((r) => ({
       platformID: r.platformID,
-      encodingId: r.encodingID,
+      encodingID: r.encodingID,
     }));
   }
 
