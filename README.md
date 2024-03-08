@@ -2,6 +2,7 @@
 
 If you're looking for the (really) old ES5 version of LibFont, when it was still called "Font.js", you should be able to find it [here](https://github.com/Pomax/lib-font/tree/v2015).
 
+Also, if this made a difference in your dev life, consider (temporarily, even?) becoming a patron of my work over on https://www.patreon.com/bezierinfo, or send a one-time donatation to [help keep this project funded](https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=QPRDLNGDANJSW). Any amount is appreciated!
 
 ## td;dr:
 
