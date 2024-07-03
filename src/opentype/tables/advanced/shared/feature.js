@@ -41,7 +41,7 @@ class FeatureTable extends ParsedData {
       p.currentPosition = this.start + this.featureParams;
       const tag = this.featureTag;
       if (tag === `size`) return new Size(p);
-      if (tag.startsWith(`cc`)) return new CharacterVariant(p);
+      if (tag.startsWith(`cv`)) return new CharacterVariant(p);
       if (tag.startsWith(`ss`)) return new StylisticSet(p);
     }
   }
