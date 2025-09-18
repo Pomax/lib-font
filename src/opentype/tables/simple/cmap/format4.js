@@ -102,7 +102,7 @@ class Format4 extends Subtable {
       (s) => s.startCode <= charCode && charCode <= s.endCode
     );
     if (!segment) return 0;
-    return segment.glyphIDs[charCode - segment.startCode];
+    return segment.glyphIDs[charCode - segment.startCode] % 65536;
   }
 
   supports(charCode) {
