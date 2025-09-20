@@ -10,8 +10,9 @@ class Format12 extends Subtable {
     this.length = p.uint32;
     this.language = p.uint32;
     this.numGroups = p.uint32;
+    const groupStart = p.currentPosition;
     const getter = () => {
-      p.currentPosition = this.start + 14;
+      p.currentPosition = groupStart;
       return [...new Array(this.numGroups)].map(
         (_) => new SequentialMapGroup(p)
       );

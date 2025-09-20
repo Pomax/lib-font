@@ -18,12 +18,13 @@
     "start": "npm test",
     "terser": "terser lib-font.browser.js -o lib-font.browser.js",
     "test:browser": "run-p test:server test:puppeteer",
-    "test:jest:node": "npm run test:jest -- ./testing/node/",
+    "test:node:jest": "npm run test:jest -- ./testing/node/",
+    "test:node:native": "node --test \"./testing/native-node/**/*.js\"",
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false",
     "test:manual": "http-server -o testing/manual/index.html",
     "test:puppeteer": "node ./testing/browser/puppeteer.js",
     "test:server": "node ./testing/browser/server.js",
-    "test": "run-s clean test:jest:node bundle test:browser"
+    "test": "run-s clean test:node:jest test:node:native bundle test:browser"
   },
   "repository": {
     "type": "git",
