@@ -21,9 +21,7 @@ async function loadFontFromPath(path, name = "Untitled Font") {
 describe(`cmap unit test`, async () => {
   test(`Inter Regular`, async () => {
     const font = await loadFontFromPath("Inter-Regular.otf", "Inter Regular");
-
     const { cmap } = font.opentype.tables;
-
     assert(cmap.getGlyphId(65) === 2); // 0x0041
     assert(cmap.getGlyphId(61153) === 2932); // 0xeee1
     assert(cmap.getGlyphId(129106) === 1807); // 0x1f852
@@ -35,9 +33,7 @@ describe(`cmap unit test`, async () => {
       "SourceCodePro/SourceCodePro-Regular.ttf",
       "Source Code Pro"
     );
-
     const { cmap } = font.opentype.tables;
-
     assert(cmap.getGlyphId(65) === 2);
     assert(cmap.getGlyphId(0x1f3b6) === 1560);
     assert(cmap.getGlyphId(0x2500) === 1395);
@@ -46,9 +42,7 @@ describe(`cmap unit test`, async () => {
 
   test(`Recursive`, async () => {
     const font = await loadFontFromPath("Recursive_VF_1.064.ttf", "Recursive");
-
     const { cmap } = font.opentype.tables;
-
     assert(cmap.getGlyphId(65) === 7);
     assert(cmap.getGlyphId(0x00ad) === 716);
     assert(cmap.getGlyphId(0x25bc) === 704);
