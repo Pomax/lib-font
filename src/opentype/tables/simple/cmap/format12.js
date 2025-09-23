@@ -10,9 +10,23 @@ class Format12 extends Subtable {
     this.length = p.uint32;
     this.language = p.uint32;
     this.numGroups = p.uint32;
-    const getter = () =>
-      [...new Array(this.numGroups)].map((_) => new SequentialMapGroup(p));
+    const groupStart = p.currentPosition;
+    const getter = () => {
+      p.currentPosition = groupStart;
+      return [...new Array(this.numGroups)].map(
+        (_) => new SequentialMapGroup(p)
+      );
+    };
     lazy(this, `groups`, getter);
+  }
+
+  getGlyphId(charCode) {
+    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+    const group = this.groups.find(
+      (s) => s.startCharCode <= charCode && charCode <= s.endCharCode
+    );
+    if (!group) return 0;
+    return group.glyphIds[charCode - group.startCharCode];
   }
 
   supports(charCode) {
@@ -59,6 +73,11 @@ class SequentialMapGroup {
     this.startCharCode = p.uint32;
     this.endCharCode = p.uint32;
     this.startGlyphID = p.uint32;
+    const getter = () =>
+      [...new Array(this.endCharCode - this.startCharCode + 1)].map(
+        (_, i) => this.startGlyphID + i
+      );
+    lazy(this, `glyphIds`, getter);
   }
 }
 

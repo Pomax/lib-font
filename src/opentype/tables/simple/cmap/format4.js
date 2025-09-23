@@ -63,7 +63,7 @@ class Format4 extends Subtable {
       // simple case
       if (idRangeOffset === 0) {
         for (let i = startCode + idDelta, e = endCode + idDelta; i <= e; i++) {
-          glyphIDs.push(i);
+          glyphIDs.push((i + 65536) % 65536);
         }
       }
 
@@ -71,7 +71,7 @@ class Format4 extends Subtable {
       else {
         for (let i = 0, e = endCode - startCode; i <= e; i++) {
           p.currentPosition = idRangeOffsetPointer + idRangeOffset + i * 2;
-          glyphIDs.push(p.uint16);
+          glyphIDs.push((p.uint16 + 65536) % 65536);
         }
       }
 
