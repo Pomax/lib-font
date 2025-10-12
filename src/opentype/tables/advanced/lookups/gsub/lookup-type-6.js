@@ -116,7 +116,7 @@ class ChainSubRuleTable {
       (_) => p.uint16
     );
     this.substitutionCount = p.uint16;
-    this.substLookupRecords = [...new Array(this.SubstCount)].map(
+    this.substLookupRecords = [...new Array(this.substitutionCount)].map(
       (_) => new SubstLookupRecord(p)
     );
   }
