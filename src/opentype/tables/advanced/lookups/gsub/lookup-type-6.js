@@ -47,7 +47,7 @@ class LookupType6 extends LookupType {
         ...new Array(this.lookaheadGlyphCount),
       ].map((_) => p.Offset16);
       this.seqLookupCount = p.uint16;
-      this.seqLookupRecords = [...new Array(this.substitutionCount)].map(
+      this.seqLookupRecords = [...new Array(this.seqLookupCount)].map(
         (_) => new SequenceLookupRecord(p)
       );
     }
@@ -116,7 +116,7 @@ class ChainSubRuleTable {
       (_) => p.uint16
     );
     this.substitutionCount = p.uint16;
-    this.substLookupRecords = [...new Array(this.SubstCount)].map(
+    this.substLookupRecords = [...new Array(this.substitutionCount)].map(
       (_) => new SubstLookupRecord(p)
     );
   }
