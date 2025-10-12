@@ -134,7 +134,7 @@ class ChainSubClassSetTable extends ParsedData {
   }
   getSubClass(index) {
     let p = this.parser;
-    p.currentPosition = this.start + this.chainSubRuleOffsets[index];
+    p.currentPosition = this.start + this.chainSubClassRuleOffsets[index];
     return new ChainSubClassRuleTable(p);
   }
 }
