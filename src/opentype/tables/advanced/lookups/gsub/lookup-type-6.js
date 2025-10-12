@@ -47,7 +47,7 @@ class LookupType6 extends LookupType {
         ...new Array(this.lookaheadGlyphCount),
       ].map((_) => p.Offset16);
       this.seqLookupCount = p.uint16;
-      this.seqLookupRecords = [...new Array(this.substitutionCount)].map(
+      this.seqLookupRecords = [...new Array(this.seqLookupCount)].map(
         (_) => new SequenceLookupRecord(p)
       );
     }
