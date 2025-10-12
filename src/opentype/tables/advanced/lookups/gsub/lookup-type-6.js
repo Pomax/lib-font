@@ -112,7 +112,7 @@ class ChainSubRuleTable {
       (_) => p.uint16
     );
     this.lookaheadGlyphCount = p.uint16;
-    this.lookAheadSequence = [...new Array(this.lookAheadGlyphCount)].map(
+    this.lookaheadSequence = [...new Array(this.lookaheadGlyphCount)].map(
       (_) => p.uint16
     );
     this.substitutionCount = p.uint16;
@@ -150,7 +150,7 @@ class ChainSubClassRuleTable {
       (_) => p.uint16
     );
     this.lookaheadGlyphCount = p.uint16;
-    this.lookAheadSequence = [...new Array(this.lookAheadGlyphCount)].map(
+    this.lookaheadSequence = [...new Array(this.lookaheadGlyphCount)].map(
       (_) => p.uint16
     );
     this.substitutionCount = p.uint16;
