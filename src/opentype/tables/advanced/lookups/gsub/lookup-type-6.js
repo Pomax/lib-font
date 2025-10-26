@@ -7,19 +7,20 @@ import {
 import { CoverageTable } from "../../shared/coverage.js";
 
 class LookupType6 extends LookupType {
+  type = 6;
   constructor(p) {
     super(p);
 
     // There are three possible subtable formats
 
-    if (this.substFormat === 1) {
+    if (this.format === 1) {
       this.chainSubRuleSetCount = p.uint16;
       this.chainSubRuleSetOffsets = [
         ...new Array(this.chainSubRuleSetCount),
       ].map((_) => p.Offset16);
     }
 
-    if (this.substFormat === 2) {
+    if (this.format === 2) {
       this.backtrackClassDefOffset = p.Offset16;
       this.inputClassDefOffset = p.Offset16;
       this.lookaheadClassDefOffset = p.Offset16;
@@ -29,7 +30,7 @@ class LookupType6 extends LookupType {
       ].map((_) => p.Offset16);
     }
 
-    if (this.substFormat === 3) {
+    if (this.format === 3) {
       // undo the coverageOffset parsing, because this format uses an
       // entire *array* of coverage offsets instead, like 5.3
       undoCoverageOffsetParsing(this);
@@ -54,19 +55,17 @@ class LookupType6 extends LookupType {
   }
 
   getChainSubRuleSet(index) {
-    if (this.substFormat !== 1)
-      throw new Error(
-        `lookup type 6.${this.substFormat} has no chainsubrule sets.`
-      );
+    if (this.format !== 1)
+      throw new Error(`lookup type 6.${this.format} has no chainsubrule sets.`);
     let p = this.parser;
     p.currentPosition = this.start + this.chainSubRuleSetOffsets[index];
     return new ChainSubRuleSetTable(p);
   }
 
   getChainSubClassSet(index) {
-    if (this.substFormat !== 2)
+    if (this.format !== 2)
       throw new Error(
-        `lookup type 6.${this.substFormat} has no chainsubclass sets.`
+        `lookup type 6.${this.format} has no chainsubclass sets.`
       );
     let p = this.parser;
     p.currentPosition = this.start + this.chainSubClassSetOffsets[index];
@@ -74,9 +73,9 @@ class LookupType6 extends LookupType {
   }
 
   getCoverageFromOffset(offset) {
-    if (this.substFormat !== 3)
+    if (this.format !== 3)
       throw new Error(
-        `lookup type 6.${this.substFormat} does not use contextual coverage offsets.`
+        `lookup type 6.${this.format} does not use contextual coverage offsets.`
       );
     let p = this.parser;
     p.currentPosition = this.start + offset;

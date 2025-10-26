@@ -49,7 +49,7 @@ function doSomeFontThings(evt) {
             const subtable = lookup.getSubTable(i);
 
             console.log(
-              `| | | |--subtable id ${i} (type ${lookup.lookupType}, substFormat ${subtable.substFormat})`
+              `| | | |--subtable id ${i} (type ${lookup.lookupType}, format ${subtable.format})`
             );
 
             if (lookup.lookupType === 6) {

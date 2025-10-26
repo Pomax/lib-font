@@ -7,19 +7,20 @@ import {
 import { CoverageTable } from "../../shared/coverage.js";
 
 class LookupType5 extends LookupType {
+  type = 5;
   constructor(p) {
     super(p);
 
     // There are three possible subtable formats
 
-    if (this.substFormat === 1) {
+    if (this.format === 1) {
       this.subRuleSetCount = p.uint16;
       this.subRuleSetOffsets = [...new Array(this.subRuleSetCount)].map(
         (_) => p.Offset16
       );
     }
 
-    if (this.substFormat === 2) {
+    if (this.format === 2) {
       this.classDefOffset = p.Offset16;
       this.subClassSetCount = p.uint16;
       this.subClassSetOffsets = [...new Array(this.subClassSetCount)].map(
@@ -27,7 +28,7 @@ class LookupType5 extends LookupType {
       );
     }
 
-    if (this.substFormat === 3) {
+    if (this.format === 3) {
       // undo the coverageOffset parsing, because this format uses an
       // entire *array* of coverage offsets instead, like 6.3
       undoCoverageOffsetParsing(this);
@@ -44,29 +45,27 @@ class LookupType5 extends LookupType {
   }
 
   getSubRuleSet(index) {
-    if (this.substFormat !== 1)
-      throw new Error(`lookup type 5.${this.substFormat} has no subrule sets.`);
+    if (this.format !== 1)
+      throw new Error(`lookup type 5.${this.format} has no subrule sets.`);
     let p = this.parser;
     p.currentPosition = this.start + this.subRuleSetOffsets[index];
     return new SubRuleSetTable(p);
   }
 
   getSubClassSet(index) {
-    if (this.substFormat !== 2)
-      throw new Error(
-        `lookup type 5.${this.substFormat} has no subclass sets.`
-      );
+    if (this.format !== 2)
+      throw new Error(`lookup type 5.${this.format} has no subclass sets.`);
     let p = this.parser;
     p.currentPosition = this.start + this.subClassSetOffsets[index];
     return new SubClassSetTable(p);
   }
 
   getCoverageTable(index) {
-    if (this.substFormat !== 3 && !index) return super.getCoverageTable();
+    if (this.format !== 3 && !index) return super.getCoverageTable();
 
     if (!index)
       throw new Error(
-        `lookup type 5.${this.substFormat} requires an coverage table index.`
+        `lookup type 5.${this.format} requires an coverage table index.`
       );
 
     let p = this.parser;

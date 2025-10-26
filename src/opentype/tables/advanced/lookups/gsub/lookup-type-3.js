@@ -1,6 +1,7 @@
 import { LookupType } from "./gsub-lookup.js";
 
 class LookupType3 extends LookupType {
+  type = 3;
   constructor(p) {
     super(p);
     this.alternateSetCount = p.uint16;
