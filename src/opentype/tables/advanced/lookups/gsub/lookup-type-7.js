@@ -1,4 +1,4 @@
-import { ParsedData } from "../../../../../parser.js";
+import { LookupType, undoCoverageOffsetParsing } from "./gsub-lookup.js";
 
 import { LookupType1 } from "./lookup-type-1.js";
 import { LookupType2 } from "./lookup-type-2.js";
@@ -12,15 +12,17 @@ import { LookupType8 } from "./lookup-type-8.js";
 // offset" hack table that is used as a pointer to
 // any of the other subtables that can't be pointed
 // to using a 16 bit offset value.
-class LookupType7 extends ParsedData {
+class LookupType7 extends LookupType {
+  type = 7;
   constructor(p) {
     super(p);
-    this.substFormat = p.uint16;
+    // undo the coverageOffset parsing, because this subtable
+    // "isn't a table", it's just a pointer to another table.
+    undoCoverageOffsetParsing(this);
     this.extensionLookupType = p.uint16;
     this.extensionOffset = p.Offset32; // from beginning of subtable
   }
-
-  getLookup() {
+  getSubstTable() {
     if (this._lookup === undefined) {
       const p = this.parser;
       const type = this.extensionLookupType;

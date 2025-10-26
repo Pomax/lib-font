@@ -31,25 +31,21 @@ function processGSUB(GSUB) {
       features.forEach((feature) => {
         const lookupIDs = feature.lookupListIndices;
 
+        // TODO: FIXME: this seems to be finding GPOS lookups, which shouldn't show up for GSUB?
+
         lookupIDs.forEach((id) => {
           const lookup = GSUB.getLookup(id);
+          const type = lookup.lookupType;
           const cnt = lookup.subTableCount;
           const s = cnt !== 1 ? "s" : "";
+
           console.log(
-            `lookup type ${lookup.lookupType} in ${lang}, lookup ${id}, ${cnt} subtable${s}`
+            `lookup type ${type} in ${lang}, lookup ${id}, ${cnt} subtable${s}`
           );
 
-          if (lookup.lookupType === 7) {
-            for (let i = 0; i < cnt; i++) {
-              const subtable = lookup.getSubTable(i);
-              console.log(
-                `  32 bit lookup hack. Actually a pointer to lookup type ${
-                  subtable.extensionLookupType
-                } at offset ${subtable.start + subtable.extensionOffset}`
-              );
-              const extensionLookup = subtable.getLookup();
-              console.log(extensionLookup);
-            }
+          for (let i = 0; i < cnt; i++) {
+            const subtable = lookup.getSubTable(i);
+            console.log(subtable);
           }
         });
       });

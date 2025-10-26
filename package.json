@@ -17,12 +17,12 @@
     "rollup": "rollup -i lib-font.js -n Font -o lib-font.browser.js --inlineDynamicImports --external fs,zlib",
     "start": "npm test",
     "terser": "terser lib-font.browser.js -o lib-font.browser.js",
-    "test:browser": "run-p test:server test:puppeteer",
+    "test:browser": "run-p test:server test:playwright",
     "test:node:jest": "npm run test:jest -- ./testing/node/",
     "test:node:native": "node --test \"./testing/native-node/**/*.js\"",
     "test:jest": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose=false",
     "test:manual": "http-server -o testing/manual/index.html",
-    "test:puppeteer": "node ./testing/browser/puppeteer.js",
+    "test:playwright": "playwright test ./testing/browser/playwright.test.js",
     "test:server": "node ./testing/browser/server.js",
     "test": "run-s clean test:node:jest test:node:native bundle test:browser"
   },
@@ -43,6 +43,7 @@
   },
   "homepage": "https://github.com/Pomax/lib-font#readme",
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
     "http-server": "^0.12.3",
@@ -50,7 +51,6 @@
     "npm-run-all": "^4.1.5",
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
-    "puppeteer": "^5.3.1",
     "rollup": "^2.53.0",
     "terser": "^5.7.1"
   }

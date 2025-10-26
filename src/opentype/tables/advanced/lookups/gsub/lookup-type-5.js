@@ -7,6 +7,7 @@ import {
 import { CoverageTable } from "../../shared/coverage.js";
 
 class LookupType5 extends LookupType {
+  type = 5;
   constructor(p) {
     super(p);
 
