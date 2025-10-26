@@ -26,7 +26,6 @@ class LookupType7 extends LookupType {
     if (this._lookup === undefined) {
       const p = this.parser;
       const type = this.extensionLookupType;
-
       let LookupType;
       if (type === 1) LookupType = LookupType1;
       if (type === 2) LookupType = LookupType2;
@@ -35,7 +34,6 @@ class LookupType7 extends LookupType {
       if (type === 5) LookupType = LookupType5;
       if (type === 6) LookupType = LookupType6;
       if (type === 8) LookupType = LookupType8;
-
       if (LookupType) {
         p.currentPosition = this.start + this.extensionOffset;
         this._lookup = new LookupType(p);

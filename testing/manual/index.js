@@ -40,12 +40,15 @@ function processGSUB(GSUB) {
           const s = cnt !== 1 ? "s" : "";
 
           console.log(
-            `lookup type ${type} in ${lang}, lookup ${id}, ${cnt} subtable${s}`
+            `${id}: lookup type ${type} in ${lang}, ${cnt} subtable${s}`
           );
 
           for (let i = 0; i < cnt; i++) {
             const subtable = lookup.getSubTable(i);
-            console.log(subtable);
+            console.log(
+              `- lookup ${i} type ${subtable.type} subtable, format ${subtable.format}:`
+            );
+            console.log(`--`, subtable);
           }
         });
       });

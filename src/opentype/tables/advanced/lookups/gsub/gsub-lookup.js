@@ -12,7 +12,7 @@ function undoCoverageOffsetParsing(instance) {
 class LookupType extends ParsedData {
   constructor(p) {
     super(p);
-    this.substFormat = p.uint16;
+    this.format = p.uint16;
     this.coverageOffset = p.Offset16;
   }
   getCoverageTable() {

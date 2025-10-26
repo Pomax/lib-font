@@ -13,7 +13,7 @@
   },
   "scripts": {
     "bundle": "run-s rollup terser",
-    "clean": "prettier --write \"src/**/*.js\"",
+    "clean": "prettier --write \"lib-font.js\" \"src/**/*.js\"",
     "rollup": "rollup -i lib-font.js -n Font -o lib-font.browser.js --inlineDynamicImports --external fs,zlib",
     "start": "npm test",
     "terser": "terser lib-font.browser.js -o lib-font.browser.js",
