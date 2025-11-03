@@ -2,6 +2,7 @@ import { ParsedData } from "../../../../../parser.js";
 import { LookupType } from "./gsub-lookup.js";
 
 class LookupType4 extends LookupType {
+  type = 4;
   constructor(p) {
     super(p);
     this.ligatureSetCount = p.uint16;

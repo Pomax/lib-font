@@ -1,6 +1,8 @@
 import { ParsedData } from "../../../../../parser.js";
 import { CoverageTable } from "../../shared/coverage.js";
 
+// Not every lookup subtable indicates a coverageOffset, so for
+// those few that need it, we want to be able to undo parsing that.
 function undoCoverageOffsetParsing(instance) {
   instance.parser.currentPosition -= 2;
   delete instance.coverageOffset;
@@ -10,7 +12,7 @@ function undoCoverageOffsetParsing(instance) {
 class LookupType extends ParsedData {
   constructor(p) {
     super(p);
-    this.substFormat = p.uint16;
+    this.format = p.uint16;
     this.coverageOffset = p.Offset16;
   }
   getCoverageTable() {

@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test_first_time_setup:
+    name: Continuous Integration Testing
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.labels.*.name, 'bypass-ci')"
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "latest"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npx playwright install
+
+      - name: Run tests
+        run: npm test

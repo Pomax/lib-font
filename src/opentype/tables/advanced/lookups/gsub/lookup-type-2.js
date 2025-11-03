@@ -1,6 +1,7 @@
 import { LookupType } from "./gsub-lookup.js";
 
 class LookupType2 extends LookupType {
+  type = 2;
   constructor(p) {
     super(p);
     this.sequenceCount = p.uint16;

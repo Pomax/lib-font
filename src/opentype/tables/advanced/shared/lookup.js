@@ -50,7 +50,9 @@ class LookupTable extends ParsedData {
   getSubTable(index) {
     const builder = this.ctType === `GSUB` ? GSUBtables : GPOStables;
     this.parser.currentPosition = this.start + this.subtableOffsets[index];
-    return builder.buildSubtable(this.lookupType, this.parser);
+    let subtable = builder.buildSubtable(this.lookupType, this.parser);
+    if (this.lookupType === 7) subtable = subtable.getSubstTable();
+    return subtable;
   }
 }
 
