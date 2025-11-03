@@ -8,6 +8,18 @@ import { LookupType5 } from "./lookup-type-5.js";
 import { LookupType6 } from "./lookup-type-6.js";
 import { LookupType8 } from "./lookup-type-8.js";
 
+const Lookups = [
+  null,
+  LookupType1,
+  LookupType2,
+  LookupType3,
+  LookupType4,
+  LookupType5,
+  LookupType6,
+  null,
+  LookupType8,
+];
+
 // This subtable is the "I actually need a 32 bit
 // offset" hack table that is used as a pointer to
 // any of the other subtables that can't be pointed
@@ -26,14 +38,7 @@ class LookupType7 extends LookupType {
     if (this._lookup === undefined) {
       const p = this.parser;
       const type = this.extensionLookupType;
-      let LookupType;
-      if (type === 1) LookupType = LookupType1;
-      if (type === 2) LookupType = LookupType2;
-      if (type === 3) LookupType = LookupType3;
-      if (type === 4) LookupType = LookupType4;
-      if (type === 5) LookupType = LookupType5;
-      if (type === 6) LookupType = LookupType6;
-      if (type === 8) LookupType = LookupType8;
+      let LookupType = Lookups[type];
       if (LookupType) {
         p.currentPosition = this.start + this.extensionOffset;
         this._lookup = new LookupType(p);
