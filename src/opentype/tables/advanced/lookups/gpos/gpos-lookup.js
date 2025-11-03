@@ -4,8 +4,12 @@ import { ParsedData } from "../../../../../parser.js";
 // those few that need it, we want to be able to undo parsing that.
 function undoCoverageOffsetParsing(instance) {
   instance.parser.currentPosition -= 2;
+
+  // remove the coverageOffset property binding
   delete instance.coverageOffset;
-  delete instance.getCoverageTable;
+
+  // we can't delete a prototype function, but we can undefine it.
+  instance.getCoverageTable = undefined;
 }
 
 class LookupType extends ParsedData {
