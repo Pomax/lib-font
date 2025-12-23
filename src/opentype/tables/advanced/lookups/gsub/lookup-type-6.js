@@ -47,9 +47,9 @@ class LookupType6 extends LookupType {
       this.lookaheadCoverageOffsets = [
         ...new Array(this.lookaheadGlyphCount),
       ].map((_) => p.Offset16);
-      this.seqLookupCount = p.uint16;
-      this.seqLookupRecords = [...new Array(this.seqLookupCount)].map(
-        (_) => new SequenceLookupRecord(p)
+      this.substitutionCount = p.uint16;
+      this.substLookupRecords = [...new Array(this.substitutionCount)].map(
+        (_) => new SubstLookupRecord(p)
       );
     }
   }
@@ -80,6 +80,10 @@ class LookupType6 extends LookupType {
     let p = this.parser;
     p.currentPosition = this.start + offset;
     return new CoverageTable(p);
+  }
+
+  getSubstLookupRecord(index) {
+    return this.substLookupRecords?.[index];
   }
 }
 
@@ -138,7 +142,7 @@ class ChainSubClassSetTable extends ParsedData {
   }
 }
 
-class ChainSubClassRuleTable {
+class ChainSubClassRuleTable extends ParsedData {
   constructor(p) {
     this.backtrackGlyphCount = p.uint16;
     this.backtrackSequence = [...new Array(this.backtrackGlyphCount)].map(
@@ -154,18 +158,11 @@ class ChainSubClassRuleTable {
     );
     this.substitutionCount = p.uint16;
     this.substLookupRecords = [...new Array(this.substitutionCount)].map(
-      (_) => new SequenceLookupRecord(p)
+      (_) => new SubstLookupRecord(p)
     );
   }
-}
-
-// 6.3
-
-class SequenceLookupRecord extends ParsedData {
-  constructor(p) {
-    super(p);
-    this.sequenceIndex = p.uint16;
-    this.lookupListIndex = p.uint16;
+  getSubstLookupRecord(index) {
+    return this.substLookupRecords[index];
   }
 }
 

@@ -6,3 +6,4 @@
 "IBM Plex Sans Thai" retrieved from https://fonts.google.com/specimen/IBM+Plex+Sans+Thai"
 "Inter Regular" retrieved from https://github.com/rsms/inter
 "Lato" retrieved from https://github.com/google/fonts/blob/main/ofl/lato/Lato-Regular.ttf
+"Bangers Regular" retrieved from https://github.com/google/fonts/blob/main/ofl/bangers/Bangers-Regular.ttf
