@@ -142,7 +142,7 @@ class ChainSubClassSetTable extends ParsedData {
   }
 }
 
-class ChainSubClassRuleTable extends ParsedData {
+class ChainSubClassRuleTable {
   constructor(p) {
     this.backtrackGlyphCount = p.uint16;
     this.backtrackSequence = [...new Array(this.backtrackGlyphCount)].map(

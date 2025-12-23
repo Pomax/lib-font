@@ -16,6 +16,7 @@ describe("GSUB 6.2 checks", () => {
   });
 
   test("has all expected type 7 redirects", () => {
+    const subtables = [];
     const sequence = [];
     const { GSUB } = font.opentype.tables;
 
@@ -33,7 +34,9 @@ describe("GSUB 6.2 checks", () => {
             const cnt = lookup.subTableCount;
             // and all subtables for each lookup
             for (let i = 0; i < cnt; i++) {
-              const { type: sType, format } = lookup.getSubTable(i);
+              const subtable = lookup.getSubTable(i);
+              const { type: sType, format } = subtable;
+              subtables.push(subtable);
               sequence.push([id, type, lang, i, sType, format]);
             }
           });
@@ -41,7 +44,6 @@ describe("GSUB 6.2 checks", () => {
       });
     });
 
-    // I do not know if this is the correct information right now
     expect(sequence.slice(0, 30)).toEqual([
       [0, 1, "dflt", 0, 1, 2],
       [1, 3, "dflt", 0, 3, 1],
@@ -74,5 +76,43 @@ describe("GSUB 6.2 checks", () => {
       [19, 4, "dflt", 0, 4, 1],
       [15, 1, "dflt", 0, 1, 1],
     ]);
+
+    // I have no idea if this is correct atm
+    const lookup6dot2 = subtables[4];
+    expect(lookup6dot2).toEqual({
+      type: 6,
+      format: 2,
+      coverageOffset: 432,
+      backtrackClassDefOffset: 468,
+      inputClassDefOffset: 612,
+      lookaheadClassDefOffset: 672,
+      chainSubClassSetCount: 3,
+      chainSubClassSetOffsets: [460, 472, 472],
+    });
+
+    // I have no idea if this is correct atm
+    const classSet = lookup6dot2.getChainSubClassSet(1);
+    expect(classSet).toEqual({
+      chainSubClassRuleCount: 1,
+      chainSubClassRuleOffsets: [512],
+    });
+
+    // I have no idea if this is correct atm
+    const subclass = classSet.getSubClass(0);
+    expect(subclass).toEqual({
+      backtrackGlyphCount: 0,
+      backtrackSequence: [],
+      inputGlyphCount: 1,
+      inputSequence: [],
+      lookaheadGlyphCount: 1,
+      lookaheadSequence: [1],
+      substLookupRecords: [
+        {
+          glyphSequenceIndex: 0,
+          lookupListIndex: 4,
+        },
+      ],
+      substitutionCount: 1,
+    });
   });
 });
