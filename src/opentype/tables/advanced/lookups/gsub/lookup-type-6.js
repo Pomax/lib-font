@@ -83,6 +83,16 @@ class LookupType6 extends LookupType {
     return new CoverageTable(p);
   }
 
+  getBacktrackClassDef() {
+    if (this.format !== 2)
+      throw new Error(
+        `lookup type 6.${this.format} does not use class definitions.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + this.backtrackClassDefOffset;
+    return new ClassDefinition(p);
+  }
+
   getInputClassDef() {
     if (this.format !== 2)
       throw new Error(
@@ -90,6 +100,16 @@ class LookupType6 extends LookupType {
       );
     let p = this.parser;
     p.currentPosition = this.start + this.inputClassDefOffset;
+    return new ClassDefinition(p);
+  }
+
+  getLookaheadClassDef() {
+    if (this.format !== 2)
+      throw new Error(
+        `lookup type 6.${this.format} does not use class definitions.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + this.lookaheadClassDefOffset;
     return new ClassDefinition(p);
   }
 
