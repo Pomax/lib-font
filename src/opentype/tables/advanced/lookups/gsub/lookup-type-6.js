@@ -5,6 +5,7 @@ import {
   SubstLookupRecord,
 } from "./gsub-lookup.js";
 import { CoverageTable } from "../../shared/coverage.js";
+import { ClassDefinition } from "../../shared/class.js";
 
 class LookupType6 extends LookupType {
   type = 6;
@@ -80,6 +81,36 @@ class LookupType6 extends LookupType {
     let p = this.parser;
     p.currentPosition = this.start + offset;
     return new CoverageTable(p);
+  }
+
+  getBacktrackClassDef() {
+    if (this.format !== 2)
+      throw new Error(
+        `lookup type 6.${this.format} does not use class definitions.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + this.backtrackClassDefOffset;
+    return new ClassDefinition(p);
+  }
+
+  getInputClassDef() {
+    if (this.format !== 2)
+      throw new Error(
+        `lookup type 6.${this.format} does not use class definitions.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + this.inputClassDefOffset;
+    return new ClassDefinition(p);
+  }
+
+  getLookaheadClassDef() {
+    if (this.format !== 2)
+      throw new Error(
+        `lookup type 6.${this.format} does not use class definitions.`
+      );
+    let p = this.parser;
+    p.currentPosition = this.start + this.lookaheadClassDefOffset;
+    return new ClassDefinition(p);
   }
 
   getSubstLookupRecord(index) {
