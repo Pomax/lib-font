@@ -115,4 +115,19 @@ describe("GSUB 6.2 checks", () => {
       substitutionCount: 1,
     });
   });
+
+  test("getInputClassDef returns class definitions for i and j", () => {
+    const { GSUB } = font.opentype.tables;
+    const lookup = GSUB.getLookup(3);
+    const subtable = lookup.getSubTable(0);
+
+    const inputClassDef = subtable.getInputClassDef();
+
+    expect(inputClassDef.classFormat).toBe(2);
+
+    expect(inputClassDef.classRangeRecords).toEqual([
+      { startGlyphID: 272, endGlyphID: 272, class: 2 }, // i
+      { startGlyphID: 288, endGlyphID: 288, class: 1 }, // j
+    ]);
+  });
 });
