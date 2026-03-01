@@ -115,4 +115,59 @@ describe("GSUB 6.2 checks", () => {
       substitutionCount: 1,
     });
   });
+
+  test("getInputClassDef returns class definitions for i and j", () => {
+    const { GSUB } = font.opentype.tables;
+    const lookup = GSUB.getLookup(3);
+    const subtable = lookup.getSubTable(0);
+
+    const inputClassDef = subtable.getInputClassDef();
+
+    expect(inputClassDef.classFormat).toBe(2);
+
+    expect(inputClassDef.classRangeRecords).toEqual([
+      { startGlyphID: 272, endGlyphID: 272, class: 2 }, // i
+      { startGlyphID: 288, endGlyphID: 288, class: 1 }, // j
+    ]);
+  });
+
+  test("getBacktrackClassDef returns no class definitions", () => {
+    const { GSUB } = font.opentype.tables;
+    const lookup = GSUB.getLookup(3);
+    const subtable = lookup.getSubTable(0);
+
+    const backtrackClassDef = subtable.getBacktrackClassDef();
+
+    // Bangers has no backtrack chars for this lookup
+    expect(backtrackClassDef.classRangeRecords).toEqual([]);
+  });
+
+  test("getLookaheadClassDef returns multiple definitions", () => {
+    const { GSUB } = font.opentype.tables;
+    const lookup = GSUB.getLookup(3);
+    const subtable = lookup.getSubTable(0);
+
+    const lookaheadClassDef = subtable.getLookaheadClassDef();
+
+    // Bangers lookahead:
+    // uni0308
+    // uni0307
+    // gravecomb
+    // acutecomb
+    // uni030B
+    // uni0302
+    // uni030C
+    // uni0306
+    // uni030A
+    // tildecomb
+    // uni0304
+    // hookabovecomb
+    // uni030F
+    // uni0312
+    expect(lookaheadClassDef.classRangeRecords).toEqual([
+      { startGlyphID: 525, endGlyphID: 529, class: 1 },
+      { startGlyphID: 531, endGlyphID: 538, class: 1 },
+      { startGlyphID: 540, endGlyphID: 540, class: 1 },
+    ]);
+  });
 });
