@@ -1,18 +1,20 @@
+import fs from "node:fs";
+import { describe, test, before } from "node:test";
+import assert from "node:assert";
 import { Font } from "../../../../lib-font.js";
 
 const font = new Font("GSUB type 7 redirect testing");
 
 describe("GSUB type 7 checks", () => {
-  beforeAll(async (done) => {
-    font.onerror = (err) => {
-      throw err;
-    };
-    font.onload = async () => done();
-    font.src = `./fonts/Lato-Regular.ttf`;
-  });
+  before(() => new Promise((resolve, reject) => {
+    font.onerror = (err) => reject(err);
+    font.onload = () => resolve();
+    const buffer = fs.readFileSync("./fonts/Lato-Regular.ttf");
+    font.fromDataBuffer(Uint8Array.from(buffer).buffer, "Lato-Regular.ttf");
+  }));
 
   test("font loaded", () => {
-    expect(font.opentype).toBeDefined();
+    assert.ok(font.opentype !== undefined);
   });
 
   test("has all expected type 7 redirects", () => {
@@ -41,7 +43,7 @@ describe("GSUB type 7 checks", () => {
       });
     });
 
-    expect(sequence.slice(0,30)).toEqual([
+    assert.deepStrictEqual(sequence.slice(0,30), [
       [26, 7, "dflt", 0, 6, 3],
       [26, 7, "dflt", 1, 6, 3],
       [28, 7, "dflt", 0, 6, 3],

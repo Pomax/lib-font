@@ -2,6 +2,12 @@ import { Parser } from "../../../parser.js";
 import { SimpleTable } from "../simple-table.js";
 import lazy from "../../../lazy.js";
 
+const decoders = {
+  mac: new TextDecoder(`macintosh`),
+  shiftJIS: new TextDecoder(`shift-jis`),
+  big5: new TextDecoder(`big5`),
+};
+
 /**
  * The OpenType `name` table.
  *
@@ -38,7 +44,27 @@ class name extends SimpleTable {
    */
   get(nameID) {
     let record = this.nameRecords.find((record) => record.nameID === nameID);
-    if (record) return record.string;
+    if (!record) return;
+
+    const { platformID, encodingID, string } = record;
+    const bytes = new Uint8Array(
+      Array.from(string).map((s) => s.codePointAt(0))
+    );
+
+    if (platformID === 1) {
+      return decoders.mac.decode(bytes);
+    }
+
+    if (platformID === 3) {
+      if (encodingID === 2) {
+        return decoders.shiftJIS.decode(bytes);
+      }
+      if (encodingID === 4) {
+        return decoders.big5.decode(bytes);
+      }
+    }
+
+    return string;
   }
 }
 

@@ -1,19 +1,21 @@
+import fs from "node:fs";
+import { describe, test, before } from "node:test";
+import assert from "node:assert";
 import { Font } from "../../lib-font.js";
 import { testGSUB } from "./gsub/test-gsub.js";
 
 const font = new Font("mehr nastaliq");
 
 describe("Basic font testing", () => {
-  beforeAll((done) => {
-    font.onerror = (err) => {
-      throw err;
-    };
-    font.onload = async () => done();
-    font.src = "./fonts/MehrNastaliqWeb-Regular.ttf";
-  });
+  before(() => new Promise((resolve, reject) => {
+    font.onerror = (err) => reject(err);
+    font.onload = () => resolve();
+    const buffer = fs.readFileSync("./fonts/MehrNastaliqWeb-Regular.ttf");
+    font.fromDataBuffer(Uint8Array.from(buffer).buffer, "MehrNastaliqWeb-Regular.ttf");
+  }));
 
   test("font loaded", () => {
-    expect(font.opentype).toBeDefined();
+    assert.ok(font.opentype !== undefined);
   });
 
   test("GSUB format 6/8 functionality", () => {
