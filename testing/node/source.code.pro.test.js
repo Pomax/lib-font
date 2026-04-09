@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import { describe, test, before } from "node:test";
+import assert from "node:assert";
 import { Font } from "../../lib-font.js";
 import { testGSUB } from "./gsub/test-gsub.js";
 
@@ -5,16 +8,15 @@ const font = new Font("source code pro");
 let letterFor = function(){};
 
 describe("Basic font testing", () => {
-  beforeAll((done) => {
-    font.onerror = (err) => {
-      throw err;
-    };
-    font.onload = async () => done();
-    font.src = "./fonts/SourceCodePro/SourceCodePro-Regular.ttf";
-  });
+  before(() => new Promise((resolve, reject) => {
+    font.onerror = (err) => reject(err);
+    font.onload = () => resolve();
+    const buffer = fs.readFileSync("./fonts/SourceCodePro/SourceCodePro-Regular.ttf");
+    font.fromDataBuffer(Uint8Array.from(buffer).buffer, "SourceCodePro-Regular.ttf");
+  }));
 
   test("font loaded", () => {
-    expect(font.opentype).toBeDefined();
+    assert.ok(font.opentype !== undefined);
 
     letterFor = function(glyphid) {
       let reversed = font.opentype.tables.cmap.reverse(glyphid);
@@ -23,22 +25,22 @@ describe("Basic font testing", () => {
   });
 
   test("Glyph support", () => {
-    expect(font.supports(`f`)).toBe(true);
-    expect(font.supports(`i`)).toBe(true);
-    expect(font.supports(String.fromCharCode(0xffff))).toBe(false);
+    assert.strictEqual(font.supports(`f`), true);
+    assert.strictEqual(font.supports(`i`), true);
+    assert.strictEqual(font.supports(String.fromCharCode(0xffff)), false);
   });
 
   test("HEAD table", () => {
     const head = font.opentype.tables.head;
-    expect(head).toBeDefined();
+    assert.ok(head !== undefined);
 
-    expect(head.magicNumber).toBe(1594834165);
-    expect(head.fontDirectionHint).toBe(2);
-    expect(head.unitsPerEm).toBe(1000);
-    expect(head.xMin).toBe(-193);
-    expect(head.xMax).toBe(793);
-    expect(head.yMin).toBe(-454);
-    expect(head.yMax).toBe(1060);
+    assert.strictEqual(head.magicNumber, 1594834165);
+    assert.strictEqual(head.fontDirectionHint, 2);
+    assert.strictEqual(head.unitsPerEm, 1000);
+    assert.strictEqual(head.xMin, -193);
+    assert.strictEqual(head.xMax, 793);
+    assert.strictEqual(head.yMin, -454);
+    assert.strictEqual(head.yMax, 1060);
   });
 
   test("GSUB table", () => {

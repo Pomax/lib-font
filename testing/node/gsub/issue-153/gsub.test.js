@@ -1,18 +1,20 @@
+import fs from "node:fs";
+import { describe, test, before } from "node:test";
+import assert from "node:assert";
 import { Font } from "../../../../lib-font.js";
 
 const font = new Font("GSUB type 6 subformat 2 testing");
 
 describe("GSUB 6.2 checks", () => {
-  beforeAll(async (done) => {
-    font.onerror = (err) => {
-      throw err;
-    };
-    font.onload = async () => done();
-    font.src = `./fonts/Bangers-Regular.ttf`;
-  });
+  before(() => new Promise((resolve, reject) => {
+    font.onerror = (err) => reject(err);
+    font.onload = () => resolve();
+    const buffer = fs.readFileSync("./fonts/Bangers-Regular.ttf");
+    font.fromDataBuffer(Uint8Array.from(buffer).buffer, "Bangers-Regular.ttf");
+  }));
 
   test("font loaded", () => {
-    expect(font.opentype).toBeDefined();
+    assert.ok(font.opentype !== undefined);
   });
 
   test("has all expected type 7 redirects", () => {
@@ -44,7 +46,7 @@ describe("GSUB 6.2 checks", () => {
       });
     });
 
-    expect(sequence.slice(0, 30)).toEqual([
+    assert.deepStrictEqual(sequence.slice(0, 30), [
       [0, 1, "dflt", 0, 1, 2],
       [1, 3, "dflt", 0, 3, 1],
       [20, 1, "dflt", 0, 1, 2],
@@ -79,7 +81,7 @@ describe("GSUB 6.2 checks", () => {
 
     // I have no idea if this is correct atm
     const lookup6dot2 = subtables[4];
-    expect(lookup6dot2).toEqual({
+    assert.deepStrictEqual({...lookup6dot2}, {
       type: 6,
       format: 2,
       coverageOffset: 432,
@@ -92,14 +94,14 @@ describe("GSUB 6.2 checks", () => {
 
     // I have no idea if this is correct atm
     const classSet = lookup6dot2.getChainSubClassSet(1);
-    expect(classSet).toEqual({
+    assert.deepStrictEqual({...classSet}, {
       chainSubClassRuleCount: 1,
       chainSubClassRuleOffsets: [512],
     });
 
     // I have no idea if this is correct atm
     const subclass = classSet.getSubClass(0);
-    expect(subclass).toEqual({
+    assert.deepStrictEqual({...subclass, substLookupRecords: subclass.substLookupRecords.map(r => ({...r}))}, {
       backtrackGlyphCount: 0,
       backtrackSequence: [],
       inputGlyphCount: 1,
@@ -123,9 +125,9 @@ describe("GSUB 6.2 checks", () => {
 
     const inputClassDef = subtable.getInputClassDef();
 
-    expect(inputClassDef.classFormat).toBe(2);
+    assert.strictEqual(inputClassDef.classFormat, 2);
 
-    expect(inputClassDef.classRangeRecords).toEqual([
+    assert.deepStrictEqual(inputClassDef.classRangeRecords.map(r => ({...r})), [
       { startGlyphID: 272, endGlyphID: 272, class: 2 }, // i
       { startGlyphID: 288, endGlyphID: 288, class: 1 }, // j
     ]);
@@ -139,7 +141,7 @@ describe("GSUB 6.2 checks", () => {
     const backtrackClassDef = subtable.getBacktrackClassDef();
 
     // Bangers has no backtrack chars for this lookup
-    expect(backtrackClassDef.classRangeRecords).toEqual([]);
+    assert.deepStrictEqual(backtrackClassDef.classRangeRecords, []);
   });
 
   test("getLookaheadClassDef returns multiple definitions", () => {
@@ -164,7 +166,7 @@ describe("GSUB 6.2 checks", () => {
     // hookabovecomb
     // uni030F
     // uni0312
-    expect(lookaheadClassDef.classRangeRecords).toEqual([
+    assert.deepStrictEqual(lookaheadClassDef.classRangeRecords.map(r => ({...r})), [
       { startGlyphID: 525, endGlyphID: 529, class: 1 },
       { startGlyphID: 531, endGlyphID: 538, class: 1 },
       { startGlyphID: 540, endGlyphID: 540, class: 1 },

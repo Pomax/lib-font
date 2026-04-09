@@ -167,7 +167,7 @@ function testSFNT(SFNT, isTTF) { try {
         assertEqual(name.nameRecords.length, 127, `Data indeed resolves to 127 records`);
 
         let string = name.get(0);
-        let expected = `Copyright 2010, 2012 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ÔSourceÕ.`;
+        let expected = `Copyright 2010, 2012 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name \u2018Source\u2019.`;
         assertEqual(string, expected, `Record 0 is the copyright string.`)
     }
 

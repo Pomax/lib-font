@@ -1,19 +1,21 @@
+import fs from "node:fs";
+import { describe, test, before } from "node:test";
+import assert from "node:assert";
 import { Font } from "../../lib-font.js";
 import { testGSUB } from "./gsub/test-gsub.js";
 
 const font = new Font("athena ruby");
 
 describe("Basic font testing", () => {
-  beforeAll((done) => {
-    font.onerror = (err) => {
-      throw err;
-    };
-    font.onload = async () => done();
-    font.src = "./fonts/AthenaRuby_b018.ttf";
-  });
+  before(() => new Promise((resolve, reject) => {
+    font.onerror = (err) => reject(err);
+    font.onload = () => resolve();
+    const buffer = fs.readFileSync("./fonts/AthenaRuby_b018.ttf");
+    font.fromDataBuffer(Uint8Array.from(buffer).buffer, "AthenaRuby_b018.ttf");
+  }));
 
   test("font loaded", () => {
-    expect(font.opentype).toBeDefined();
+    assert.ok(font.opentype !== undefined);
   });
 
   test("GSUB format 3 variant access", () => {

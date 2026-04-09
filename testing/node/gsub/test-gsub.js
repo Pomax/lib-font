@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals";
+import assert from "node:assert";
 import { profiles } from "../font-profiles/profiles.js";
 
 function testGSUB(font, tests) {
@@ -6,47 +6,47 @@ function testGSUB(font, tests) {
 
   const { cmap, name, GSUB } = font.opentype.tables;
 
-  expect(GSUB).toBeDefined();
-  expect(cmap).toBeDefined();
-  expect(name).toBeDefined();
+  assert.ok(GSUB !== undefined);
+  assert.ok(cmap !== undefined);
+  assert.ok(name !== undefined);
 
   let scripts = GSUB.getSupportedScripts();
-  expect(scripts).toEqual(Object.keys(expectation));
+  assert.deepStrictEqual(scripts, Object.keys(expectation));
 
   scripts.forEach((script) => {
     tests.script.forEach(fn => fn(script));
 
     let langsys = GSUB.getSupportedLangSys(script);
 
-    expect(langsys).toEqual(expectation[script].langsys);
+    assert.deepStrictEqual(langsys, expectation[script].langsys);
 
     langsys.forEach((lang) => {
       let langSysTable = GSUB.getLangSysTable(script, lang);
       let features = GSUB.getFeatures(langSysTable);
       let featureCount = features.length;
 
-      expect(featureCount).toEqual(expectation[script].features[lang].length);
+      assert.deepStrictEqual(featureCount, expectation[script].features[lang].length);
 
       features.forEach((feature) => {
         tests.feature.forEach(fn => fn(feature));
 
         const lookupIDs = feature.lookupListIndices;
 
-        const test = {
+        const actual = {
           script,
           lang,
           feature: feature.featureTag,
           lookupIDs
         };
 
-        const match = {
+        const expected = {
           script,
           lang,
           feature: feature.featureTag,
           lookupIDs: expectation[script].features[lang].lookups[feature.featureTag]
         };
 
-        expect(test).toEqual(match);
+        assert.deepStrictEqual(actual, expected);
 
         lookupIDs.forEach((id) => {
           const lookup = GSUB.getLookup(id);
