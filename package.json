@@ -1,6 +1,6 @@
 {
   "name": "lib-font",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A JS based OpenType font inspector",
   "main": "./lib-font.js",
   "exports": "./lib-font.js",
