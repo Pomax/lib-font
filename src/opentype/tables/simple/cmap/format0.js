@@ -11,7 +11,7 @@ class Format0 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) {
+    if (charCode.codePointAt) {
       // TODO: FIXME: map this character to a number based on the Apple standard character to glyph mapping
       charCode = -1;
       console.warn(

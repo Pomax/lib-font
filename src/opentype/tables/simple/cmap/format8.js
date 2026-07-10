@@ -16,7 +16,7 @@ class Format8 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) {
+    if (charCode.codePointAt) {
       // TODO: FIXME: https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-8-mixed-16-bit-and-32-bit-coverage is kind of incredible
       charCode = -1;
       console.warn(

@@ -17,7 +17,7 @@ class Format10 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) {
+    if (charCode.codePointAt) {
       // TODO: FIXME: This can be anything, and depends on the Macintosh language indicated by this.language...
       charCode = -1;
       console.warn(
