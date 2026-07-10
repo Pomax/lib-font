@@ -6,6 +6,7 @@ const decoders = {
   mac: new TextDecoder(`macintosh`),
   shiftJIS: new TextDecoder(`shift-jis`),
   big5: new TextDecoder(`big5`),
+  utf16be: new TextDecoder(`utf-16be`),
 };
 
 /**
@@ -106,21 +107,15 @@ function decodeString(p, record) {
 
   if (length === 0) return ``;
 
-  // We decode strings for the Unicode/Microsoft platforms as UTF-16
+  // We decode strings for the Unicode/Microsoft platforms as UTF-16BE
   if (platformID === 0 || platformID === 3) {
-    const str = [];
-    for (let i = 0, e = length / 2; i < e; i++)
-      str[i] = String.fromCodePoint(p.uint16);
-    return str.join(``);
+    const bytes = p.readBytes(length);
+    return decoders.utf16be.decode(new Uint8Array(bytes));
   }
 
   // Everything else, we treat as plain bytes.
   const bytes = p.readBytes(length);
-  const str = [];
-  bytes.forEach(function (b, i) {
-    str[i] = String.fromCodePoint(b);
-  });
-  return str.join(``);
+  return bytes.map((b) => String.fromCodePoint(b)).join(``);
 
   // TODO: if someone wants to finesse this/implement all the other string encodings, have at it!
 }
