@@ -7,7 +7,7 @@ const startDate = new Date(`1904-01-01T00:00:00+0000`).getTime();
  */
 function asText(data) {
   return Array.from(data)
-    .map((v) => String.fromCharCode(v))
+    .map((v) => String.fromCodePoint(v))
     .join(``);
 }
 

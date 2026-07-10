@@ -25,7 +25,7 @@ class Format2 extends Subtable {
   }
 
   supports(charCode) {
-    if (charCode.charCodeAt) {
+    if (charCode.codePointAt) {
       // TODO: FIXME: consider implementing the correct mapping, https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-2-high-byte-mapping-through-table
       charCode = -1;
       console.warn(

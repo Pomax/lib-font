@@ -89,7 +89,7 @@ class Format4 extends Subtable {
   }
 
   getGlyphId(charCode) {
-    if (charCode.charCodeAt) charCode = charCode.charCodeAt(0);
+    if (charCode.codePointAt) charCode = charCode.codePointAt(0);
 
     // surrogate pair value?
     if (0xd800 <= charCode && charCode <= 0xdfff) return 0;

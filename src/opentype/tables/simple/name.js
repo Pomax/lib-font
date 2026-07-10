@@ -110,7 +110,7 @@ function decodeString(p, record) {
   if (platformID === 0 || platformID === 3) {
     const str = [];
     for (let i = 0, e = length / 2; i < e; i++)
-      str[i] = String.fromCharCode(p.uint16);
+      str[i] = String.fromCodePoint(p.uint16);
     return str.join(``);
   }
 
@@ -118,7 +118,7 @@ function decodeString(p, record) {
   const bytes = p.readBytes(length);
   const str = [];
   bytes.forEach(function (b, i) {
-    str[i] = String.fromCharCode(b);
+    str[i] = String.fromCodePoint(b);
   });
   return str.join(``);
 

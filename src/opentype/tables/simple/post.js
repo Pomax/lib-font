@@ -73,7 +73,7 @@ class post extends SimpleTable {
 
     this.parser.currentPosition = this.namesOffset + offset;
     const data = this.parser.readBytes(len, this.namesOffset + offset, 8, true);
-    return data.map((b) => String.fromCharCode(b)).join(``);
+    return data.map((b) => String.fromCodePoint(b)).join(``);
   }
 }
 
