@@ -58,4 +58,14 @@ describe(`cmap unit test`, async () => {
     const result = format4.reverse(3); // Lato's glyph for A
     assert(typeof result.unicode === "string");
   });
+
+  test(`reverse works for format 6`, async () => {
+    const font = await loadFontFromPath("Lato-Regular.ttf", "Lato");
+    const { cmap } = font.opentype.tables;
+    const format6 = cmap.getSubTable(1); // This table is a format 6 table
+    assert(format6.format === 6);
+
+    const result = format6.reverse(3); // Lato's glyph for A
+    assert(typeof result.unicode === "string");
+  });
 });
