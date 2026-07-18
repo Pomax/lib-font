@@ -31,7 +31,9 @@ class Format6 extends Subtable {
 
   reverse(glyphID) {
     let pos = this.glyphIdArray.indexOf(glyphID);
-    if (pos > -1) return this.firstCode + pos;
+    if (pos === -1) return {};
+    const code = this.firstCode + pos;
+    return { code, unicode: String.fromCodePoint(code) };
   }
 
   getSupportedCharCodes(preservePropNames = false) {
