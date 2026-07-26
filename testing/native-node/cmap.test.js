@@ -68,4 +68,20 @@ describe(`cmap unit test`, async () => {
     const result = format6.reverse(3); // Lato's glyph for A
     assert(typeof result.unicode === "string");
   });
+
+  test(`reverse works for format 12`, async () => {
+    const font = await loadFontFromPath("SourceCodePro/SourceCodePro-Regular.ttf", "Source Code Pro");
+    const { cmap } = font.opentype.tables;
+    const format12 = cmap.getSubTable(1);
+    assert(format12.format === 12);
+
+    // Start glyph is treated differently, explicitly test for it
+    const startGlyph = format12.groups[0].startGlyphID;
+    const startResult = format12.reverse(startGlyph);
+    assert(typeof startResult.unicode === "string");
+
+    // And test for a non-start glyph
+    const nonStartResult = format12.reverse(startGlyph + 1);
+    assert(typeof nonStartResult.unicode === "string");
+  });
 });

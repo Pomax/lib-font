@@ -50,7 +50,10 @@ class Format12 extends Subtable {
     for (let group of this.groups) {
       let start = group.startGlyphID;
       if (start > glyphID) continue;
-      if (start === glyphID) return group.startCharCode;
+      if (start === glyphID) {
+        const code = group.startCharCode;
+        return { code, unicode: String.fromCodePoint(code) };
+      }
       let end = start + (group.endCharCode - group.startCharCode);
       if (end < glyphID) continue;
       const code = group.startCharCode + (glyphID - start);
