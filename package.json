@@ -6,7 +6,7 @@
   "exports": "./lib-font.js",
   "type": "module",
   "author": "Pomax",
-  "license": "LICENSE.md",
+  "license": "MIT",
   "directories": {
     "lib": "lib",
     "src": "src"
