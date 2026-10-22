@@ -10,7 +10,7 @@ class hdmx extends SimpleTable {
     const { p } = super(dict, dataview);
     const numGlyphs = tables.hmtx.numGlyphs;
     this.version = p.uint16;
-    this.numRecords = p.int16;
+    const numRecords = (this.numRecords = p.int16);
     this.sizeDeviceRecord = p.int32;
     this.records = [...new Array(numRecords)].map(
       (_) => new DeviceRecord(p, numGlyphs)

@@ -1,10 +1,11 @@
 import { IndexSubHeader } from "../shared.js";
 import lazy from "../../../../../lazy.js";
+import { ParsedData } from "../../../../../parser.js";
 
 /**
  * IndexSubTable4: variable-metrics glyphs with sparse glyph codes
  */
-class Subtable4 {
+class Subtable4 extends ParsedData {
   constructor(p) {
     super(p);
 

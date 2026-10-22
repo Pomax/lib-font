@@ -1,9 +1,10 @@
+import { ParsedData } from "../../../../../parser.js";
 import { IndexSubHeader } from "../shared.js";
 
 /**
  * IndexSubTable1: variable-metrics glyphs with 4-byte offsets
  */
-class Subtable1 {
+class Subtable1 extends ParsedData {
   constructor(p) {
     super(p);
     this.header = new IndexSubHeader(p);

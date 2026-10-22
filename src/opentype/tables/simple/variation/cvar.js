@@ -9,13 +9,13 @@ import lazy from "../../../../lazy.js";
 class cvar extends SimpleTable {
   constructor(dict, dataview) {
     const { p } = super(dict, dataview);
-    this.majorVersion = uint16;
-    this.minorVersion = uint16;
-    this.tupleVariationCount = uint16;
+    this.majorVersion = p.uint16;
+    this.minorVersion = p.uint16;
+    this.tupleVariationCount = p.uint16;
     this.dataOffset = p.Offset32; // from the start of the table
 
     // FIXME: this is only correct if we can properly read full Tuple Variation Header...
-    lazy(this`tupleVariationHeaders`, () =>
+    lazy(this, `tupleVariationHeaders`, () =>
       [...new Array(this.tupleVariationCount)].map(
         (_) => new TupleVariationHeader(p)
       )
@@ -43,13 +43,13 @@ class TupleVariationHeader {
   }
 
   get EMBEDDED_PEAK_TUPLE() {
-    return this.tupleIndex & (0x8000 === 0x8000);
+    return (this.tupleIndex & 0x8000) === 0x8000;
   }
   get INTERMEDIATE_REGION() {
-    return this.tupleIndex & (0x4000 === 0x4000);
+    return (this.tupleIndex & 0x4000) === 0x4000;
   }
   get PRIVATE_POINT_NUMBERS() {
-    return this.tupleIndex & (0x2000 === 0x2000);
+    return (this.tupleIndex & 0x2000) === 0x2000;
   }
   get realTupleIndex() {
     return this.tupleIndex & 0xfff;

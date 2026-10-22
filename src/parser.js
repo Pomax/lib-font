@@ -2,8 +2,6 @@ const startDate = new Date(`1904-01-01T00:00:00+0000`).getTime();
 
 /**
  * Convert an array of uint8 char into a proper string.
- *
- * @param {uint8[]} data
  */
 function asText(data) {
   return Array.from(data)
@@ -21,23 +19,6 @@ class Parser {
     this.start = dict.offset;
     this.offset = 0;
     this.data = dataview;
-
-    [
-      `getInt8`,
-      `getUint8`,
-      `getInt16`,
-      `getUint16`,
-      `getInt32`,
-      `getUint32`,
-      `getBigInt64`,
-      `getBigUint64`,
-    ].forEach((name) => {
-      let fn = name.replace(/get(Big)?/, "").toLowerCase();
-      let increment = parseInt(name.replace(/[^\d]/g, "")) / 8;
-      Object.defineProperty(this, fn, {
-        get: () => this.getValue(name, increment),
-      });
-    });
   }
 
   get currentPosition() {
@@ -86,7 +67,7 @@ class Parser {
 
   get fixed() {
     let major = this.int16;
-    let minor = Math.round((1000 * this.uint16) / 65356);
+    let minor = Math.round((1000 * this.uint16) / 2 ** 16);
     return major + minor / 1000;
   }
 
@@ -97,9 +78,41 @@ class Parser {
     return parseFloat(`${major}.${minor}`);
   }
 
+  get int8() {
+    return this.getValue(`getInt8`, 1);
+  }
+
+  get uint8() {
+    return this.getValue(`getUint8`, 1);
+  }
+
+  get int16() {
+    return this.getValue(`getInt16`, 2);
+  }
+
+  get uint16() {
+    return this.getValue(`getUint16`, 2);
+  }
+
   get uint24() {
     // Why does DataView not have a 24 bit value getters?
     return (this.uint8 << 16) + (this.uint8 << 8) + this.uint8;
+  }
+
+  get int32() {
+    return this.getValue(`getInt32`, 4);
+  }
+
+  get uint32() {
+    return this.getValue(`getUint32`, 4);
+  }
+
+  get int64() {
+    return this.getValue(`getBigInt64`, 8);
+  }
+
+  get uint64() {
+    return this.getValue(`getBigUint64`, 8);
   }
 
   get uint128() {
@@ -135,7 +148,7 @@ class Parser {
 
   // "that weird datatype"
   get F2DOT14() {
-    const bits = p.uint16;
+    const bits = this.uint16;
     const integer = [0, 1, -2, -1][bits >> 14];
     const fraction = bits & 0x3fff;
     return integer + fraction / 16384;
@@ -180,7 +193,7 @@ class ParsedData {
 
   load(struct) {
     Object.keys(struct).forEach((p) => {
-      let props = Object.getOwnPropertyDescriptor(struct, p);
+      let props = Object.getOwnPropertyDescriptor(struct, p) ?? {};
       if (props.get) {
         this[p] = props.get.bind(this);
       } else if (props.value !== undefined) {

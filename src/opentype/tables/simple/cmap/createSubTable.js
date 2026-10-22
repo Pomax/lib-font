@@ -12,8 +12,6 @@ import { Format14 } from "./format14.js";
 
 /**
  * Cmap Subtable factory
- * @param {int} format the subtable format number (see https://docs.microsoft.com/en-us/typography/opentype/spec/cmap#format-0-byte-encoding-table onward)
- * @param {parser} parser a parser already pointing at the subtable's data location, right after reading the `format` uint16.
  */
 export default function createSubTable(parser, platformID, encodingID) {
   const format = parser.uint16;

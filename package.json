@@ -19,11 +19,12 @@
     "terser": "terser lib-font.browser.js -o lib-font.browser.js",
     "test:browser": "run-p test:server test:playwright",
     "test:cleanup": "rm -rf ./test-results",
+    "test:lint": "node run-tsc.js",
     "test:node": "node --test \"./testing/node/**/*.test.js\" \"./testing/native-node/**/*.js\"",
     "test:manual": "http-server -o testing/manual/index.html",
     "test:playwright": "playwright test ./testing/browser/playwright.test.js",
     "test:server": "node ./testing/browser/server.js",
-    "test": "run-s clean test:node bundle test:browser test:cleanup"
+    "test": "run-s clean test:lint test:node bundle test:browser test:cleanup"
   },
   "repository": {
     "type": "git",
@@ -43,12 +44,14 @@
   "homepage": "https://github.com/Pomax/lib-font#readme",
   "devDependencies": {
     "@playwright/test": "^1.56.1",
+    "@types/node": "^26.6.5",
     "express": "^4.17.1",
     "http-server": "^0.12.3",
     "npm-run-all": "^4.1.5",
     "open-cli": "^6.0.1",
     "prettier": "^2.1.1",
     "rollup": "^2.53.0",
-    "terser": "^5.7.1"
+    "terser": "^5.7.1",
+    "typescript": "^7.0.2"
   }
 }
