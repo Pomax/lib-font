@@ -1,9 +1,10 @@
+import { ParsedData } from "../../../../../parser.js";
 import { IndexSubHeader, BigGlyphMetrics } from "../shared.js";
 
 /**
  * IndexSubTable2: all glyphs have identical metrics
  */
-class Subtable2 {
+class Subtable2 extends ParsedData {
   constructor(p) {
     super(p);
     this.header = new IndexSubHeader(p);
