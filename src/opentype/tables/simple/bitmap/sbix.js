@@ -30,6 +30,7 @@ class sbix extends SimpleTable {
 
 class Strike extends ParsedData {
   constructor(p, numGlyphs) {
+    super(p);
     this.ppem = p.uint16;
     this.ppi = p.uint16;
     lazy(this, `glyphDataOffsets`, () =>

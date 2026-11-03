@@ -21,8 +21,8 @@ class loca extends SimpleTable {
   }
 
   getGlyphDataOffsetAndLength(glyphID) {
-    let offset = this.offsets[glyphID] * this.x2 ? 2 : 1;
-    let nextOffset = this.offsets[glyphID + 1] * this.x2 ? 2 : 1;
+    let offset = this.offsets[glyphID] * (this.x2 ? 2 : 1);
+    let nextOffset = this.offsets[glyphID + 1] * (this.x2 ? 2 : 1);
     return { offset, length: nextOffset - offset };
   }
 }

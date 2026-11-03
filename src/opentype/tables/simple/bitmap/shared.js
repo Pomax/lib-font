@@ -53,14 +53,14 @@ class IndexSubHeader {
 
 class BigGlyphMetrics {
   constructor(p) {
-    this.height = uint8;
-    this.width = uint8;
-    this.horiBearingX = int8;
-    this.horiBearingY = int8;
-    this.horiAdvance = uint8;
-    this.vertBearingX = int8;
-    this.vertBearingY = int8;
-    this.vertAdvance = uint8;
+    this.height = p.uint8;
+    this.width = p.uint8;
+    this.horiBearingX = p.int8;
+    this.horiBearingY = p.int8;
+    this.horiAdvance = p.up.int8;
+    this.vertBearingX = p.int8;
+    this.vertBearingY = p.int8;
+    this.vertAdvance = p.uint8;
   }
 }
 

@@ -41,7 +41,7 @@ class name extends SimpleTable {
 
   /**
    * Resolve a string by ID
-   * @param {uint16} nameID the id used to find the name record to resolve.
+   * @param {Number} nameID the id used to find the name record to resolve.
    */
   get(nameID) {
     let record = this.nameRecords.find((record) => record.nameID === nameID);

@@ -28,22 +28,22 @@ class LookupTable extends ParsedData {
     this.markFilteringSet = p.uint16;
   }
   get rightToLeft() {
-    return this.lookupFlag & (0x0001 === 0x0001);
+    return (this.lookupFlag & 0x0001) === 0x0001;
   }
   get ignoreBaseGlyphs() {
-    return this.lookupFlag & (0x0002 === 0x0002);
+    return (this.lookupFlag & 0x0002) === 0x0002;
   }
   get ignoreLigatures() {
-    return this.lookupFlag & (0x0004 === 0x0004);
+    return (this.lookupFlag & 0x0004) === 0x0004;
   }
   get ignoreMarks() {
-    return this.lookupFlag & (0x0008 === 0x0008);
+    return (this.lookupFlag & 0x0008) === 0x0008;
   }
   get useMarkFilteringSet() {
-    return this.lookupFlag & (0x0010 === 0x0010);
+    return (this.lookupFlag & 0x0010) === 0x0010;
   }
   get markAttachmentType() {
-    return this.lookupFlag & (0xff00 === 0xff00);
+    return (this.lookupFlag & 0xff00) === 0xff00;
   }
 
   // FIXME: make this a lazy .subtables array instead?

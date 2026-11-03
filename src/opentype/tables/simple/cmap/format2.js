@@ -2,6 +2,9 @@ import lazy from "../../../../lazy.js";
 import { Subtable } from "./subtable.js";
 
 class Format2 extends Subtable {
+  subHeaders;
+  glyphIndexArray;
+
   constructor(p, platformID, encodingID) {
     super(p, platformID, encodingID);
     this.format = 2;

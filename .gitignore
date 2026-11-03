@@ -6,3 +6,4 @@ test.js
 fonts/proprietary
 test-results
 *.ttx
+.claude/state

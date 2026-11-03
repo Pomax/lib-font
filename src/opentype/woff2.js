@@ -5,7 +5,8 @@ const brotliDecode = globalThis.unbrotli;
 let nativeBrotliDecode = undefined;
 
 if (!brotliDecode) {
-  import("zlib").then((zlib) => {
+  // @ts-ignore
+  import(`node:zlib`).then((zlib) => {
     nativeBrotliDecode = (buffer) => zlib.brotliDecompressSync(buffer);
   });
 }
@@ -111,10 +112,6 @@ class Woff2TableDirectoryEntry {
  * woff2 font, so that accessing a table via the
  * font.opentype.tables.tableName property kicks off
  * a table parse on first access.
- *
- * @param {*} woff2 the woff2 font object
- * @param {decoded} the original (decompressed) SFNT data
- * @param {createTable} the opentype table builder function
  */
 function buildWoff2LazyLookups(woff2, decoded, createTable) {
   woff2.tables = {};

@@ -53,6 +53,7 @@ class COLR extends SimpleTable {
   }
 
   getLayers(glyphID) {
+    const { p } = this;
     let record = this.getBaseGlyphRecord(glyphID);
     this.parser.currentPosition =
       this.tableStart + this.layerRecordsOffset + 4 * record.firstLayerIndex;

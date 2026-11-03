@@ -6,6 +6,7 @@ import {
 } from "./advanced/shared/script.js";
 import { FeatureList, FeatureTable } from "./advanced/shared/feature.js";
 import { LookupList, LookupTable } from "./advanced/shared/lookup.js";
+import { FeatureVariations } from "./advanced/shared/featurevariations.js";
 import lazy from "../../lazy.js";
 
 /**
@@ -51,8 +52,6 @@ class CommonLayoutTable extends SimpleTable {
       p.currentPosition = tableStart + this.lookupListOffset;
       return new LookupList(p);
     });
-
-    // FIXME: This class doesn't actually exist anywhere in the code...
 
     if (this.featureVariationsOffset) {
       lazy(this, `featureVariations`, () => {

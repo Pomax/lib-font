@@ -1,10 +1,11 @@
 import { IndexSubHeader, BigGlyphMetrics } from "../shared.js";
 import lazy from "../../../../../lazy.js";
+import { ParsedData } from "../../../../../parser.js";
 
 /**
  * IndexSubTable5: constant-metrics glyphs with sparse glyph codes
  */
-class Subtable5 {
+class Subtable5 extends ParsedData {
   constructor(p) {
     super(p);
 

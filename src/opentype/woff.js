@@ -5,7 +5,8 @@ const gzipDecode = globalThis.pako ? globalThis.pako.inflate : undefined;
 let nativeGzipDecode = undefined;
 
 if (!gzipDecode) {
-  import("zlib").then((zlib) => {
+  // @ts-ignore
+  import(`node:zlib`).then((zlib) => {
     nativeGzipDecode = (buffer) => zlib.unzipSync(buffer);
   });
 }
@@ -20,6 +21,7 @@ class WOFF extends SimpleTable {
   constructor(font, dataview, createTable) {
     const { p } = super({ offset: 0, length: 44 }, dataview, `woff`);
 
+    this.font = font;
     this.signature = p.tag;
     this.flavor = p.uint32;
     this.length = p.uint32;
@@ -61,12 +63,9 @@ class WoffTableDirectoryEntry {
  * woff/woff2 font, so that accessing a table via the
  * woff.tables.tableName or woff2.tables.tableName
  * property kicks off a table parse on first access.
- *
- * @param {*} woff the woff or woff2 font object
- * @param {DataView} dataview passed when dealing with woff
- * @param {buffer} decoded passed when dealing with woff2
  */
 function buildWoffLazyLookups(woff, dataview, createTable) {
+  const { font } = this;
   woff.tables = {};
   woff.directory.forEach((entry) => {
     lazy(woff.tables, entry.tag.trim(), () => {
@@ -86,7 +85,7 @@ function buildWoffLazyLookups(woff, dataview, createTable) {
           unpacked = nativeGzipDecode(new Uint8Array(data));
         } else {
           const msg = `no brotli decoder available to decode WOFF2 font`;
-          if (font.onerror) font.onerror(msg);
+          if (font?.onerror) font.onerror(msg);
           throw new Error(msg);
         }
 
