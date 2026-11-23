@@ -65,7 +65,7 @@ class WoffTableDirectoryEntry {
  * property kicks off a table parse on first access.
  */
 function buildWoffLazyLookups(woff, dataview, createTable) {
-  const { font } = this;
+  const { font } = woff;
   woff.tables = {};
   woff.directory.forEach((entry) => {
     lazy(woff.tables, entry.tag.trim(), () => {
